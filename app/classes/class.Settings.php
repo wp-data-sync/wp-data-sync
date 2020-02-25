@@ -58,6 +58,9 @@ class Settings {
 		add_action( 'admin_init', [ $this, 'register_settings' ], 2 );
 		add_action( 'admin_menu', [ $this, 'add_pages' ], 5 );
 
+		// Delete log files on setting change.
+		add_action( 'update_option_wp_data_sync_allow_logging', array( $this, 'delete_log_files' ), 10, 2 );
+
 	}
 
 	/**
@@ -361,6 +364,25 @@ class Settings {
 
 		return isset( $args['value'] ) ? $args['value'] :
 			isset ( $args['key'] ) ? get_option( $args['key'], '' ) : '';
+
+	}
+
+	/**
+	 * Delete log files on setting saved.
+	 *
+	 * @param $old_value
+	 * @param $value
+	 */
+
+	public function delete_log_files( $old_value, $value ) {
+
+		if ( 'checked' !== $value ) {
+
+			foreach ( glob( WP_DATA_SYNC_LOG_DIR . '*.log' ) as $file ) {
+				unlink( $file );
+			}
+
+		}
 
 	}
 
