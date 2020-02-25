@@ -63,7 +63,7 @@ class KeyRequest extends Core {
 				'args'    => [
 					'access_token' => [
 						'sanitize_callback' => 'sanitize_text_field',
-						'validate_callback' => [ $this, 'access_token' ]
+						'validate_callback' => [ $this, 'access_key' ]
 					]
 				],
 				'permission_callback' => [ $this, 'access' ],

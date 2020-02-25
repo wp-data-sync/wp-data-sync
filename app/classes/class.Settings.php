@@ -110,8 +110,8 @@ class Settings {
 				]
 			],
 			10 => (object) [
-				'key' 		=> 'wp_data_sync_access_token',
-				'label'		=> __( 'API Access Token' ),
+				'key' 		=> 'wp_data_sync_access_key',
+				'label'		=> __( 'API Access Key' ),
 				'callback'  => 'input',
 				'args'      => [
 					'sanitize_callback' => 'sanitize_key',
@@ -122,8 +122,8 @@ class Settings {
 				]
 			],
 			20 => (object) [
-				'key' 		=> 'wp_data_sync_access_secret',
-				'label'		=> __( 'API Access Secret' ),
+				'key' 		=> 'wp_data_sync_private_key',
+				'label'		=> __( 'API Private Key' ),
 				'callback'  => 'input',
 				'args'      => [
 					'sanitize_callback' => 'sanitize_key',

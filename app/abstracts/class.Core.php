@@ -29,18 +29,8 @@ abstract class Core {
 
 				Log::write( 'access-attempt', "Referer Approved: $referer" );
 
-				if ( $access_token = $this->access_token() ) {
-
-					Log::write( 'access-attempt', "Access Token Captured: $access_token" );
-
-					if ( $access_token === get_option( 'wp_data_sync_access_secret' ) ) {
-
-						Log::write( 'access-attempt', "Access Token Approved: $access_token" );
-
-						return TRUE;
-
-					}
-
+				if ( $this->private_key() ) {
+					return TRUE;
 				}
 
 			}
@@ -52,20 +42,58 @@ abstract class Core {
 	}
 
 	/**
-	 * Get the HTTP access_token header.
+	 * Verify the access_key.
 	 *
 	 * @return bool|string
 	 */
 
-	public function access_token() {
+	public function access_key( $param ) {
 
-		$access_token = sanitize_text_field( $_SERVER['HTTP_AUTHENTICATION'] );
+		$access_key = sanitize_key( $param );
 
-		$access_token = empty( $access_token ) ? FALSE : $access_token;
+		$access_key = empty( $access_key ) ? FALSE : $access_key;
 
-		Log::write( 'access-attempt', "Access Token Available: $access_token" );
+		$local_key = get_option( 'wp_data_sync_access_key' );
 
-		return $access_token;
+		Log::write( 'access-attempt', "Access Key Available" );
+
+		if ( $access_key && $access_key === $local_key ) {
+
+			Log::write( 'access-attempt', "Access Key Approved" );
+
+			return TRUE;
+
+		}
+
+		return FALSE;
+
+	}
+
+	/**
+	 * Verify private key.
+	 *
+	 * @return bool
+	 */
+
+	public function private_key() {
+
+		$private_key = sanitize_key( $_SERVER['HTTP_AUTHENTICATION'] );
+
+		$private_key = empty( $private_key ) ? FALSE : $private_key;
+
+		$local_key = get_option( 'wp_data_sync_private_key' );
+
+		Log::write( 'access-attempt', "Private Key Available" );
+
+		if ( $private_key && $private_key === $local_key ) {
+
+			Log::write( 'access-attempt', "Private Key Approved" );
+
+			return TRUE;
+
+		}
+
+		return FALSE;
 
 	}
 
