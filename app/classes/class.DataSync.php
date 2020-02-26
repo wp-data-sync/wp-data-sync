@@ -388,19 +388,6 @@ class DataSync {
 
 		}
 
-		$upload_dir = wp_upload_dir();
-
-		if( wp_mkdir_p( $upload_dir['path'] ) ) {
-
-			$file = "{$upload_dir['path']}/{$basename}";
-
-		}
-		else {
-
-			$file = "{$upload_dir['basedir']}/{$basename}";
-
-		}
-
 		Log::write( 'attachemnt-file', $image_url );
 
 		$file_type = wp_check_filetype( $basename );
@@ -409,8 +396,11 @@ class DataSync {
 
 			if ( $image_data = $this->fetch_image_data( $image_url ) ) {
 
+				$upload_dir = wp_upload_dir();
+				$file_path  = file_path( $upload_dir, $basename );
+
 				// Copy the image to image upload dir
-				file_put_contents( $file, $image_data );
+				file_put_contents( $file_path, $image_data );
 
 				$attachment = [
 					'guid'           => "{$upload_dir['url']}/{$basename}",
@@ -421,10 +411,10 @@ class DataSync {
 				];
 
 				// Insert featured image data
-				$attach_id = wp_insert_attachment( $attachment, $file, $post_id );
+				$attach_id = wp_insert_attachment( $attachment, $file_path, $post_id );
 
 				// Get metadata for featured image
-				$attach_data = wp_generate_attachment_metadata( $attach_id, $file );
+				$attach_data = wp_generate_attachment_metadata( $attach_id, $file_path );
 
 				// Update metadata
 				wp_update_attachment_metadata( $attach_id, $attach_data );
@@ -458,6 +448,25 @@ class DataSync {
 		}
 
 		return FALSE;
+
+	}
+
+	/**
+	 * File path.
+	 *
+	 * @param $upload_dir
+	 * @param $basename
+	 *
+	 * @return string
+	 */
+
+	public function file_path( $upload_dir, $basename ) {
+
+		if( wp_mkdir_p( $upload_dir['path'] ) ) {
+			return "{$upload_dir['path']}/{$basename}";
+		}
+
+		return "{$upload_dir['basedir']}/{$basename}";
 
 	}
 
