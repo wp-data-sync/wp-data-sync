@@ -4,8 +4,8 @@
  * Plugin URI:  https://wpdatasync.com
  * Description: Sync raw data from WP Data Sync API to your WordPress website
  * Version:     1.0
- * Author:      KevinBrent
- * Author URI:  https://kevinbrent.com
+ * Author:      WP Data Sync
+ * Author URI:  https://wpdatasync.com/about-the-developer/
  * License:     GPL2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: wp-data-sync

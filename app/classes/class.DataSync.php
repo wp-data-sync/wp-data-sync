@@ -354,22 +354,15 @@ class DataSync {
 
 	public function post_thumbnail( $post_id, $post_thumbnail ) {
 
-		$attach_id = $this->attachment( $post_id, $post_thumbnail );
+		if ( $attach_id = $this->attachment( $post_id, $post_thumbnail ) ) {
 
-		set_post_thumbnail( $post_id, $attach_id );
+			set_post_thumbnail( $post_id, $attach_id );
 
-		do_action( 'wp_data_sync_post_thumbnail', $post_id, $post_thumbnail );
+			do_action( 'wp_data_sync_post_thumbnail', $post_id, $post_thumbnail );
+
+		}
 
 	}
-
-	/**
-	 * Attachment.
-	 *
-	 * @param $post_id
-	 * @param $image_url
-	 *
-	 * @return int|\WP_Error
-	 */
 
 	public function attachment( $post_id, $image_url ) {
 
@@ -401,31 +394,53 @@ class DataSync {
 
 		Log::write( 'attachemnt-file', $image_url );
 
-		$image_data = file_get_contents( $image_url );
-
-		// Copy the image to image upload dir
-		file_put_contents( $file, $image_data );
-
 		$file_type = wp_check_filetype( $basename );
 
-		$attachment = [
-			'guid'           => "{$upload_dir['url']}/{$basename}",
-			'post_mime_type' => $file_type['type'],
-			'post_title'     => $post_title,
-			'post_content'   => '',
-			'post_status'    => 'inherit'
-		];
+		if ( FALSE !== strpos( $file_type['type'], 'image' ) ) {
 
-		// Insert featured image data
-		$attach_id = wp_insert_attachment( $attachment, $file, $post_id );
+			if ( $image_data = $this->fetch_image_data( $image_url ) ) {
 
-		// Get metadata for featured image
-		$attach_data = wp_generate_attachment_metadata( $attach_id, $file );
+				// Copy the image to image upload dir
+				file_put_contents( $file, $image_data );
 
-		// Update metadata
-		wp_update_attachment_metadata( $attach_id, $attach_data );
+				$attachment = [
+					'guid'           => "{$upload_dir['url']}/{$basename}",
+					'post_mime_type' => $file_type['type'],
+					'post_title'     => $post_title,
+					'post_content'   => '',
+					'post_status'    => 'inherit'
+				];
 
-		return $attach_id;
+				// Insert featured image data
+				$attach_id = wp_insert_attachment( $attachment, $file, $post_id );
+
+				// Get metadata for featured image
+				$attach_data = wp_generate_attachment_metadata( $attach_id, $file );
+
+				// Update metadata
+				wp_update_attachment_metadata( $attach_id, $attach_data );
+
+				return $attach_id;
+
+			}
+
+		}
+
+		return FALSE;
+
+	}
+
+	public function fetch_image_data( $image_url ) {
+
+		if ( $response = wp_remote_get( $image_url ) ) {
+
+			if ( 200 === wp_remote_retrieve_response_code( $response ) ) {
+				return wp_remote_retrieve_body( $response );
+			}
+
+		}
+
+		return FALSE;
 
 	}
 

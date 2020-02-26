@@ -179,7 +179,13 @@ class SyncRequest extends Core {
 			$sanitize_callback = 'html';
 		}
 
-		return apply_filters( 'wp_data_sync_sanitize_callback', $sanitize_callback );
+		if ( 'post_thumbnail' === $key || 'gallery_image_' === substr( $key, 0, 14 ) ) {
+			$sanitize_callback = 'url';
+		}
+
+		Log::write( 'sanitize-callback', "$key - $sanitize_callback" );
+
+		return apply_filters( 'wp_data_sync_sanitize_callback', $sanitize_callback, $key );
 
 	}
 
