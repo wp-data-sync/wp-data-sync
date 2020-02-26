@@ -364,6 +364,15 @@ class DataSync {
 
 	}
 
+	/**
+	 * Attachment.
+	 *
+	 * @param $post_id
+	 * @param $image_url
+	 *
+	 * @return bool|int|\WP_Error|\WP_Post
+	 */
+
 	public function attachment( $post_id, $image_url ) {
 
 		require_once( ABSPATH . 'wp-admin/includes/image.php' );
@@ -429,6 +438,14 @@ class DataSync {
 		return FALSE;
 
 	}
+
+	/**
+	 * Fetch image data from an image url.
+	 *
+	 * @param $image_url
+	 *
+	 * @return bool|string
+	 */
 
 	public function fetch_image_data( $image_url ) {
 
