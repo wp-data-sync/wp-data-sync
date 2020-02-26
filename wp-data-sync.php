@@ -16,11 +16,13 @@
 
 namespace WP_DataSync;
 
+$uploads = wp_get_upload_dir();
+
 $defines = [
 	'WP_DATA_SYNC_VERSION' => '1.0.0',
 	'WP_DATA_SYNC_CAP'     => 'manage_options',
 	'WP_DATA_SYNC_VIEWS'   => plugin_dir_path( __FILE__ ) . 'views/',
-	'WP_DATA_SYNC_LOG_DIR' => ABSPATH . 'wp-content/uploads/wp-data-sync-logs/'
+	'WP_DATA_SYNC_LOG_DIR' => $uploads['basedir'] . '/wp-data-sync-logs/'
 ];
 
 foreach ( $defines as $define => $value ) {
