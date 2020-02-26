@@ -397,7 +397,7 @@ class DataSync {
 			if ( $image_data = $this->fetch_image_data( $image_url ) ) {
 
 				$upload_dir = wp_upload_dir();
-				$file_path  = file_path( $upload_dir, $basename );
+				$file_path  = $this->file_path( $upload_dir, $basename );
 
 				// Copy the image to image upload dir
 				file_put_contents( $file_path, $image_data );
