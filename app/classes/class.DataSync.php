@@ -210,7 +210,7 @@ class DataSync {
 
 	public function insert_post( $post_object ) {
 
-		do_action( 'wp_data_sync_before_insert_post', $post_id, $post_object );
+		do_action( 'wp_data_sync_before_insert_post', $post_object );
 
 		if ( $post_id = wp_insert_post( $post_object ) ) {
 
@@ -510,7 +510,7 @@ class DataSync {
 
 		$basename = sanitize_file_name( basename( $image_url  ) );
 
-		return apply_filters( 'wp_data_sync_basename', $basename );
+		return apply_filters( 'wp_data_sync_basename', $basename, $post_id );
 
 	}
 

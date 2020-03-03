@@ -42,4 +42,7 @@ Yes. We have [Developer Documentation](https://wpdatasync.com/documentation/ "De
 = 1.0 =
 * Initial commit
 
+= 1.0.1 =
+* Tweek - Adjust the args for action and filter hooks
+
 == Upgrade Notice ==

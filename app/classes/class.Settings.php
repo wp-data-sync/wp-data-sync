@@ -332,7 +332,7 @@ class Settings {
 
 		$view = WP_DATA_SYNC_VIEWS . "{$name}.php";
 
-		return apply_filters( 'wp_data_sync_view', $view );
+		return apply_filters( 'wp_data_sync_view', $view, $name );
 
 	}
 
