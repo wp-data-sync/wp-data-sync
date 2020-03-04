@@ -17,6 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<h1 class="wp-data-sync-admin-h1"><?php _e( 'WP Data Sync', 'wp-data-sync' ); ?></h1>
 
+	<?php do_action( 'wp_data_sync_help_buttons' ); ?>
+
 	<form method="post" action="options.php">
 
 		<table class="form-table">

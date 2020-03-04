@@ -3,7 +3,7 @@
  * Plugin Name: WP Data Sync
  * Plugin URI:  https://wpdatasync.com/products/
  * Description: Sync raw data from WP Data Sync API to your WordPress website
- * Version:     1.0.1
+ * Version:     1.0.2
  * Author:      WP Data Sync
  * Author URI:  https://wpdatasync.com
  * License:     GPL2
@@ -19,8 +19,9 @@ namespace WP_DataSync;
 $uploads = wp_get_upload_dir();
 
 $defines = [
-	'WP_DATA_SYNC_VERSION' => '1.0.1',
+	'WP_DATA_SYNC_VERSION' => '1.0.2',
 	'WP_DATA_SYNC_CAP'     => 'manage_options',
+	'WP_DATA_SYNC_PLUGIN'  => plugin_basename( __FILE__ ),
 	'WP_DATA_SYNC_VIEWS'   => plugin_dir_path( __FILE__ ) . 'views/',
 	'WP_DATA_SYNC_LOG_DIR' => $uploads['basedir'] . '/wp-data-sync-logs/'
 ];

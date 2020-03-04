@@ -57,9 +57,10 @@ class Settings {
 
 		add_action( 'admin_init', [ $this, 'register_settings' ], 2 );
 		add_action( 'admin_menu', [ $this, 'add_pages' ], 5 );
+		add_action( 'wp_data_sync_help_buttons', [ $this, 'help_buttons' ] );
 
 		// Delete log files on setting change.
-		add_action( 'update_option_wp_data_sync_allow_logging', array( $this, 'delete_log_files' ), 10, 2 );
+		add_action( 'update_option_wp_data_sync_allow_logging', [ $this, 'delete_log_files' ], 10, 2 );
 
 	}
 
@@ -382,6 +383,18 @@ class Settings {
 				unlink( $file );
 			}
 
+		}
+
+	}
+
+	/**
+	 * Help buttons.
+	 */
+
+	public function help_buttons() {
+
+		if ( $view = $this->view( 'settings/help-buttons' ) ) {
+			include $view;
 		}
 
 	}
