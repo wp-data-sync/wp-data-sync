@@ -53,9 +53,6 @@ class DataSync {
 
 	public function process( $data ) {
 
-		// Filter the data before processing.
-		$data = apply_filters( 'wp_data_sync_data', $data );
-
 		/**
 		 * Extract
 		 *

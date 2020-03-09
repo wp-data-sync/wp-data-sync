@@ -60,3 +60,5 @@ Yes. We have WordPress hooks and filters throughout the plugin to allow for almo
 == Change Log ==
 
 [Change Log](https://wpdatasync.com/plugin/wp-data-sync/ "Change Log")
+
+== Upgrade Notice ==

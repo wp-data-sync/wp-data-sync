@@ -86,10 +86,7 @@ class SyncRequest extends Core {
 		$start_request = microtime();
 
 		$raw_data = $request->get_params();
-		Log::write( 'request-raw-data', $raw_data );
-
-		$data     = $this->sanitize_request( $raw_data );
-		Log::write( 'clean-data', $data );
+		$data     = $this->request_data( $raw_data );
 
 		$sync     = DataSync::instance();
 		$response = $sync->process( $data );
@@ -98,6 +95,26 @@ class SyncRequest extends Core {
 		Log::write( 'sync-request-response', $response );
 
 		return rest_ensure_response( $response );
+
+	}
+
+	/**
+	 * Request data.
+	 *
+	 * @param $raw_data
+	 *
+	 * @return mixed|void
+	 */
+
+	public function request_data( $raw_data ) {
+
+		Log::write( 'request-raw-data', $raw_data );
+
+		$data = $this->sanitize_request( $raw_data );
+
+		Log::write( 'request-data', $data );
+
+		return apply_filters( 'wp_data_sync_data', $data );
 
 	}
 
