@@ -56,3 +56,7 @@ Yes. We have WordPress hooks and filters throughout the plugin to allow for almo
 == Screenshots ==
 
 1. WP Data Sync: Take the headache out of syncing raw data into your WordPress website.
+
+== Change Log ==
+
+[Change Log](https://wpdatasync.com/plugin/wp-data-sync/ "Change Log")
