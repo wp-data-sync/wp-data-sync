@@ -65,55 +65,39 @@ class DataSync {
 
 		extract( $data );
 
-		// Map in the post object defaults.
-		$post_object = $this->post_object_defaults( $post_object );
-		$post_object = $this->post_date_format( $post_object );
-
 		// A post object is required!!
 		if ( empty( $post_object ) ) {
-
-			Log::write( 'empty-post-object', $data );
-
-			die( __( 'A valid post object is required!!' ) );
-
+			return [ 'post_object' => 'Empty post object' ];
 		}
 
 		// Check to see if we already have this post.
-		if ( $post_id = $this->post_exists( $data_sync_id ) ) {
+		$post_object = $this->post_id( $post_object, $data_sync_id );
+		$post_object = $this->post_object_defaults( $post_object );
+		$post_object = $this->post_date_format( $post_object );
 
-			if ( $this->maybe_trash_post( $post_object, $post_id ) ) {
-				return [ 'post_id' => $post_id ];
+		if ( $this->maybe_trash_post( $post_object ) ) {
+			return [ 'post_object' => 'Trash Post' ];
+		}
+
+		if ( $post_id = $this->post_object( $post_object ) ) {
+
+			if ( isset( $post_meta ) ) {
+				$this->post_meta( $post_id, $post_meta );
 			}
 
-			$post_id = $this->update_post( $post_object, $post_id );
+			if ( isset( $taxonomies ) ) {
+				$this->taxonomy( $post_id, $taxonomies );
+			}
 
-		} else {
+			if ( isset( $post_thumbnail ) ) {
+				$this->post_thumbnail( $post_id, $post_thumbnail );
+			}
 
-			$post_id = $this->insert_post( $post_object );
+			do_action( 'wp_data_sync_after_process', $post_id, $data );
 
-			update_post_meta( $post_id, 'data_sync_id', $data_sync_id );;
+			return [ 'post_id' => $post_id ];
 
 		}
-
-		if ( ! $post_id ) {
-			return;
-		}
-
-		if ( isset( $post_meta ) ) {
-			$this->post_meta( $post_id, $post_meta );
-		}
-
-		if ( isset(  $taxonomies ) ) {
-			$this->taxonomy( $post_id, $taxonomies );
-		}
-
-		if ( isset(  $post_thumbnail ) ) {
-			$this->post_thumbnail( $post_id, $post_thumbnail );
-		}
-
-		do_action( 'wp_data_sync_after_process', $post_id, $data );
-
-		return [ 'post_id' => $post_id ];
 
 	}
 
@@ -143,14 +127,15 @@ class DataSync {
 	}
 
 	/**
-	 * Check to see if post exists.
+	 * Get the post ID.
 	 *
+	 * @param $post_object
 	 * @param $data_sync_id
 	 *
-	 * @return bool|int
+	 * @return mixed
 	 */
 
-	public function post_exists( $data_sync_id ) {
+	public function post_id( $post_object, $data_sync_id ) {
 
 		global $wpdb;
 
@@ -164,10 +149,12 @@ class DataSync {
 		);
 
 		if ( null === $row ) {
-			return FALSE;
+			return $post_object;
 		}
 
-		return intval( $row->post_id );
+		$post_object['ID'] = intval( $row->post_id );
+
+		return $post_object;
 
 	}
 
@@ -180,13 +167,13 @@ class DataSync {
 	 * @return bool
 	 */
 
-	public function maybe_trash_post( $post_object, $post_id ) {
+	public function maybe_trash_post( $post_object ) {
 
-		if ( 'trash' === $post_object['post_status'] ) {
+		if ( $post_object['ID'] && 'trash' === $post_object['post_status'] ) {
 
 			$force_delete = ( 'true' === get_option( 'wp_data_sync_force_delete' ) ) ? TRUE : FALSE;
 
-			if ( wp_delete_post( $post_id, $force_delete ) ) {
+			if ( wp_delete_post( $post_object['ID'], $force_delete ) ) {
 				return TRUE;
 			}
 
@@ -197,48 +184,20 @@ class DataSync {
 	}
 
 	/**
-	 * Insert a new post.
+	 * Post object.
 	 *
 	 * @param $post_object
-	 * @param $data_sync_id
 	 *
 	 * @return int|\WP_Error
 	 */
 
-	public function insert_post( $post_object ) {
+	public function post_object( $post_object ) {
 
-		do_action( 'wp_data_sync_before_insert_post', $post_object );
+		do_action( 'wp_data_sync_before_post_object', $post_object );
 
 		if ( $post_id = wp_insert_post( $post_object ) ) {
 
-			do_action( 'wp_data_sync_after_insert_post', $post_id, $post_object );
-
-			return $post_id;
-
-		}
-
-		return FALSE;
-
-	}
-
-	/**
-	 * Update an existing post.
-	 *
-	 * @param $post_object
-	 * @param $post-id
-	 *
-	 * @return int|\WP_Error
-	 */
-
-	public function update_post( $post_object, $post_id ) {
-
-		$post_object['ID'] = $post_id;
-
-		do_action( 'wp_data_sync_before_update_post', $post_id, $post_object );
-
-		if ( $post_id = wp_update_post( $post_object ) ) {
-
-			do_action( 'wp_data_sync_after_update_post', $post_id, $post_object );
+			do_action( 'wp_data_sync_after_post_object', $post_object );
 
 			return $post_id;
 
