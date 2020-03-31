@@ -56,9 +56,7 @@ class DataSync {
 		/**
 		 * Extract
 		 *
-		 * $data_sync_id
 		 * $post_object
-		 * $post_meta
 		 * $taxonomies
 		 * $post_thumbnail
 		 */
@@ -71,21 +69,18 @@ class DataSync {
 		}
 
 		// Check to see if we already have this post.
-		$post_object = $this->post_id( $post_object, $data_sync_id );
-		$post_object = $this->post_object_defaults( $post_object );
-		$post_object = $this->post_date_format( $post_object );
+		$post_object = $this->post_id( $post_object );
 
 		if ( $this->maybe_trash_post( $post_object ) ) {
 			return [ 'post_object' => 'Trash Post' ];
 		}
 
+		$post_object = $this->post_object_defaults( $post_object );
+		$post_object = $this->post_date_format( $post_object );
+
 		if ( $post_id = $this->post_object( $post_object ) ) {
 
-			if ( isset( $post_meta ) ) {
-				$this->post_meta( $post_id, $post_meta );
-			}
-
-			if ( isset( $taxonomies ) ) {
+			if ( isset(  $taxonomies ) ) {
 				$this->taxonomy( $post_id, $taxonomies );
 			}
 
@@ -93,12 +88,58 @@ class DataSync {
 				$this->post_thumbnail( $post_id, $post_thumbnail );
 			}
 
+			do_action( 'wp_data_sync_post_meta', $post_id, $post_object['meta_input'] );
 			do_action( 'wp_data_sync_after_process', $post_id, $data );
 
 			return [ 'post_id' => $post_id ];
 
 		}
 
+	}
+
+	/**
+	 * Get the post ID.
+	 *
+	 * @param $post_object
+	 *
+	 * @return mixed
+	 */
+
+	public function post_id( $post_object ) {
+
+		global $wpdb;
+
+		$data_sync_id = $this->data_sync_id( $post_object );
+
+		$row = $wpdb->get_row(
+			"
+			SELECT *
+			FROM $wpdb->postmeta
+			WHERE meta_key = '_data_sync_id'
+			AND meta_value = '$data_sync_id'
+			"
+		);
+
+		if ( null === $row ) {
+			return $post_object;
+		}
+
+		$post_object['ID'] = intval( $row->post_id );
+
+		return $post_object;
+
+	}
+
+	/**
+	 * Data sync ID.
+	 *
+	 * @param $post_object
+	 *
+	 * @return mixed
+	 */
+
+	public function data_sync_id( $post_object ) {
+		return $post_object['meta_input']['_data_sync_id'];
 	}
 
 	/**
@@ -121,38 +162,6 @@ class DataSync {
 			$post_object[$key] = apply_filters( "wp_data_sync_{$key}", $value );
 
 		}
-
-		return $post_object;
-
-	}
-
-	/**
-	 * Get the post ID.
-	 *
-	 * @param $post_object
-	 * @param $data_sync_id
-	 *
-	 * @return mixed
-	 */
-
-	public function post_id( $post_object, $data_sync_id ) {
-
-		global $wpdb;
-
-		$row = $wpdb->get_row(
-			"
-			SELECT *
-			FROM $wpdb->postmeta
-			WHERE meta_key = 'data_sync_id'
-			AND meta_value = '$data_sync_id'
-			"
-		);
-
-		if ( null === $row ) {
-			return $post_object;
-		}
-
-		$post_object['ID'] = intval( $row->post_id );
 
 		return $post_object;
 
@@ -197,6 +206,8 @@ class DataSync {
 
 		if ( $post_id = wp_insert_post( $post_object ) ) {
 
+			$post_object['ID'] = $post_id;
+
 			do_action( 'wp_data_sync_after_post_object', $post_object );
 
 			return $post_id;
@@ -204,28 +215,6 @@ class DataSync {
 		}
 
 		return FALSE;
-
-	}
-
-	/**
-	 * Add/Update the post meta.
-	 *
-	 * @param $post_id
-	 * @param $post_meta
-	 */
-
-	public function post_meta( $post_id, $post_meta ) {
-
-		foreach ( $post_meta as $meta_key => $meta_value ) {
-
-			$meta_key   = apply_filters( 'wp_data_sync_meta_key', $meta_key, $meta_value );
-			$meta_value = apply_filters( 'wp_data_sync_meta_value', $meta_value, $meta_key );
-
-			update_post_meta( $post_id, $meta_key, $meta_value );
-
-		}
-
-		do_action( 'wp_data_sync_post_meta', $post_id, $post_meta );
 
 	}
 
@@ -238,11 +227,11 @@ class DataSync {
 
 	public function taxonomy( $post_id, $taxonomies ) {
 
-		$append = ( 'false' === get_option( 'wp_data_sync_append_terms' ) ) ? FALSE : TRUE;
+		if ( ! is_array( $taxonomies ) ) {
+			return;
+		}
 
-		foreach ( $taxonomies as $taxonomy_array ) {
-
-			extract( $taxonomy_array );
+		foreach ( $taxonomies as $taxonomy => $terms ) {
 
 			if ( ! taxonomy_exists( $taxonomy ) ) {
 
@@ -252,23 +241,28 @@ class DataSync {
 
 			}
 
-			$parent_id = 0;
+			$parent_id  = 0;
+			$term_ids   = [];
+			$parent_ids = [];
+			$append     = ( 'true' === get_option( 'wp_data_sync_append_terms' ) ) ? TRUE : FALSE;
 
-			if ( ! empty( $parents ) ) {
+			foreach ( $terms as $term ) {
 
-				foreach ( $parents as $parent ) {
+				if ( ! empty( $term['parents'] ) ) {
 
-					$parent_id = $this->term_id( $parent, $taxonomy, $parent_id );
-
-					wp_set_object_terms( $post_id, $parent_id, $taxonomy, $append );
+					foreach ( $term['parents'] as $parent ) {
+						$parent_ids[] = $parent_id = $this->term_id( $parent, $taxonomy, $parent_id );
+					}
 
 				}
 
+				$term_ids[] = $this->term_id( $term['name'], $taxonomy, $parent_id );
+
 			}
 
-			$term_id = $this->term_id( $term_name, $taxonomy, $parent_id );
+			$ids = array_merge( $term_ids, $parent_ids );
 
-			wp_set_object_terms( $post_id, $term_id, $taxonomy, $append );
+			wp_set_object_terms( $post_id, $ids, $taxonomy, $append );
 
 		}
 

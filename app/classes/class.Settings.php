@@ -242,8 +242,8 @@ class Settings {
 					'name'              => 'wp_data_sync_append_terms',
 					'class'             => 'append-terms widefat',
 					'values'            => [
-						'true'  => __( 'Yes, I want mutiple terms per post' ),
-						'false' => __( 'No, I only want 1 term per post' )
+						'false' => __( 'No, I want old terms to be replaced (Recommended)' ),
+						'true'  => __( 'Yes, I want to keep the old terms' )
 					]
 				]
 			],
