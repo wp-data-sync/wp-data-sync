@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	return;
 } ?>
 
-<div class="wp-data-sync-wrap">
+<div class="wp-data-sync-settings wrap">
 
 	<h1 class="wp-data-sync-admin-h1"><?php _e( 'WP Data Sync', 'wp-data-sync' ); ?></h1>
 
@@ -21,12 +21,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<form method="post" action="options.php">
 
+		<?php $this->admin_tabs(); ?>
+
 		<table class="form-table">
 
 			<tbody>
 
-				<?php settings_fields( $this->group ); ?>
-				<?php do_settings_fields( 'manage_options', 'default' ); ?>
+				<?php settings_fields( $this->group_key ); ?>
+				<?php do_settings_fields( WP_DATA_SYNC_CAP, 'default' ); ?>
 
 			</tbody>
 
