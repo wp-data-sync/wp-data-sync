@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div class="wp-data-sync-settings wrap">
 
-	<h1 class="wp-data-sync-admin-h1"><?php _e( 'WP Data Sync', 'wp-data-sync' ); ?></h1>
+	<h1 class="wp-data-sync-admin-h1"><?php esc_html_e( 'WP Data Sync' ); ?></h1>
 
 	<?php do_action( 'wp_data_sync_help_buttons' ); ?>
 

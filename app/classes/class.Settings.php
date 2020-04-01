@@ -138,8 +138,8 @@ class Settings {
 	public function add_pages() {
 
 		add_options_page(
-			__( 'WP Data Sync', 'wp-data-sync' ),
-			__( 'WP Data Sync', 'wp-data-sync' ),
+			__( 'WP Data Sync' ),
+			__( 'WP Data Sync' ),
 			WP_DATA_SYNC_CAP,
 			Settings::SLUG,
 			[ $this, 'settings_page' ]
