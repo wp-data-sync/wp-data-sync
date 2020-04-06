@@ -56,6 +56,7 @@ class DataSync {
 		/**
 		 * Extract
 		 *
+		 * $primary_id
 		 * $post_object
 		 * $taxonomies
 		 * $post_thumbnail
@@ -69,7 +70,7 @@ class DataSync {
 		}
 
 		// Check to see if we already have this post.
-		$post_object = $this->post_id( $post_object );
+		$post_object = $this->post_id( $post_object, $primary_id );
 
 		if ( $this->maybe_trash_post( $post_object ) ) {
 			return [ 'post_object' => 'Trash Post' ];
@@ -101,23 +102,26 @@ class DataSync {
 	 * Get the post ID.
 	 *
 	 * @param $post_object
+	 * @param $primary_id
 	 *
 	 * @return mixed
 	 */
 
-	public function post_id( $post_object ) {
+	public function post_id( $post_object, $primary_id ) {
 
 		global $wpdb;
 
-		$data_sync_id = $this->data_sync_id( $post_object );
-
 		$row = $wpdb->get_row(
-			"
-			SELECT *
-			FROM $wpdb->postmeta
-			WHERE meta_key = '_data_sync_id'
-			AND meta_value = '$data_sync_id'
-			"
+			$wpdb->prepare(
+				"
+				SELECT post_id
+				FROM $wpdb->postmeta
+				WHERE meta_key = '%s'
+				AND meta_value = '%s'
+				",
+				$primary_id['meta_key'],
+				$primary_id['meta_value']
+			)
 		);
 
 		if ( null === $row ) {
@@ -128,18 +132,6 @@ class DataSync {
 
 		return $post_object;
 
-	}
-
-	/**
-	 * Data sync ID.
-	 *
-	 * @param $post_object
-	 *
-	 * @return mixed
-	 */
-
-	public function data_sync_id( $post_object ) {
-		return $post_object['meta_input']['_data_sync_id'];
 	}
 
 	/**
