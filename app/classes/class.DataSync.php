@@ -111,24 +111,28 @@ class DataSync {
 
 		global $wpdb;
 
-		$row = $wpdb->get_row(
+		$post_id = $wpdb->get_var(
 			$wpdb->prepare(
 				"
-				SELECT post_id
-				FROM $wpdb->postmeta
-				WHERE meta_key = '%s'
-				AND meta_value = '%s'
+				SELECT post_id 
+    			FROM {$wpdb->postmeta} pm 
+    			JOIN {$wpdb->posts} p 
+      			ON p.ID = pm.post_id
+    			WHERE meta_key = '%s' 
+      			AND meta_value = '%s' 
+      			ORDER BY meta_id DESC
+    			LIMIT 1
 				",
 				$primary_id['meta_key'],
 				$primary_id['meta_value']
 			)
 		);
 
-		if ( null === $row ) {
+		if ( null === $post_id ) {
 			return $post_object;
 		}
 
-		$post_object['ID'] = intval( $row->post_id );
+		$post_object['ID'] = (int) $post_id;
 
 		return $post_object;
 
@@ -225,7 +229,7 @@ class DataSync {
 
 		foreach ( $taxonomies as $taxonomy => $terms ) {
 
-			if ( ! taxonomy_exists( $taxonomy ) ) {
+			if ( empty( $taxonomy ) || ! taxonomy_exists( $taxonomy ) ) {
 
 				Log::write( 'invalid-taxonomy', $taxonomy );
 
@@ -355,13 +359,17 @@ class DataSync {
 				// Insert featured image data
 				$attach_id = wp_insert_attachment( $attachment, $file_path, $post_id );
 
-				// Get metadata for featured image
-				$attach_data = wp_generate_attachment_metadata( $attach_id, $file_path );
+				if ( is_int( $attach_id ) && 0 < $attach_id ) {
 
-				// Update metadata
-				wp_update_attachment_metadata( $attach_id, $attach_data );
+					// Get metadata for featured image
+					$attach_data = wp_generate_attachment_metadata( $attach_id, $file_path );
 
-				return $attach_id;
+					// Update metadata
+					wp_update_attachment_metadata( $attach_id, $attach_data );
+
+					return $attach_id;
+
+				}
 
 			}
 
@@ -422,20 +430,25 @@ class DataSync {
 
 	public function attachment_exists( $post_title ) {
 
-		$args = [
-			'posts_per_page' => 1,
-			'post_type'      => 'attachment',
-			'post_title'     => trim( $post_title ),
-			'fields'         => 'ids'
-		];
+		global $wpdb;
 
-		$attachment_ids = get_posts( $args );
+		$row = $wpdb->get_row(
+			$wpdb->prepare(
+				"
+				SELECT post_id
+				FROM $wpdb->posts
+				WHERE post_title = '%s'
+				AND post_type = 'attachment'
+				",
+				$post_title
+			)
+		);
 
-		if ( ! empty( $attachment_ids ) ) {
-			return $attachment_ids[0];
+		if ( null === $row ) {
+			return FALSE;
 		}
 
-		return FALSE;
+		return $row->post_id;
 
 	}
 
