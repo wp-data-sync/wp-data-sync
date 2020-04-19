@@ -174,11 +174,17 @@ class DataSync {
 
 	public function maybe_trash_post( $post_object ) {
 
-		if ( $post_object['ID'] && 'trash' === $post_object['post_status'] ) {
+		if ( 0 < $post_object['ID'] && 'trash' === $post_object['post_status'] ) {
 
-			$force_delete = ( 'true' === get_option( 'wp_data_sync_force_delete' ) ) ? TRUE : FALSE;
+			if ( 'true' === get_option( 'wp_data_sync_force_delete' ) ) {
 
-			if ( wp_delete_post( $post_object['ID'], $force_delete ) ) {
+				if ( wp_delete_post( $post_object['ID'], TRUE ) ) {
+					return TRUE;
+				}
+
+			}
+
+			if ( wp_trash_post( $post_object['ID'] ) ) {
 				return TRUE;
 			}
 
