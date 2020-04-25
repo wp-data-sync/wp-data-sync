@@ -90,7 +90,7 @@ class DataSync {
 			}
 
 			do_action( 'wp_data_sync_post_meta', $post_id, $post_object['meta_input'] );
-			do_action( 'wp_data_sync_after_process', $post_id, $data );
+			do_action( 'wp_data_sync_after_process', $post_id, $data, $this );
 
 			return [ 'post_id' => $post_id ];
 
