@@ -96,11 +96,11 @@ class Settings {
 
 		$tabs = [
 			0 => [
-				'label' => __( 'Dashboard' ),
+				'label' => __( 'Dashboard', 'wp-data-sync' ),
 				'id'    => $this->main_tab
 			],
 			1 => [
-				'label' => __( 'Defaults' ),
+				'label' => __( 'Defaults', 'wp-data-sync' ),
 				'id'    => 'defaults'
 			]
 		];
@@ -132,7 +132,7 @@ class Settings {
 	public function settings_page() {
 
 		if ( ! current_user_can( WP_DATA_SYNC_CAP ) ) {
-			wp_die( __( 'You do not have sufficient permissions to access this page.') );
+			wp_die( __( 'You do not have sufficient permissions to access this page.', 'wp-data-sync' ) );
 		}
 
 		if ( $view = $this->view( 'settings/page' ) ) {
@@ -341,7 +341,7 @@ class Settings {
 			'dashboard' => [
 				0 => (object) [
 					'key' 		=> 'wp_data_sync_allowed',
-					'label'		=> __( 'Data Sync Allowed' ),
+					'label'		=> __( 'Data Sync Allowed', 'wp-data-sync' ),
 					'callback'  => 'input',
 					'args'      => [
 						'sanitize_callback' => 'sanitize_text_field',
@@ -353,7 +353,7 @@ class Settings {
 				],
 				1 => (object) [
 					'key' 		=> 'wp_data_sync_access_key',
-					'label'		=> __( 'API Access Key' ),
+					'label'		=> __( 'API Access Key', 'wp-data-sync' ),
 					'callback'  => 'input',
 					'args'      => [
 						'sanitize_callback' => 'sanitize_key',
@@ -365,7 +365,7 @@ class Settings {
 				],
 				2 => (object) [
 					'key' 		=> 'wp_data_sync_private_key',
-					'label'		=> __( 'API Private Key' ),
+					'label'		=> __( 'API Private Key', 'wp-data-sync' ),
 					'callback'  => 'input',
 					'args'      => [
 						'sanitize_callback' => 'sanitize_key',
@@ -377,19 +377,19 @@ class Settings {
 				],
 				3 => (object) [
 					'key' 		=> 'wp_data_sync_api_url',
-					'label'		=> __( 'API URL' ),
+					'label'		=> __( 'API URL', 'wp-data-sync' ),
 					'callback'  => 'input',
 					'args'      => [
 						'sanitize_callback' => 'sanitize_text_field',
 						'basename'          => 'text-input',
 						'type'		        => 'url',
 						'class'		        => 'regular-text',
-						'placeholder'       => 'https://domain.com'
+						'placeholder'       => __( 'https://domain.com', 'wp-data-sync' )
 					]
 				],
 				4 => (object) [
 					'key' 		=> 'wp_data_sync_allow_logging',
-					'label'		=> __( 'Allow Logging' ),
+					'label'		=> __( 'Allow Logging', 'wp-data-sync' ),
 					'callback'  => 'input',
 					'args'      => [
 						'sanitize_callback' => 'sanitize_text_field',
@@ -401,7 +401,7 @@ class Settings {
 				],
 				5 => (object) [
 					'key' 		=> 'wp_data_sync_auto_update',
-					'label'		=> __( 'Automatically Update Plugin' ),
+					'label'		=> __( 'Automatically Update Plugin', 'wp-data-sync' ),
 					'callback'  => 'input',
 					'args'      => [
 						'sanitize_callback' => 'sanitize_text_field',
@@ -415,7 +415,7 @@ class Settings {
 			'defaults' => [
 				0 => (object) [
 					'key' 		=> 'wp_data_sync_post_title',
-					'label'		=> __( 'Default Title' ),
+					'label'		=> __( 'Default Title', 'wp-data-sync' ),
 					'callback'  => 'input',
 					'args'      => [
 						'sanitize_callback' => 'sanitize_text_field',
@@ -427,7 +427,7 @@ class Settings {
 				],
 				1 => (object) [
 					'key' 		=> 'wp_data_sync_post_author',
-					'label'		=> __( 'Default Author' ),
+					'label'		=> __( 'Default Author', 'wp-data-sync' ),
 					'callback'  => 'input',
 					'args'      => [
 						'sanitize_callback' => 'sanitize_text_field',
@@ -440,7 +440,7 @@ class Settings {
 				],
 				2 => (object) [
 					'key' 		=> 'wp_data_sync_post_status',
-					'label'		=> __( 'Default Status' ),
+					'label'		=> __( 'Default Status', 'wp-data-sync' ),
 					'callback'  => 'input',
 					'args'      => [
 						'sanitize_callback' => 'sanitize_text_field',
@@ -449,18 +449,18 @@ class Settings {
 						'name'              => 'wp_data_sync_post_status',
 						'class'             => 'default-status widefat',
 						'values'            => [
-							'publish' => 'Publish',
-							'pending' => 'Pending',
-							'draft'   => 'Draft',
-							'future'  => 'Future',
-							'private' => 'Private',
-							'trash'   => 'Trash'
+							'publish' => __( 'Publish', 'wp-data-sync' ),
+							'pending' => __( 'Pending', 'wp-data-sync' ),
+							'draft'   => __( 'Draft', 'wp-data-sync' ),
+							'future'  => __( 'Future', 'wp-data-sync' ),
+							'private' => __( 'Private', 'wp-data-sync' ),
+							'trash'   => __( 'Trash', 'wp-data-sync' )
 						]
 					]
 				],
 				3 => (object) [
 					'key' 		=> 'wp_data_sync_post_type',
-					'label'		=> __( 'Default Type' ),
+					'label'		=> __( 'Default Type', 'wp-data-sync' ),
 					'callback'  => 'input',
 					'args'      => [
 						'sanitize_callback' => 'sanitize_text_field',
@@ -473,7 +473,7 @@ class Settings {
 				],
 				4 => (object) [
 					'key' 		=> 'wp_data_sync_append_terms',
-					'label'		=> __( 'Append Terms' ),
+					'label'		=> __( 'Append Terms', 'wp-data-sync' ),
 					'callback'  => 'input',
 					'args'      => [
 						'sanitize_callback' => 'sanitize_text_field',
@@ -482,14 +482,14 @@ class Settings {
 						'name'              => 'wp_data_sync_append_terms',
 						'class'             => 'append-terms widefat',
 						'values'            => [
-							'false' => __( 'No, I want old terms to be replaced (Recommended)' ),
-							'true'  => __( 'Yes, I want to keep the old terms' )
+							'false' => __( 'No, I want old terms to be replaced (Recommended)', 'wp-data-sync' ),
+							'true'  => __( 'Yes, I want to keep the old terms', 'wp-data-sync' )
 						]
 					]
 				],
 				5 => (object) [
 					'key' 		=> 'wp_data_sync_force_delete',
-					'label'		=> __( 'Force Delete' ),
+					'label'		=> __( 'Force Delete', 'wp-data-sync' ),
 					'callback'  => 'input',
 					'args'      => [
 						'sanitize_callback' => 'sanitize_text_field',
@@ -498,8 +498,8 @@ class Settings {
 						'name'              => 'wp_data_sync_force_delete',
 						'class'             => 'force-delete widefat',
 						'values'            => [
-							'false' => __( 'No, put item in the trash (Recommended)' ),
-							'true'  => __( 'Yes, delete item and all associated data' )
+							'false' => __( 'No, put item in the trash (Recommended)', 'wp-data-sync' ),
+							'true'  => __( 'Yes, delete item and all associated data', 'wp-data-sync' )
 						]
 					]
 
