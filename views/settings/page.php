@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<?php do_action( 'wp_data_sync_help_buttons' ); ?>
 
-	<form method="post" action="options.php">
+	<form method="post" action="options.php?<?php esc_attr_e( $this->active_tab ); ?>=<?php esc_attr_e( $this->group ); ?>">
 
 		<?php $this->admin_tabs(); ?>
 
@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<tbody>
 
-				<?php settings_fields( $this->group_key ); ?>
+				<?php settings_fields( $this->group ); ?>
 				<?php do_settings_fields( WP_DATA_SYNC_CAP, 'default' ); ?>
 
 			</tbody>

@@ -20,22 +20,10 @@ class Settings {
 	public static $instance;
 
 	/**
-	 * @var string
-	 */
-
-	public $group_key = 'wp_data_sync_settings';
-
-	/**
 	 * @var array
 	 */
 
-	private $options;
-
-	/**
-	 * @var array
-	 */
-
-	private $group;
+	public $group;
 
 	/**
 	 * @var string
@@ -60,7 +48,11 @@ class Settings {
 	 */
 
 	public function __construct() {
+
+		$this->group   = $this->group();
+
 		self::$instance = $this;
+
 	}
 
 	/**
@@ -91,20 +83,6 @@ class Settings {
 
 		// Delete log files on setting change.
 		add_action( 'update_option_wp_data_sync_allow_logging', [ $this, 'delete_log_files' ], 10, 2 );
-
-	}
-
-	/**
-	 * Group.
-	 *
-	 * @return array|mixed
-	 */
-
-	public function group() {
-
-		$tab = $this->active_tab();
-
-		return isset( $this->options[$tab] ) ? $this->options[$tab] : [];
 
 	}
 
@@ -277,13 +255,15 @@ class Settings {
 	}
 
 	/**
-	 * Active tab.
+	 * Group.
 	 *
 	 * @return string
 	 */
 
-	public function active_tab() {
+	public function group() {
+
 		return isset( $_GET[ $this->active_tab ] ) ? $_GET[ $this->active_tab ] : $this->main_tab;
+
 	}
 
 	/**
@@ -314,15 +294,14 @@ class Settings {
 
 	public function register_settings() {
 
-		$this->options = $this->options();
-		$this->group   = $this->group();
+		$options = $this->get_options();
 
-		foreach ( $this->group as $option ) {
+		foreach ( $options as $option ) {
 
 			// Add the key into the args array
 			$option->args['key'] = $option->key;
 
-			register_setting( $this->group_key, $option->key, $option->args );
+			register_setting( $this->group, $option->key, $option->args );
 			add_settings_field(
 				$option->key,
 				$option->label,
@@ -337,7 +316,21 @@ class Settings {
 	}
 
 	/**
-	 * Get the plugin settings.
+	 * Get the plugin options.
+	 *
+	 * @return array|mixed
+	 */
+
+	public function get_options() {
+
+		$options = $this->options();
+
+		return isset( $options[ $this->group ] ) ? $options[ $this->group ] : [];
+
+	}
+
+	/**
+	 * Plugin options.
 	 *
 	 * @return array
 	 */
