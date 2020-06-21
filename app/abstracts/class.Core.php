@@ -115,4 +115,41 @@ abstract class Core {
 
 	}
 
+	/**
+	 * Post ID.
+	 *
+	 * @param $primary_id
+	 *
+	 * @return bool|int
+	 */
+
+	public function post_id( $primary_id ) {
+
+		global $wpdb;
+
+		$post_id = $wpdb->get_var(
+			$wpdb->prepare(
+				"
+				SELECT post_id 
+    			FROM {$wpdb->postmeta} pm 
+    			JOIN {$wpdb->posts} p 
+      			ON p.ID = pm.post_id
+    			WHERE meta_key = '%s' 
+      			AND meta_value = '%s' 
+      			ORDER BY meta_id DESC
+    			LIMIT 1
+				",
+				$primary_id['meta_key'],
+				$primary_id['meta_value']
+			)
+		);
+
+		if ( null === $post_id ) {
+			return FALSE;
+		}
+
+		return (int) $post_id;
+
+	}
+
 }

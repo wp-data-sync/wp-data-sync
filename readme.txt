@@ -1,20 +1,26 @@
 === WP Data Sync ===
 Contributors: kevin-brent
-Tags: sync data, api feed, json feed, woocommerce, data transfer, csv import, data sync, sync products
+Tags: sync data, api feed, data feed, json feed, woocommerce, data transfer, csv import, data sync, sync products, google sheets, google forms
 Requires at least: 5.0
-Tested up to: 5.3.2
+Tested up to: 5.4.2
 Requires PHP: 5.6
 Stable tag: /trunk
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Sync raw data into your WordPress website from JSON or CSV
+Sync raw data into your WordPress or WooCommerce website from mutiple data sources and formats.
 
 == Description ==
 
 No more CSV import failures or server timeouts. The WP Data Sync API will import your raw data, then securely deliver perfect WordPress objects to your WordPress website.
 
 The WP Data Sync servers handle the heavy workload. Keeping your production server up and running. This results in a better overall user experience.
+
+__Supported Data Formats__
+&#x2611; JSON
+&#x2611; XML
+&#x2611; CSV
+&#x2611; Google Sheets
 
 __Helpful Resources__
 
@@ -27,6 +33,7 @@ __Helpful Resources__
 1. Upload the plugin files to the `/wp-content/plugins` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress Admin.
 3. Navigate to WP Admin > Settings > WP Data Sync.
+4. For WooCommerce Users - The WooCommerce plugin must be activated.
 
 == Frequently Asked Questions ==
 
@@ -34,13 +41,13 @@ __Helpful Resources__
 
 We process data in 3 steps:
 
-1. WP Data Sync uses it's API to process raw data from a JSON feed, or CSV import.
-2. WP Data Sync API sends a prefect WordPress post object to the website.
+1. WP Data Sync uses it's API to process raw data from your data source.
+2. WP Data Sync API sends a prefect WordPress post object to your website.
 3. WP Data Sync plugin inserts or updates the data in the WordPress website.
 
 = How many websites can I sync using the same data? =
 
-WP Data Sync API can sync the same data into as many websites as you like. Each website is considered a unique endpoint.
+WP Data Sync API can sync the same data into as many websites as you like.
 
 = How many objects can I sync each month? =
 
@@ -62,4 +69,4 @@ Yes. We have WordPress hooks and filters throughout the plugin to allow for almo
 
 [Change Log](https://wpdatasync.com/plugin/wp-data-sync/ "Change Log")
 
-== Upgrade Notice ==
+ == Upgrade Notice ==

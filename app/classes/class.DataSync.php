@@ -11,7 +11,7 @@
 
 namespace WP_DataSync\App;
 
-class DataSync {
+class DataSync extends Core {
 
 	/**
 	 * @var DataSync
@@ -70,7 +70,7 @@ class DataSync {
 		}
 
 		// Check to see if we already have this post.
-		$post_object = $this->post_id( $post_object, $primary_id );
+		$post_object = $this->post_exists( $post_object, $primary_id );
 
 		if ( $this->maybe_trash_post( $post_object ) ) {
 			return [ 'post_object' => 'Trash Post' ];
@@ -107,32 +107,11 @@ class DataSync {
 	 * @return mixed
 	 */
 
-	public function post_id( $post_object, $primary_id ) {
+	public function post_exists( $post_object, $primary_id ) {
 
-		global $wpdb;
-
-		$post_id = $wpdb->get_var(
-			$wpdb->prepare(
-				"
-				SELECT post_id 
-    			FROM {$wpdb->postmeta} pm 
-    			JOIN {$wpdb->posts} p 
-      			ON p.ID = pm.post_id
-    			WHERE meta_key = '%s' 
-      			AND meta_value = '%s' 
-      			ORDER BY meta_id DESC
-    			LIMIT 1
-				",
-				$primary_id['meta_key'],
-				$primary_id['meta_value']
-			)
-		);
-
-		if ( null === $post_id ) {
-			return $post_object;
+		if ( $post_id = $this->post_id( $primary_id ) ) {
+			$post_object['ID'] = $post_id;
 		}
-
-		$post_object['ID'] = (int) $post_id;
 
 		return $post_object;
 
