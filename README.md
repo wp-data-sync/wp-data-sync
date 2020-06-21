@@ -54,4 +54,4 @@ Yes. We have WordPress hooks and filters throughout the plugin to allow for almo
 
 __Change Log__
 
-[Change Log](https://wpdatasync.com/plugin/wp-data-sync/ "Change Log")
+[Change Log](https://wpdatasync.com/changelog/wp-data-sync-1/ "Change Log")
