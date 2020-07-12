@@ -78,11 +78,7 @@ class WC_DataSync {
 		extract( $data );
 
 		if ( isset( $attributes ) ) {
-			$this->attributes( $post_id, $attributes, 0 );
-		}
-
-		if ( isset( $attribute_taxonomies ) ) {
-			$this->attributes( $post_id, $attribute_taxonomies, 1 );
+			$this->attributes( $post_id, $attributes );
 		}
 
 		if ( isset( $product_gallery ) ) {
@@ -98,10 +94,9 @@ class WC_DataSync {
 	 *
 	 * @param $post_id
 	 * @param $attributes
-	 * @param $is_taxonomy
 	 */
 
-	public function attributes( $post_id, $attributes, $is_taxonomy ) {
+	public function attributes( $post_id, $attributes ) {
 
 		if ( empty( $attributes ) ) {
 			return;
@@ -135,9 +130,9 @@ class WC_DataSync {
 				'name'         => $is_taxonomy ? $taxonomy : $name,
 				'value'        => $is_taxonomy ? 0 : join( ',', $values ),
 				'position'     => 0,
-				'is_visible'   => 1,
-				'is_variation' => 0,
-				'is_taxonomy'  => $is_taxonomy
+				'is_visible'   => intval( $is_visible ),
+				'is_variation' => intval( $is_variation ),
+				'is_taxonomy'  => intval( $is_taxonomy )
 			];
 
 		}
@@ -147,7 +142,6 @@ class WC_DataSync {
 		update_post_meta( $post_id, '_product_attributes', $product_attributes );
 
 		do_action( 'wp_data_sync_attributes', $post_id, $attributes );
-		do_action( 'wp_data_sync_attribute_taxonomiess', $post_id, $attributes );
 
 	}
 
@@ -156,7 +150,7 @@ class WC_DataSync {
 	 *
 	 * @param $raw_name
 	 *
-	 * @return array
+	 * @return string
 	 */
 
 	public function attribute_taxonomy( $raw_name ) {
