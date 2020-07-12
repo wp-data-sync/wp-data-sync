@@ -420,7 +420,7 @@ class DataSync extends Core {
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
 				"
-				SELECT post_id
+				SELECT ID
 				FROM $wpdb->posts
 				WHERE post_title = '%s'
 				AND post_type = 'attachment'
@@ -433,7 +433,7 @@ class DataSync extends Core {
 			return FALSE;
 		}
 
-		return $row->post_id;
+		return $row->ID;
 
 	}
 
