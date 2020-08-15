@@ -14,43 +14,35 @@ namespace WP_DataSync\App;
 class WC_DataSync {
 
 	/**
+	 * @var object
+	 */
+
+	private $data_sync;
+
+	/**
 	 * @var WC_DataSync
 	 */
 
 	public static $instance;
 
 	/**
-	 * @var DataSync
-	 */
-
-	private $data_sync;
-
-	/**
 	 * WC_DataSync constructor.
-	 *
-	 * @param $data_sync
 	 */
 
-	public function __construct( $data_sync ) {
-
-		$this->data_sync = $data_sync;
-
-		self::$instance  = $this;
-
+	public function __construct() {
+		self::$instance = $this;
 	}
 
 	/**
 	 * Instance.
 	 *
-	 * @param $data_sync
-	 *
 	 * @return WC_DataSync
 	 */
 
-	public static function instance( $data_sync ) {
+	public static function instance() {
 
 		if ( self::$instance === NULL ) {
-			self::$instance = new self( $data_sync );
+			self::$instance = new self();
 		}
 
 		return self::$instance;
@@ -60,49 +52,42 @@ class WC_DataSync {
 	/**
 	 * WooCommerce process data.
 	 *
-	 * @param $post_id
-	 * @param $data
+	 * @param $product_id
+	 * @param $data_sync
 	 */
 
-	public function wc_process( $post_id, $data ) {
+	public function wc_process( $product_id, $data_sync ) {
 
-		/**
-		 * Extract
-		 *
-		 * $attributes
-		 * $attribute_taxonomies
-		 * $product_gallery
-		 * $taxonomies
-		 */
+		$this->data_sync = $data_sync;
 
-		extract( $data );
-
-		if ( isset( $attributes ) ) {
-			$this->attributes( $post_id, $attributes );
+		if ( $attributes = $this->data_sync->get_attributes() ) {
+			$this->attributes( $product_id, $attributes );
 		}
 
-		if ( isset( $product_gallery ) ) {
-			$this->product_gallery( $post_id, $product_gallery );
+		if ( $product_gallery = $this->data_sync->get_product_gallery() ) {
+			$this->product_gallery( $product_id, $product_gallery );
 		}
 
-		$this->product_visibility( $post_id, $taxonomies );
+		if ( $taxonomies = $this->data_sync->get_taxonomies() ) {
+			$this->product_visibility( $product_id, $taxonomies );
+		}
 
 	}
 
 	/**
 	 * Product attributes.
 	 *
-	 * @param $post_id
+	 * @param $product_id
 	 * @param $attributes
 	 */
 
-	public function attributes( $post_id, $attributes ) {
+	public function attributes( $product_id, $attributes ) {
 
 		if ( empty( $attributes ) ) {
 			return;
 		}
 
-		$product_attributes = get_post_meta( $post_id, '_product_attributes', TRUE ) ?: [];
+		$product_attributes = get_post_meta( $product_id, '_product_attributes', TRUE ) ?: [];
 
 		foreach ( $attributes as $attribute ) {
 
@@ -111,24 +96,24 @@ class WC_DataSync {
 			if ( $is_taxonomy ) {
 
 				$taxonomy   = $this->attribute_taxonomy( $name );
-				$term_names = wp_get_object_terms( $post_id, $taxonomy, [ 'fields' => 'names' ] );
 				$term_ids   = [];
 
 				foreach ( $values as $value ) {
-
-					if ( ! in_array( $value, $term_names ) ) {
-						$term_ids[] = $this->data_sync->term_id( $value, $taxonomy, 0 );
-					}
-
+					$term_ids[] = $this->data_sync->term_id( $value, $taxonomy, 0 );
 				}
 
-				wp_set_object_terms( $post_id, $term_ids, $taxonomy );
+				wp_set_object_terms( $product_id, $term_ids, $taxonomy );
 
+			}
+
+			if ( $is_variation ) {
+
+				// Create variations from all terms
 			}
 
 			$product_attributes[ $name ] = [
 				'name'         => $is_taxonomy ? $taxonomy : $name,
-				'value'        => $is_taxonomy ? 0 : join( ',', $values ),
+				'value'        => join( ',', $values ),
 				'position'     => 0,
 				'is_visible'   => intval( $is_visible ),
 				'is_variation' => intval( $is_variation ),
@@ -139,9 +124,9 @@ class WC_DataSync {
 
 		$product_attributes = apply_filters( 'wp_data_sync_product_attributes', $product_attributes );
 
-		update_post_meta( $post_id, '_product_attributes', $product_attributes );
+		update_post_meta( $product_id, '_product_attributes', $product_attributes );
 
-		do_action( 'wp_data_sync_attributes', $post_id, $attributes );
+		do_action( 'wp_data_sync_attributes', $product_id, $attributes );
 
 	}
 
@@ -201,17 +186,17 @@ class WC_DataSync {
 	/**
 	 * Create a WooCommerce image gallery.
 	 *
-	 * @param $post_id
+	 * @param $product_id
 	 * @param $product_gallery
 	 */
 
-	public function product_gallery( $post_id, $product_gallery ) {
+	public function product_gallery( $product_id, $product_gallery ) {
 
 		$attach_ids = [];
 
 		foreach ( $product_gallery as $image_url ) {
 
-			if ( $attach_id = $this->data_sync->attachment( $post_id, $image_url ) ) {
+			if ( $attach_id = $this->data_sync->attachment( $product_id, $image_url ) ) {
 				$attach_ids[] = $attach_id;
 			}
 
@@ -220,20 +205,20 @@ class WC_DataSync {
 		$product_gallery_ids = apply_filters( 'wp_data_sync_product_gallery_ids', join( ',', $attach_ids ) );
 		$product_gallery_key = apply_filters( 'wp_data_sync_product_gallery_meta_key', '_product_image_gallery' );
 
-		update_post_meta( $post_id, $product_gallery_key, $product_gallery_ids );
+		update_post_meta( $product_id, $product_gallery_key, $product_gallery_ids );
 
-		do_action( 'wp_data_sync_product_gallery', $post_id, $product_gallery );
+		do_action( 'wp_data_sync_product_gallery', $product_id, $product_gallery );
 
 	}
 
 	/**
 	 * Product visibility.
 	 *
-	 * @param $post_id
+	 * @param $product_id
 	 * @param $taxonomies
 	 */
 
-	public function product_visibility( $post_id, $taxonomies ) {
+	public function product_visibility( $product_id, $taxonomies ) {
 
 		$taxonomy = 'product_visibility';
 
@@ -255,7 +240,7 @@ class WC_DataSync {
 
 			}
 
-			wp_set_object_terms( $post_id, $term_ids, $taxonomy );
+			wp_set_object_terms( $product_id, $term_ids, $taxonomy );
 
 		}
 

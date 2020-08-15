@@ -89,7 +89,8 @@ class SyncRequest extends Core {
 		$data     = $this->request_data( $raw_data );
 
 		$sync     = DataSync::instance();
-		$response = $sync->process( $data );
+		$sync->init( $data );
+		$response = $sync->process();
 
 		$response['request_time'] = microtime() - $start_request;
 		Log::write( 'sync-request-response', $response );

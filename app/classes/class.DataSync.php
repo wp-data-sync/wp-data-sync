@@ -14,6 +14,54 @@ namespace WP_DataSync\App;
 class DataSync extends Core {
 
 	/**
+	 * @var bool|array
+	 */
+
+	private $primary_id = FALSE;
+
+	/**
+	 * @var bool|int
+	 */
+
+	private $post_id = FALSE;
+
+	/**
+	 * @var bool|array
+	 */
+
+	private $post_object = FALSE;
+
+	/**
+	 * @var bool|array
+	 */
+
+	private $post_meta = FALSE;
+
+	/**
+	 * @var bool|array
+	 */
+
+	private $taxonomies = FALSE;
+
+	/**
+	 * @var bool|string
+	 */
+
+	private $post_thumbnail = FALSE;
+
+	/**
+	 * @var bool|array
+	 */
+
+	private $attributes = FALSE;
+
+	/**
+	 * @var bool|array
+	 */
+
+	private $product_gallery = FALSE;
+
+	/**
 	 * @var DataSync
 	 */
 
@@ -44,126 +92,124 @@ class DataSync extends Core {
 	}
 
 	/**
-	 * Process request data.
+	 * Init.
 	 *
 	 * @param $data
+	 */
+
+	public function init( $data ) {
+
+		if ( is_array( $data ) ) {
+
+			foreach ( $data as $key => $value ) {
+				$this->$key = $value;
+			}
+
+		}
+    }
+
+	/**
+	 * Process request data.
 	 *
 	 * @return mixed
 	 */
 
-	public function process( $data ) {
+	public function process() {
 
-		/**
-		 * Extract
-		 *
-		 * $primary_id
-		 * $post_object
-		 * $taxonomies
-		 * $post_thumbnail
-		 */
-
-		extract( $data );
-
-		// A post object is required!!
-		if ( empty( $post_object ) ) {
-			return [ 'post_object' => 'Empty post object' ];
+		// A primary ID is required!!
+		if ( empty( $this->primary_id ) ) {
+			return [ 'primary_id' => 'Empty primary ID' ];
 		}
 
 		// Check to see if we already have this post.
-		$post_object = $this->post_exists( $post_object, $primary_id );
+		$this->post_exists();
 
-		if ( $this->maybe_trash_post( $post_object ) ) {
+		// A post object is required!!
+		if ( empty( $this->post_object ) ) {
+			return [ 'post_object' => 'Empty post object' ];
+		}
+
+		if ( $this->maybe_trash_post() ) {
 			return [ 'post_object' => 'Trash Post' ];
 		}
 
-		$post_object = $this->post_object_defaults( $post_object );
-		$post_object = $this->post_date_format( $post_object );
+		if ( $this->post_object() ) {
 
-		if ( $post_id = $this->post_object( $post_object ) ) {
-
-			if ( isset(  $taxonomies ) ) {
-				$this->taxonomy( $post_id, $taxonomies );
+			if ( isset(  $this->post_meta ) ) {
+				$this->post_meta();
 			}
 
-			if ( isset( $post_thumbnail ) ) {
-				$this->post_thumbnail( $post_id, $post_thumbnail );
+			if ( isset(  $this->taxonomies ) ) {
+				$this->taxonomy();
 			}
 
-			do_action( 'wp_data_sync_post_meta', $post_id, $post_object['meta_input'] );
-			do_action( 'wp_data_sync_after_process', $post_id, $data, $this );
+			if ( isset( $this->post_thumbnail ) ) {
+				$this->post_thumbnail();
+			}
 
-			return [ 'post_id' => $post_id ];
+			do_action( 'wp_data_sync_after_process', $this->post_id, $this );
+
+			return [ 'post_id' => $this->post_id ];
 
 		}
 
 	}
 
 	/**
-	 * Get the post ID.
-	 *
-	 * @param $post_object
-	 * @param $primary_id
-	 *
-	 * @return mixed
+	 * Set the post ID.
 	 */
 
-	public function post_exists( $post_object, $primary_id ) {
+	public function post_exists() {
 
-		if ( $post_id = $this->post_id( $primary_id ) ) {
-			$post_object['ID'] = $post_id;
+		if ( $this->post_id = $this->post_id( $this->primary_id ) ) {
+			$this->post_object['ID'] = $this->post_id;
 		}
-
-		return $post_object;
 
 	}
 
 	/**
 	 * Get the default value for a post object key.
 	 *
-	 * @param $post_object
-	 * @param $key
-	 *
-	 * @return mixed|void
 	 */
 
-	public function post_object_defaults( $post_object ) {
+	public function post_object_defaults() {
 
-		$keys = $this->post_object_keys();
+		// Only set the defaults for a new post.
+		if ( empty( $this->post_id ) ) {
 
-		foreach ( $keys as $key ) {
+			$keys = $this->post_object_keys();
 
-			$value = isset( $post_object[$key] ) ? $post_object[$key] : get_option( "wp_data_sync_{$key}", '' );
+			foreach ( $keys as $key ) {
 
-			$post_object[$key] = apply_filters( "wp_data_sync_{$key}", $value );
+				$value = isset( $this->post_object[ $key ] ) ? $this->post_object[ $key ] : get_option( "wp_data_sync_{$key}", '' );
+
+				$this->post_object[ $key ] = apply_filters( "wp_data_sync_{$key}", $value );
+
+			}
 
 		}
-
-		return $post_object;
 
 	}
 
 	/**
 	 * Trash post.
 	 *
-	 * @param $post_object
-	 * @param $post_id
-	 *
 	 * @return bool
 	 */
 
-	public function maybe_trash_post( $post_object ) {
+	public function maybe_trash_post() {
 
-		if ( 0 < $post_object['ID'] && 'trash' === $post_object['post_status'] ) {
+		if ( 0 < $this->post_id && 'trash' === $this->post_object['post_status'] ) {
 
 			if ( 'true' === get_option( 'wp_data_sync_force_delete' ) ) {
 
-				if ( wp_delete_post( $post_object['ID'], TRUE ) ) {
+				if ( wp_delete_post( $this->post_id, TRUE ) ) {
 					return TRUE;
 				}
 
 			}
 
-			if ( wp_trash_post( $post_object['ID'] ) ) {
+			if ( wp_trash_post( $this->post_id ) ) {
 				return TRUE;
 			}
 
@@ -176,22 +222,21 @@ class DataSync extends Core {
 	/**
 	 * Post object.
 	 *
-	 * @param $post_object
-	 *
 	 * @return int|\WP_Error
 	 */
 
-	public function post_object( $post_object ) {
+	public function post_object() {
 
-		do_action( 'wp_data_sync_before_post_object', $post_object );
+		do_action( 'wp_data_sync_before_post_object', $this->post_object );
 
-		if ( $post_id = wp_insert_post( $post_object ) ) {
+		$this->post_object_defaults();
+		$this->post_date_format();
 
-			$post_object['ID'] = $post_id;
+		if ( $this->post_id = wp_insert_post( $this->post_object ) ) {
 
-			do_action( 'wp_data_sync_after_post_object', $post_object );
+			do_action( 'wp_data_sync_after_post_object', $this->post_object );
 
-			return $post_id;
+			return TRUE;
 
 		}
 
@@ -200,19 +245,39 @@ class DataSync extends Core {
 	}
 
 	/**
-	 * Add taxonomies to the object.
-	 *
-	 * @param $post_id
-	 * @param $taxonomies
+	 * Post Meta.
 	 */
 
-	public function taxonomy( $post_id, $taxonomies ) {
+	public function post_meta() {
 
-		if ( ! is_array( $taxonomies ) ) {
+		if ( is_array( $this->post_meta ) ) {
+
+			foreach( $this->post_meta as $meta_key => $meta_value ) {
+
+				$meta_key   = apply_filters( 'wp_data_sync_meta_key', $meta_key, $meta_value, $this->post_id );
+				$meta_value = apply_filters( 'wp_data_sync_meta_value', $meta_value, $meta_key, $this->post_id );
+
+				update_post_meta( $this->post_id, $meta_key, $meta_value );
+
+			}
+
+		}
+
+		do_action( 'wp_data_sync_post_meta', $this->post_id, $this->post_meta );
+
+	}
+
+	/**
+	 * Add taxonomies to the object.
+	 */
+
+	public function taxonomy() {
+
+		if ( ! is_array( $this->taxonomies ) ) {
 			return;
 		}
 
-		foreach ( $taxonomies as $taxonomy => $terms ) {
+		foreach ( $this->taxonomies as $taxonomy => $terms ) {
 
 			if ( empty( $taxonomy ) || ! taxonomy_exists( $taxonomy ) ) {
 
@@ -243,11 +308,11 @@ class DataSync extends Core {
 
 			$ids = array_merge( $term_ids, $parent_ids );
 
-			wp_set_object_terms( $post_id, $ids, $taxonomy, $append );
+			wp_set_object_terms( $this->post_id, $ids, $taxonomy, $append );
 
 		}
 
-		do_action( 'wp_data_sync_taxonomies', $post_id, $taxonomies );
+		do_action( 'wp_data_sync_taxonomies', $this->post_id, $this->taxonomies );
 
 	}
 
@@ -277,31 +342,28 @@ class DataSync extends Core {
 	}
 
 	/**
-	 * Set the post thumbnail
-	 *
-	 * @param $post_id
-	 * @param $post_thumbnail
+	 * Set the post thumbnail.
 	 */
 
-	public function post_thumbnail( $post_id, $post_thumbnail ) {
+	public function post_thumbnail() {
 
-		if ( $attach_id = $this->attachment( $post_id, $post_thumbnail ) ) {
+		if ( $attach_id = $this->attachment( $this->post_id, $this->post_thumbnail ) ) {
 
-			set_post_thumbnail( $post_id, $attach_id );
+			set_post_thumbnail( $this->post_id, $attach_id );
 
-			do_action( 'wp_data_sync_post_thumbnail', $post_id, $post_thumbnail );
+			do_action( 'wp_data_sync_post_thumbnail', $this->post_id, $this->post_thumbnail );
 
 		}
 
 	}
 
 	/**
-	 * Attachment.
+	 * Attachemnt.
 	 *
 	 * @param $post_id
 	 * @param $image_url
 	 *
-	 * @return bool|int|\WP_Error|\WP_Post
+	 * @return bool|int|\WP_Post
 	 */
 
 	public function attachment( $post_id, $image_url ) {
@@ -456,24 +518,18 @@ class DataSync extends Core {
 
 	/**
 	 * Format the post date for WordPress.
-	 *
-	 * @param $post_object
-	 *
-	 * @return mixed
 	 */
 
-	public function post_date_format( $post_object ) {
+	public function post_date_format() {
 
-		if ( ! empty( $post_object['post_date'] ) ) {
+		if ( ! empty( $this->post_object['post_date'] ) ) {
 
 			// Convert the date to time.
-			$post_time = strtotime( $post_object['post_date'] );
+			$post_time = strtotime( $this->post_object['post_date'] );
 
-			$post_object['post_date'] = date( 'Y-m-d H:i:s', $post_time );
+			$this->post_object['post_date'] = date( 'Y-m-d H:i:s', $post_time );
 
 		}
-
-		return $post_object;
 
 	}
 
@@ -499,6 +555,86 @@ class DataSync extends Core {
 			'comment_status'
 		];
 
+	}
+
+	/**
+	 * Get the primary ID.
+	 *
+	 * @return int|bool
+	 */
+
+	public function get_primary_id() {
+		return $this->primary_id;
+	}
+
+	/**
+	 * Get the post ID.
+	 *
+	 * @return int|bool
+	 */
+
+	public function get_id() {
+		return $this->post_id;
+	}
+
+	/**
+	 * Get the post object.
+	 *
+	 * @return array|bool
+	 */
+
+	public function get_post_object() {
+		return $this->post_object;
+	}
+
+	/**
+	 * Get the post meta.
+	 *
+	 * @return array|bool
+	 */
+
+	public function get_post_meta() {
+		return $this->post_meta;
+	}
+
+	/**
+	 * Get the taxonomies.
+	 *
+	 * @return array|bool
+	 */
+
+	public function get_taxonomies() {
+		return $this->taxonomies;
+	}
+
+	/**
+	 * Get the post thumbnail.
+	 *
+	 * @return string|bool
+	 */
+
+	public function get_post_thumbnail() {
+		return $this->post_thumbnail;
+	}
+
+	/**
+	 * Get the attributes.
+	 *
+	 * @return array|bool
+	 */
+
+	public function get_attributes() {
+		return $this->attributes;
+	}
+
+	/**
+	 * Get the product gallery.
+	 *
+	 * @return array|bool
+	 */
+
+	public function get_product_gallery() {
+		return $this->product_gallery;
 	}
 
 }
