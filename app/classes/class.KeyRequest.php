@@ -15,6 +15,10 @@ use WP_REST_Server;
 use WP_REST_Request;
 use WP_REST_Response;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 class KeyRequest extends Core {
 
 	/**
@@ -202,8 +206,3 @@ class KeyRequest extends Core {
 	}
 
 }
-
-add_action( 'rest_api_init', function() {
-	$request = KeyRequest::instance();
-	$request->register_route();
-} );

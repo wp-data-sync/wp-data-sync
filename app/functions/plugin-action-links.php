@@ -11,6 +11,10 @@
 
 namespace WP_DataSync\App;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 add_filter( 'plugin_action_links', function( $links, $file ) {
 
 	if ( $file === WP_DATA_SYNC_PLUGIN ) {

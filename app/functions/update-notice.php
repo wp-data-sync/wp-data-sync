@@ -11,6 +11,10 @@
 
 namespace WP_DataSync\App;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 add_action( 'in_plugin_update_message-wp-data-sync/plugin.php', 'WP_DataSync\App\update_message', 10, 2 );
 
 /**

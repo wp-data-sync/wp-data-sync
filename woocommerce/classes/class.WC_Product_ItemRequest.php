@@ -1,0 +1,235 @@
+<?php
+/**
+ * WC_Product_ItemRequest
+ *
+ * Request WooCommerce product data
+ *
+ * @since   1.0.0
+ *
+ * @package WP_DataSync
+ */
+
+namespace WP_DataSync\Woo;
+
+use WC_Product;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+class WC_Product_ItemRequest {
+
+	/**
+	 * @var WC_Product
+	 */
+
+	private $product;
+
+	/**
+	 * @var int
+	 */
+
+	private $product_id;
+
+	/**
+	 * @var ItemRequest
+	 */
+
+	private $item_request;
+
+	/**
+	 * @var WC_Product_ItemRequest
+	 */
+
+	public static $instance;
+
+	/**
+	 * WC_Product_ItemRequest constructor.
+	 */
+
+	public function __construct() {
+		self::$instance = $this;
+	}
+
+	/**
+	 * @return WC_Product_ItemRequest
+	 */
+
+	public static function instance() {
+
+		if ( self::$instance === null ) {
+			self::$instance = new self();
+		}
+
+		return self::$instance;
+
+	}
+
+	/**
+	 * WC Process.
+	 *
+	 * @param $item_data
+	 * @param $product_id
+	 * @param $item_request
+	 *
+	 * @return mixed
+	 */
+
+	public function wc_process( $item_data, $product_id, $item_request ) {
+
+		$this->product_id   = $product_id;
+		$this->product      = new WC_Product( $product_id );
+		$this->item_request = $item_request;
+
+		if ( $image_urls = $this->product_gallery() ) {
+			$item_data['product_gallery'] = $image_urls;
+		}
+
+		if ( $attributes = $this->product_attributes() ) {
+			$item_data['attributes'] = $attributes;
+		}
+
+		if ( $variations = $this->product_variations() ) {
+			$item_data['variations'] = $variations;
+		}
+
+		return $item_data;
+
+	}
+
+	/**
+	 * Product image gallery.
+	 *
+	 * @return array|bool
+	 */
+
+	public function product_gallery() {
+
+		$image_ids  = $this->product->get_gallery_image_ids();
+		$image_urls = [];
+		$i          = 1;
+
+		if ( empty ( $image_ids ) ) {
+			return FALSE;
+		}
+
+		foreach ( $image_ids as $image_id ) {
+
+			$image_urls["image_$i"] = wp_get_attachment_image_url( $image_id );
+
+			$i++;
+
+		}
+
+		return $image_urls;
+
+	}
+
+	/**
+	 * Product Attributes.
+	 *
+	 * @return array|bool
+	 */
+
+	public function product_attributes() {
+
+		if ( ! $this->product->has_attributes() ) {
+			return FALSE;
+		}
+
+		$product_attributes = get_post_meta( $this->product_id, '_product_attributes', TRUE );
+		$attributes         = [];
+		$i                  = 1;
+
+		foreach ( $product_attributes as $attribute ) {
+
+			$attributes["attribute_$i"] = $attribute;
+
+			if ( $attribute['is_taxonomy'] ) {
+
+				$attributes["attribute_$i"]['name']   = wc_attribute_label( $attribute['name'] );
+				$value = $this->product->get_attribute( $attribute['name'] );
+				$attributes["attribute_$i"]['values'] = $this->explode( $value );
+
+			}
+			else {
+				$attributes["attribute_$i"]['values'] = $this->explode( $attribute['value'] );
+			}
+
+			unset( $attributes["attribute_$i"]['value'] );
+
+			$i ++;
+
+		}
+
+		return array_filter( $attributes );
+
+	}
+
+	/**
+	 * Explode.
+	 *
+	 * @param $value
+	 *
+	 * @return array
+	 */
+
+	public function explode( $value ) {
+		$replace = [ '\\,', '|' ];
+		$value = str_replace( $replace, ',', $value );
+		return array_map( 'trim', explode( ',', $value ) );
+	}
+
+	/**
+	 * Product variations.
+	 *
+	 * @return bool|array
+	 */
+
+	public function product_variations() {
+
+		$variations    = [];
+		$variation_ids = $this->get_variation_ids();
+		$i             = 1;
+
+		if ( empty( $variation_ids ) ) {
+			return FALSE;
+		}
+
+		foreach ( $variation_ids as $variation_id ) {
+
+			$variation['post_object'] = $this->item_request->get_post( $variation_id );
+            $variation['post_meta']   = $this->item_request->post_meta( $variation_id );
+
+            if ( has_post_thumbnail( $variation_id ) ) {
+	            $variation['post_thumbnail'] = $this->item_request->thumbnail_url( $variation_id );
+            }
+
+			$variations["variation_$i"] = $variation;
+
+            $i++;
+
+		}
+
+		return $variations;
+
+	}
+
+	/**
+	 * Get product variation ids.
+	 *
+	 * @return int[]|\WP_Post[]
+	 */
+
+	public function get_variation_ids() {
+
+		return get_posts( [
+			'numberposts' => -1,
+			'post_type'   => 'product_variation',
+			'parent'      => $this->product_id,
+			'fields'      => 'ids',
+		] );
+
+	}
+
+}

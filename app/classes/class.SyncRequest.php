@@ -15,6 +15,10 @@ use WP_REST_Server;
 use WP_REST_Request;
 use WP_REST_Response;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 class SyncRequest extends Core {
 
 	/**
@@ -264,10 +268,6 @@ class SyncRequest extends Core {
 				$clean_value = sanitize_title( $value );
 				break;
 
-			case 'meta':
-				$clean_value = sanitize_meta( $value );
-				break;
-
 			case 'filename':
 				$clean_value = sanitize_file_name( $value );
 				break;
@@ -282,8 +282,3 @@ class SyncRequest extends Core {
 	}
 
 }
-
-add_action( 'rest_api_init', function() {
-	$request = SyncRequest::instance();
-	$request->register_route();
-} );

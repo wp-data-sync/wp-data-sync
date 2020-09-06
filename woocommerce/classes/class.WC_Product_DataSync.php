@@ -9,16 +9,21 @@
  * @package WP_DataSync
  */
 
-namespace WP_DataSync\App;
+namespace WP_DataSync\Woo;
 
 use WC_Product;
 use WC_Product_Variable;
 use WC_Product_Attribute;
+use WP_DataSync\App\DataSync;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 class WC_Product_DataSync {
 
 	/**
-	 * @var object
+	 * @var DataSync
 	 */
 
 	private $data_sync;
@@ -69,15 +74,15 @@ class WC_Product_DataSync {
 	public function wc_process( $product_id, $data_sync ) {
 
 		$this->data_sync = $data_sync;
-		$this->product   = $this->variations ? new WC_Product_Variable( $product_id ) : new WC_Product( $product_id );;
+		$this->product   = $this->variations ? new WC_Product_Variable( $product_id ) : new WC_Product( $product_id );
 
 		if ( $attributes = $this->data_sync->get_attributes() ) {
 			$this->attributes( $product_id, $attributes );
 		}
 
-		//if ( $this->variations = $this->data_sync->get_variations() ) {
-			//$this->variations( $product_id, $attributes );
-		//}
+		if ( $variations = $this->data_sync->get_variations() ) {
+			$this->variations( $product_id, $variations );
+		}
 
 		if ( $product_gallery = $this->data_sync->get_product_gallery() ) {
 			$this->product_gallery( $product_id, $product_gallery );
@@ -209,14 +214,27 @@ class WC_Product_DataSync {
 			] )
 		);
 
-		return $taxonomy_name;;
+		return $taxonomy_name;
 
 	}
 
-	public function variations( $product_id, $attributes ) {
-		// Create variations
+	public function variations( $product_id, $variations ) {
 
-		// Add variation meta from $attributes
+		if ( is_array( $variations ) ) {
+			// set varations
+			// TODO: set variations from array
+		}
+		else {
+
+			// TODO: if these exist update them instaed of create them
+			// Create variations from attributes
+			$data_store = $this->product->get_data_store();
+
+			$data_store->create_all_product_variations( $this->product );
+
+			$data_store->sort_all_product_variations( $product_id );
+
+		}
 
 	}
 

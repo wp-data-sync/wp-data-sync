@@ -9,7 +9,11 @@
  * @package WP_DataSync
  */
 
-namespace WP_DataSync\App;
+namespace WP_DataSync\Woo;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 add_action( 'wp_data_sync_admin_tabs', function( $tabs ) {
 

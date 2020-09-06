@@ -3,7 +3,7 @@ Sync raw data into your WordPress or WooCommerce website from mutiple data sourc
 
 __Description__
 
-No more CSV import failures or server timeouts. The WP Data Sync API will import your raw data, then securely deliver perfect WordPress objects to your WordPress website.
+No more CSV import failures or server timeouts. The WP Data Sync API will import your raw data, then securely sync the data with your WordPress or WooCommerce wensite.
 
 The WP Data Sync servers handle the heavy workload. Keeping your production server up and running. This results in a better overall user experience.
 

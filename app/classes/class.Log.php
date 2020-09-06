@@ -11,6 +11,10 @@
 
 namespace WP_DataSync\App;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 class Log {
 
 	/**

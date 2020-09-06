@@ -11,6 +11,10 @@
 
 namespace WP_DataSync\App;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 class Settings {
 
 	/**
@@ -341,7 +345,7 @@ class Settings {
 			'dashboard' => [
 				0 => (object) [
 					'key' 		=> 'wp_data_sync_allowed',
-					'label'		=> __( 'Data Sync Allowed', 'wp-data-sync' ),
+					'label'		=> __( 'Allow Data Sync API Access', 'wp-data-sync' ),
 					'callback'  => 'input',
 					'args'      => [
 						'sanitize_callback' => 'sanitize_text_field',

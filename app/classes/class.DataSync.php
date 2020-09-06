@@ -11,6 +11,10 @@
 
 namespace WP_DataSync\App;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 class DataSync extends Core {
 
 	/**
@@ -59,6 +63,12 @@ class DataSync extends Core {
 	 * @var bool|array
 	 */
 
+	private $variations = FALSE;
+
+	/**
+	 * @var bool|array
+	 */
+
 	private $product_gallery = FALSE;
 
 	/**
@@ -94,6 +104,8 @@ class DataSync extends Core {
 	/**
 	 * Init.
 	 *
+	 * Set property values.
+	 *
 	 * @param $data
 	 */
 
@@ -106,6 +118,7 @@ class DataSync extends Core {
 			}
 
 		}
+
     }
 
 	/**
@@ -335,6 +348,10 @@ class DataSync extends Core {
 
 		if ( 0 === $term || NULL === $term ) {
 			$term = wp_insert_term( $term_name, $taxonomy, [ 'parent' => $parent_id ] );
+		}
+
+		if ( is_wp_error( $term ) ) {
+			return FALSE;
 		}
 
 		return intval( $term['term_id'] );
@@ -625,6 +642,16 @@ class DataSync extends Core {
 
 	public function get_attributes() {
 		return $this->attributes;
+	}
+
+	/**
+	 * Get variations.
+	 *
+	 * @return mixed|bool
+	 */
+
+	public function get_variations() {
+		return $this->variations;
 	}
 
 	/**

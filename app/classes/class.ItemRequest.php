@@ -1,10 +1,10 @@
 <?php
 /**
- * Data Request
+ * Item Request
  *
- * Request data to sync inot API..
+ * Request item data.
  *
- * @since   1.0.0
+ * @since   1.2.0
  *
  * @package WP_DataSync
  */
@@ -15,20 +15,28 @@ use WP_REST_Server;
 use WP_REST_Request;
 use WP_REST_Response;
 
-class DataRequest extends Core {
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-	private $request_type;
-	private $post_type;
-	private $last_updated;
+class ItemRequest extends Core {
+
+	const sync_key = 'wp_data_sync_item_synced';
 
 	/**
-	 * @var DataRequest
+	 * @var string
+	 */
+
+	private $post_type;
+
+	/**
+	 * @var ItemRequest
 	 */
 
 	public static $instance;
 
 	/**
-	 * DataRequest constructor.
+	 * ItemRequest constructor.
 	 */
 
 	public function __construct() {
@@ -38,7 +46,7 @@ class DataRequest extends Core {
 	/**
 	 * Instance.
 	 *
-	 * @return DataRequest
+	 * @return ItemRequest
 	 */
 
 	public static function instance() {
@@ -61,7 +69,7 @@ class DataRequest extends Core {
 
 		register_rest_route(
 			'wp-data-sync/1.0/',
-			'data/(?P<access_token>\S+)/(?P<request_type>\S+)/(?P<post_type>\S+)/(?P<last_updated>\S+)',
+			'get-item/(?P<access_token>\S+)/(?P<post_type>\S+)/',
 			[
 				'methods' => WP_REST_Server::READABLE,
 				'args'    => [
@@ -69,17 +77,9 @@ class DataRequest extends Core {
 						'sanitize_callback' => 'sanitize_text_field',
 						'validate_callback' => [ $this, 'access_key' ]
 					],
-					'request_type' => [
-						'sanitize_callback' => 'sanitize_text_field',
-						'validate_callback' => [ $this, 'request_type' ]
-					],
 					'post_type' => [
 						'sanitize_callback' => 'sanitize_text_field',
 						'validate_callback' => [ $this, 'post_type' ]
-					],
-					'last_updatede' => [
-						'sanitize_callback' => 'sanitize_text_field',
-						'validate_callback' => [ $this, 'last_updated' ]
 					]
 				],
 				'permission_callback' => [ $this, 'access' ],
@@ -99,28 +99,11 @@ class DataRequest extends Core {
 
 	public function request() {
 
-		$response = $this->get_data();
+		$response = $this->get_item();
 
 		Log::write( 'data-request-response', $response );
 
 		return rest_ensure_response( $response );
-
-	}
-
-	/**
-	 * Check if request type is valid.
-	 *
-	 * @return bool
-	 */
-
-	public function request_type( $request_type ) {
-
-		if ( in_array( $request_type, [ 'initial', 'updated' ] )) {
-			$this->request_type = $request_type;
-			return TRUE;
-		}
-
-		return FALSE;
 
 	}
 
@@ -141,102 +124,211 @@ class DataRequest extends Core {
 	}
 
 	/**
-	 * Last updated.
-	 *
-	 * @param $last_updated
-	 *
-	 * @return bool
+	 * Get the data.
+	 * 
+	 * @return bool|mixed|void
 	 */
 
-	public function last_updated( $last_updated ) {
+	public function get_item() {
 
-		$this->last_updated = $last_updated;
+		if ( $item_id = $this->item_id() ) {
 
-		return is_string( $last_updated );
+			$item_data = [
+				'post_object'     => $this->get_post( $item_id ),
+				'post_meta'       => $this->post_meta( $item_id ),
+				'taxonomies'      => $this->taxonomies( $item_id ),
+				'post_thumbnail'  => $this->thumbnail_url( $item_id ),
+			];
+
+			update_post_meta( $item_id, self::sync_key, current_time( 'mysql' ) );
+
+			return apply_filters( 'wp_data_sync_item_request', $item_data, $item_id, $this );
+
+		}
+		
+		return FALSE;
 
 	}
 
 	/**
-	 * Get the data.
+	 * Get post.
+	 *
+	 * @param $item_id
+	 *
+	 * @return array|\WP_Post|null
+	 */
+
+	public function get_post( $item_id ) {
+
+		$item = get_post( $item_id );
+
+		unset( $item->ID );
+		unset( $item->guid );
+
+		return $item;
+
+	}
+
+	/**
+	 * Get the item ID.
+	 *
+	 * @return bool|mixed
+	 */
+
+	public function item_id() {
+
+		$post_ids = get_posts( [
+			'numberposts' => 1,
+			'post_type'   => $this->post_type,
+			'post_status' => [ 'publish', 'trash' ],
+			'fields'      => 'ids',
+			'meta_query' => [ [
+				'key'     => self::sync_key,
+				'compare' => 'NOT EXISTS'
+			] ]
+		] );
+		
+		return empty( $post_ids ) ? FALSE : $post_ids[0];
+
+	}
+
+	/**
+	 * Post Meta.
+	 *
+	 * @param $item_id
 	 *
 	 * @return array
 	 */
 
-	public function get_data() {
+	public function post_meta( $item_id ) {
 
-		$post_id = $this->get_post_id();
+		$values            = [];
+		$values['item_id'] = $item_id;
+		$post_meta         = get_post_meta( $item_id );
 
-		$data = [
-			'post_object'  => [
-				'post_title' => 'string',
-				'post_type'  => $this->post_type,
-				// Etc...
-			],
-			// Mix primary ID with meta data
-			'post_meta' => [
-				'key' => 'value',
-				'key' => 'value'
-			],
-			'taxonomies' => [
-				'taxonomy' => [
-					0 => [
-						'term'    => 'string',
-						'parents' => [
-							'parent',
-							'parent'
-						]
-					]
-				]
-			],
-			'post_thumbnail'  => 'URL string',
-			'product_gallery' => [
-				'URL string',
-				'URL string'
-			],
-			'attributes' => [
-				0 => [
-					'name'    => 'string',
-					'values'  => [
-						'string',
-						'string',
-						'string'
-					],
-					'is_visible'   => 'bool',
-					'is_taxonomy'  => 'bool',
-					'is_variation' => 'bool'
-				]
-			],
-			'variations' => [
-				0 => [
-					'post_object' => [
-						'post_title' => 'string',
-						'post_type'  => 'string',
-						// Etc...
-					],
-					'post_meta' => [
-						'key' => 'value',
-						'key' => 'value'
-					]
-				]
-			]
-		];
+		foreach ( $post_meta as $key => $value ) {
+			$values[ $key ] = $value[0];
+		}
 
-		return apply_filters( 'wp_data_sync_get_data_request', $data );
+		return $values;
 
 	}
 
-	public function get_post_id() {
+	/**
+	 * Thumbnail URL.
+	 *
+	 * @param $item_id
+	 *
+	 * @return bool|false|string
+	 */
 
-		return get_post( [
-			'numposts' => 1,
-			'post_type' => $this->post_type,
-			'fields'    => 'ids'
-		] );
+	public function thumbnail_url( $item_id ) {
+		return get_the_post_thumbnail_url( $item_id );
+	}
+
+	/**
+	 * Taxonomies.
+	 * 
+	 * @param $item_id
+	 *
+	 * @return array|\WP_Error
+	 */
+
+	public function taxonomies( $item_id ) {
+
+		$results = [];
+		$taxonomies = get_object_taxonomies( $this->post_type );
+
+		foreach ( $taxonomies as $taxonomy ) {
+
+			$term_ids = wp_get_object_terms( $item_id, $taxonomy, [ 'fields' => 'ids', 'childless' => TRUE ] );
+
+			if ( ! empty( $term_ids ) && is_array( $term_ids ) ) {
+				$results[ $taxonomy ] = $this->format_terms( $term_ids, $taxonomy );
+			}
+
+		}
+
+		return array_filter( $results );
+
+	}
+
+	/**
+	 * Formated terms.
+	 *
+	 * @param $term_ids
+	 * @param $taxonomy
+	 *
+	 * @return array|string
+	 */
+
+	public function format_terms( $term_ids, $taxonomy ) {
+
+		$term_ids = wp_parse_id_list( $term_ids );
+
+		if ( ! count( $term_ids ) ) {
+			return '';
+		}
+
+		$terms = [];
+		$i     = 1;
+
+		if ( is_taxonomy_hierarchical( $taxonomy ) ) {
+
+			foreach ( $term_ids as $term_id ) {
+
+				$parents = [];
+				$p       = 1;
+				$parent_ids   = array_reverse( get_ancestors( $term_id, $taxonomy ) );
+
+				foreach ( $parent_ids as $parent_id ) {
+
+					$term = get_term( $parent_id, $taxonomy );
+
+					if ( $term && ! is_wp_error( $term ) ) {
+						$parents["parent_$p"] = $term->name;
+					}
+
+					$p++;
+
+				}
+
+				$term = get_term( $term_id, $taxonomy );
+
+				if ( $term && ! is_wp_error( $term ) ) {
+
+					$terms["term_$i"] = array_filter( [
+						'name'    => $term->name,
+						'parents' => $parents
+					] );
+
+				}
+
+				$i++;
+
+			}
+
+		} else {
+
+			foreach ( $term_ids as $term_id ) {
+
+				$term = get_term( $term_id, $taxonomy );
+
+				if ( $term && ! is_wp_error( $term ) ) {
+					$terms["term_$i"] = array_filter( [
+						'name'    => $term->name,
+						'parents' => []
+					] );
+				}
+
+				$i++;
+
+			}
+
+		}
+
+		return array_filter( $terms );
 
 	}
 
 }
-
-add_action( 'rest_api_init', function() {
-	DataRequest::instance()->register_route();
-} );

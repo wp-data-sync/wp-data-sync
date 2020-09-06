@@ -2,7 +2,7 @@
 Contributors: kevin-brent
 Tags: sync data, api feed, data feed, json feed, woocommerce, data transfer, csv import, data sync, sync products, google sheets, google forms
 Requires at least: 5.0
-Tested up to: 5.4.2
+Tested up to: 5.5.1
 Requires PHP: 5.6
 Stable tag: /trunk
 License: GPLv2
@@ -12,7 +12,7 @@ Sync raw data into your WordPress or WooCommerce website from mutiple data sourc
 
 == Description ==
 
-No more CSV import failures or server timeouts. The WP Data Sync API will import your raw data, then securely deliver perfect WordPress objects to your WordPress website.
+No more CSV import failures or server timeouts. The WP Data Sync API will import your raw data, then securely sync the data with your WordPress or WooCommerce wensite.
 
 The WP Data Sync servers handle the heavy workload. Keeping your production server up and running. This results in a better overall user experience.
 
@@ -20,6 +20,8 @@ __Supported Data Formats__
 &#x2611; JSON
 &#x2611; XML
 &#x2611; CSV
+&#x2611; WordPress Website
+&#x2611; WooCommerce Website
 &#x2611; Google Sheets
 
 __Helpful Resources__
