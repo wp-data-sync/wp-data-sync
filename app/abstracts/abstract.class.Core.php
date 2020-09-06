@@ -11,6 +11,10 @@
 
 namespace WP_DataSync\App;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 abstract class Core {
 
 	/**
@@ -21,16 +25,20 @@ abstract class Core {
 
 	public function access() {
 
-		if ( $referer = $this->referer() ) {
+		if ( $this->allowed() ) {
 
-			Log::write( 'access-attempt', "Referer Captured: $referer" );
+			if ( $referer = $this->referer() ) {
 
-			if ( $referer === get_option( 'wp_data_sync_api_url' ) ) {
+				Log::write( 'access-attempt', "Referer Captured: $referer" );
 
-				Log::write( 'access-attempt', "Referer Approved: $referer" );
+				if ( $referer === get_option( 'wp_data_sync_api_url' ) ) {
 
-				if ( $this->private_key() ) {
-					return TRUE;
+					Log::write( 'access-attempt', "Referer Approved: $referer" );
+
+					if ( $this->private_key() ) {
+						return TRUE;
+					}
+
 				}
 
 			}
@@ -39,6 +47,16 @@ abstract class Core {
 
 		return FALSE;
 
+	}
+
+	/**
+	 * Is access allowed.
+	 *
+	 * @return bool
+	 */
+
+	public function allowed() {
+		return 'checked' === get_option( 'wp_data_sync_allowed' );
 	}
 
 	/**
