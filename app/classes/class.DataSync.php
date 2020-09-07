@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class DataSync extends Core {
+class DataSync {
 
 	/**
 	 * @var bool|array
@@ -149,15 +149,15 @@ class DataSync extends Core {
 		if ( $this->post_object() ) {
 
 			if ( isset(  $this->post_meta ) ) {
-				$this->post_meta();
+				$this->post_meta( $this->post_id, $this->post_meta );
 			}
 
 			if ( isset(  $this->taxonomies ) ) {
-				$this->taxonomy();
+				$this->taxonomy( $this->post_id, $this->taxonomies );
 			}
 
 			if ( isset( $this->post_thumbnail ) ) {
-				$this->post_thumbnail();
+				$this->post_thumbnail( $this->post_id, $this->post_thumbnail );
 			}
 
 			do_action( 'wp_data_sync_after_process', $this->post_id, $this );
@@ -177,6 +177,43 @@ class DataSync extends Core {
 		if ( $this->post_id = $this->post_id( $this->primary_id ) ) {
 			$this->post_object['ID'] = $this->post_id;
 		}
+
+	}
+
+	/**
+	 * Post ID.
+	 *
+	 * @param $primary_id
+	 *
+	 * @return bool|int
+	 */
+
+	public function post_id( $primary_id ) {
+
+		global $wpdb;
+
+		$post_id = $wpdb->get_var(
+			$wpdb->prepare(
+				"
+				SELECT post_id 
+    			FROM {$wpdb->postmeta} pm 
+    			JOIN {$wpdb->posts} p 
+      			ON p.ID = pm.post_id
+    			WHERE meta_key = %s 
+      			AND meta_value = %s 
+      			ORDER BY meta_id DESC
+    			LIMIT 1
+				",
+				$primary_id['meta_key'],
+				$primary_id['meta_value']
+			)
+		);
+
+		if ( null === $post_id ) {
+			return FALSE;
+		}
+
+		return (int) $post_id;
 
 	}
 
@@ -258,19 +295,22 @@ class DataSync extends Core {
 	}
 
 	/**
-	 * Post Meta.
+	 * Post meta.
+	 *
+	 * @param $post_id
+	 * @param $post_meta
 	 */
 
-	public function post_meta() {
+	public function post_meta( $post_id, $post_meta ) {
 
-		if ( is_array( $this->post_meta ) ) {
+		if ( is_array( $post_meta ) ) {
 
-			foreach( $this->post_meta as $meta_key => $meta_value ) {
+			foreach( $post_meta as $meta_key => $meta_value ) {
 
-				$meta_key   = apply_filters( 'wp_data_sync_meta_key', $meta_key, $meta_value, $this->post_id );
-				$meta_value = apply_filters( 'wp_data_sync_meta_value', $meta_value, $meta_key, $this->post_id );
+				$meta_key   = apply_filters( 'wp_data_sync_meta_key', $meta_key, $meta_value, $post_id );
+				$meta_value = apply_filters( 'wp_data_sync_meta_value', $meta_value, $meta_key, $post_id );
 
-				update_post_meta( $this->post_id, $meta_key, $meta_value );
+				update_post_meta( $post_id, $meta_key, $meta_value );
 
 			}
 
@@ -281,16 +321,19 @@ class DataSync extends Core {
 	}
 
 	/**
-	 * Add taxonomies to the object.
+	 * Set taxonomies.
+	 *
+	 * @param $post_id
+	 * @param $taxonomies
 	 */
 
-	public function taxonomy() {
+	public function taxonomy( $post_id, $taxonomies ) {
 
-		if ( ! is_array( $this->taxonomies ) ) {
+		if ( ! is_array( $taxonomies ) ) {
 			return;
 		}
 
-		foreach ( $this->taxonomies as $taxonomy => $terms ) {
+		foreach ( $taxonomies as $taxonomy => $terms ) {
 
 			if ( empty( $taxonomy ) || ! taxonomy_exists( $taxonomy ) ) {
 
@@ -321,7 +364,7 @@ class DataSync extends Core {
 
 			$ids = array_merge( $term_ids, $parent_ids );
 
-			wp_set_object_terms( $this->post_id, $ids, $taxonomy, $append );
+			wp_set_object_terms( $post_id, $ids, $taxonomy, $append );
 
 		}
 
@@ -360,15 +403,18 @@ class DataSync extends Core {
 
 	/**
 	 * Set the post thumbnail.
+	 *
+	 * @param $post_id
+	 * @param $post_thumbnail
 	 */
 
-	public function post_thumbnail() {
+	public function post_thumbnail( $post_id, $post_thumbnail ) {
 
-		if ( $attach_id = $this->attachment( $this->post_id, $this->post_thumbnail ) ) {
+		if ( $attach_id = $this->attachment( $post_id, $post_thumbnail ) ) {
 
-			set_post_thumbnail( $this->post_id, $attach_id );
+			set_post_thumbnail( $post_id, $attach_id );
 
-			do_action( 'wp_data_sync_post_thumbnail', $this->post_id, $this->post_thumbnail );
+			do_action( 'wp_data_sync_post_thumbnail', $post_id, $post_thumbnail );
 
 		}
 

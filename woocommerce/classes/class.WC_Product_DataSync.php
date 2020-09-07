@@ -14,6 +14,7 @@ namespace WP_DataSync\Woo;
 use WC_Product;
 use WC_Product_Variable;
 use WC_Product_Attribute;
+use WC_Product_Variation;
 use WP_DataSync\App\DataSync;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -74,7 +75,7 @@ class WC_Product_DataSync {
 	public function wc_process( $product_id, $data_sync ) {
 
 		$this->data_sync = $data_sync;
-		$this->product   = $this->variations ? new WC_Product_Variable( $product_id ) : new WC_Product( $product_id );
+		$this->product   = $this->data_sync->get_variations() ? new WC_Product_Variable( $product_id ) : new WC_Product( $product_id );
 
 		if ( $attributes = $this->data_sync->get_attributes() ) {
 			$this->attributes( $product_id, $attributes );
@@ -122,8 +123,8 @@ class WC_Product_DataSync {
 				$term_ids = $this->attribute_term_ids( $taxonomy, $attribute );
 			}
 
-			$product_attribute->set_name( $is_taxonomy ? $taxonomy : $name );
-			$product_attribute->set_options( $is_taxonomy ? $term_ids : join( ',', $values ) );
+			$product_attribute->set_name( $name );
+			$product_attribute->set_options( $values );
 			$product_attribute->set_position( $position );
 			$product_attribute->set_visible( $is_visible );
 			$product_attribute->set_variation( $is_variation );
@@ -218,151 +219,140 @@ class WC_Product_DataSync {
 
 	}
 
+	/**
+	 * Variations.
+	 *
+	 * @link https://woocommerce.github.io/code-reference/classes/WC-Product-Variation.html
+	 *
+	 * @param $product_id
+	 * @param $variations
+	 *
+	 * @throws \WC_Data_Exception
+	 */
+
 	public function variations( $product_id, $variations ) {
 
 		if ( is_array( $variations ) ) {
-			// set varations
-			// TODO: set variations from array
-		}
-		else {
 
-			// TODO: if these exist update them instaed of create them
-			// Create variations from attributes
-			$data_store = $this->product->get_data_store();
+			foreach ( $variations as $variation ) {
 
-			$data_store->create_all_product_variations( $this->product );
+				extract( $variation );
 
-			$data_store->sort_all_product_variations( $product_id );
+				$_variation = new WC_Product_Variation();
 
-		}
+				$_variation->set_parent_id( $product_id );
 
-	}
-
-	/**
-	 * Variation.
-	 *
-	 * @param $product_id
-	 * @param $attribute
-	 * @param $taxonomy
-	 *
-	 * @return int|\WP_Error
-	 */
-
-	public function variation( $product_id, $attribute, $taxonomy ) {
-
-		extract( $attribute );
-
-		foreach ( $values as $key => $value ) {
-
-			$variation_id = $this->create_variation( $product_id, $value );
-
-			$this->variation_meta( $variation_id, $meta_values[ $key ] );
-
-			Log::write( 'variation-id', $variation_id );
-
-			if ( $is_taxonomy ) {
-				$this->variation_term( $variation_id, $value, $taxonomy );
-			}
-
-		}
-
-	}
-
-	/**
-	 * Variation.
-	 *
-	 * @param $product_id
-	 *
-	 * @return int|\WP_Error
-	 */
-
-	public function create_variation( $product_id, $value ) {
-
-		$product = wc_get_product( $product_id );
-
-		if( $product->is_type( 'subscrption' ) ) {
-			wp_set_object_terms( $product_id, 'variable_subscription', 'product_type' );
-		}
-		else {
-			wp_set_object_terms( $product_id, 'variable', 'product_type' );
-		}
-
-		$post_title = $product->get_name() . ' ' . $value;
-
-		$variation_post = [
-			'post_title'  => $post_title,
-			'post_name'   => sanitize_title( $post_title ),
-			'post_status' => 'publish',
-			'post_parent' => $product_id,
-			'post_type'   => 'product_variation',
-			'guid'        => $product->get_permalink()
-		];
-
-		// Check to see if we already have this variation
-		if ( $variation = get_page_by_title( $post_title, 'OBJECT', 'product_variation' ) ) {
-			$variation_post['ID'] = $variation->ID;
-		}
-
-		return wp_insert_post( $variation_post );
-
-	}
-
-	/**
-	 * Variation term.
-	 *
-	 * @param $variation_id
-	 * @param $value
-	 * @param $taxonomy
-	 */
-
-	public function variation_term( $variation_id, $value, $taxonomy ) {
-
-		Log::write( 'variation-term', $value );
-
-		$term = get_term_by( 'name', $value, $taxonomy );
-
-		Log::write( 'variation-term', $term );
-
-		if ( isset( $term->slug ) ) {
-
-			update_post_meta( $variation_id, "attribute_$taxonomy", $term->slug );
-
-			// https://github.com/woocommerce/woocommerce/issues/12718
-			// FIXME: Do we really need this?
-			wp_set_object_terms( $variation_id, $term->term_id, $taxonomy );
-
-		}
-
-	}
-
-	/**
-	 * Variation Meta.
-	 *
-	 * @param $variation_id
-	 * @param $meta_values
-	 */
-
-	public function variation_meta( $variation_id, $meta_values ) {
-
-		if ( empty( $meta_values ) ) {
-			return;
-		}
-
-		if ( ! is_array( $meta_values ) ) {
-			return;
-		}
-
-		foreach ( $meta_values as $meta_key => $meta_value ) {
-
-			if ( '_variation_image' === $meta_key ) {
-
-				if ( $attach_id = $this->data_sync->attachment( $variation_id, $meta_value ) ) {
-					set_post_thumbnail( $variation_id, $attach_id );
+				if ( ! empty( $post_thumbnail ) ) {
+					$attach_id = $this->data_sync->attachment( 0, $post_thumbnail );
+					$_variation->set_image_id( $attach_id );
 				}
 
-			}
+				// Extract the Post Object
+				extract( $post_object );
 
-			update_post_meta( $variation_id, $meta_key, $meta_value );
+				// Check to see if we already have this variation
+				if ( $exists = get_page_by_title( $post_title, 'OBJECT', 'product_variation' ) ) {
+					$_variation->set_id( $exists->ID );
+				}
+
+				if ( ! empty( $post_title ) ) {
+					$_variation->set_name( $post_title );
+				}
+
+				if ( ! empty( $post_name ) ) {
+					$_variation->set_slug( $post_name );
+				}
+
+				if ( ! empty( $post_excerpt ) ) {
+					$_variation->set_short_description( $post_excerpt );
+				}
+				if ( ! empty( $post_status ) ) {
+					$_variation->set_status( $post_status );
+				}
+
+				if ( ! empty( $post_date ) ) {
+					$_variation->set_date_created( $post_date );
+				}
+
+				if ( ! empty( $menu_order ) ) {
+					$_variation->set_menu_order( $menu_order );
+				}
+
+				extract( $post_meta );
+
+				if ( ! empty( $_sku ) ) {
+					$_variation->set_sku( $_sku );
+				}
+
+				if ( ! empty( $_price ) ) {
+					$_variation->set_price( $_price );
+				}
+
+				if ( ! empty( $_regular_price ) ) {
+					$_variation->set_regular_price( $_regular_price );
+				}
+
+				if ( ! empty( $_sale_price ) ) {
+					$_variation->set_sale_price( $_sale_price );
+				}
+
+				if ( ! empty( $_variation_description ) ) {
+					$_variation->set_description( $_variation_description );
+				}
+
+				if ( ! empty( $_manage_stock ) ) {
+					$_variation->set_manage_stock( $_manage_stock );
+				}
+
+				if ( ! empty( $_back_orders ) ) {
+					$_variation->set_backorders( $_back_orders );
+				}
+
+				if ( ! empty( $_sold_individually ) ) {
+					$_variation->set_sold_individually( $_sold_individually );
+				}
+
+				if ( ! empty( $_virtual ) ) {
+					$_variation->set_virtual( $_virtual );
+				}
+
+				if ( ! empty( $_downloadable ) ) {
+					$_variation->set_downloadable( $_downloadable );
+				}
+
+				if ( ! empty( $_stock ) ) {
+					$_variation->set_stock( $_stock );
+				}
+
+				if ( ! empty( $_stock_status ) ) {
+					$_variation->set_stock_status( $_stock_status );
+				}
+
+				if ( ! empty( $_length ) ) {
+					$_variation->set_length( $_length );
+				}
+
+				if ( ! empty( $_width ) ) {
+					$_variation->set_width( $_width );
+				}
+
+				if ( ! empty( $_height ) ) {
+					$_variation->set_height( $_height );
+				}
+
+				if ( ! empty( $_weight ) ) {
+					$_variation->set_weight( $_weight );
+				}
+
+				// Attributes
+				if ( ! empty( $attributes ) ) {
+					$_variation->set_default_attributes( $attributes );
+					$_variation->set_attributes( $attributes );
+				}
+
+				$_variation->save();
+
+			}
 
 		}
 

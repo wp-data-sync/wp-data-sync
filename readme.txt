@@ -16,7 +16,7 @@ No more CSV import failures or server timeouts. The WP Data Sync API will import
 
 The WP Data Sync servers handle the heavy workload. Keeping your production server up and running. This results in a better overall user experience.
 
-__Supported Data Formats__
+__Supported Data Source__
 &#x2611; JSON
 &#x2611; XML
 &#x2611; CSV

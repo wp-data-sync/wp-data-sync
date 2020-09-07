@@ -12,6 +12,7 @@
 namespace WP_DataSync\Woo;
 
 use WC_Product;
+use WC_Product_Variation;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -175,9 +176,12 @@ class WC_Product_ItemRequest {
 	 */
 
 	public function explode( $value ) {
+
 		$replace = [ '\\,', '|' ];
-		$value = str_replace( $replace, ',', $value );
+		$value   = str_replace( $replace, ',', $value );
+
 		return array_map( 'trim', explode( ',', $value ) );
+
 	}
 
 	/**
@@ -200,6 +204,7 @@ class WC_Product_ItemRequest {
 
 			$variation['post_object'] = $this->item_request->get_post( $variation_id );
             $variation['post_meta']   = $this->item_request->post_meta( $variation_id );
+            $variation['attributes']  = $this->get_variation_attributes( $variation_id );
 
             if ( has_post_thumbnail( $variation_id ) ) {
 	            $variation['post_thumbnail'] = $this->item_request->thumbnail_url( $variation_id );
@@ -229,6 +234,38 @@ class WC_Product_ItemRequest {
 			'parent'      => $this->product_id,
 			'fields'      => 'ids',
 		] );
+
+	}
+
+	/**
+	 * Get the variation attributes.
+	 *
+	 * @param $variation_id
+	 *
+	 * @return array
+	 */
+
+	public function get_variation_attributes( $variation_id ) {
+
+		$_variation = new WC_Product_Variation( $variation_id );
+
+		$attributes = $_variation->get_variation_attributes( FALSE );
+
+		$results = [];
+
+		foreach ( $attributes as $taxonomy => $term_slug ) {
+
+			$slug = wc_attribute_taxonomy_slug( $taxonomy );
+
+			$term = get_term_by( 'slug', $term_slug, $taxonomy );
+
+			if ( ! is_wp_error( $term ) ) {
+				$results[ $slug ] = $term->name;
+			}
+
+		}
+
+		return $results;
 
 	}
 

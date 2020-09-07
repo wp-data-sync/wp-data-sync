@@ -30,6 +30,12 @@ class ItemRequest extends Core {
 	private $post_type;
 
 	/**
+	 * @var integer
+	 */
+
+	private $limit;
+
+	/**
 	 * @var ItemRequest
 	 */
 
@@ -69,7 +75,7 @@ class ItemRequest extends Core {
 
 		register_rest_route(
 			'wp-data-sync/1.0/',
-			'get-item/(?P<access_token>\S+)/(?P<post_type>\S+)/',
+			'get-item/(?P<access_token>\S+)/(?P<post_type>\S+)/(?P<limit>\d+)/',
 			[
 				'methods' => WP_REST_Server::READABLE,
 				'args'    => [
@@ -80,6 +86,10 @@ class ItemRequest extends Core {
 					'post_type' => [
 						'sanitize_callback' => 'sanitize_text_field',
 						'validate_callback' => [ $this, 'post_type' ]
+					],
+					'limit' => [
+						'sanitize_callback' => 'intval',
+						'validate_callback' => [ $this, 'limit' ]
 					]
 				],
 				'permission_callback' => [ $this, 'access' ],
@@ -99,7 +109,7 @@ class ItemRequest extends Core {
 
 	public function request() {
 
-		$response = $this->get_item();
+		$response = $this->get_items();
 
 		Log::write( 'data-request-response', $response );
 
@@ -124,29 +134,67 @@ class ItemRequest extends Core {
 	}
 
 	/**
-	 * Get the data.
-	 * 
-	 * @return bool|mixed|void
+	 * Limit.
+	 *
+	 * @param $limit
+	 *
+	 * @return bool
 	 */
 
-	public function get_item() {
+	public function limit( $limit ) {
 
-		if ( $item_id = $this->item_id() ) {
+		$this->limit = intval( $limit );
 
-			$item_data = [
-				'post_object'     => $this->get_post( $item_id ),
-				'post_meta'       => $this->post_meta( $item_id ),
-				'taxonomies'      => $this->taxonomies( $item_id ),
-				'post_thumbnail'  => $this->thumbnail_url( $item_id ),
-			];
+		return  $this->limit > 0;
 
-			update_post_meta( $item_id, self::sync_key, current_time( 'mysql' ) );
+	}
 
-			return apply_filters( 'wp_data_sync_item_request', $item_data, $item_id, $this );
+	/**
+	 * Get items.
+	 *
+	 * @return mixed
+	 */
+
+	public function get_items() {
+
+		if ( $item_ids = $this->item_ids() ) {
+
+			$items = [];
+
+			foreach ( $item_ids as $item_id ) {
+
+				$items[] = $this->get_item( $item_id );
+
+				update_post_meta( $item_id, self::sync_key, current_time( 'mysql' ) );
+
+			}
+
+			return apply_filters( 'wp_data_sync_get_items_response', $items );
 
 		}
-		
+
 		return FALSE;
+
+	}
+
+	/**
+	 * Get a single item.
+	 *
+	 * @param $item_id
+	 *
+	 * @return mixed|void
+	 */
+
+	public function get_item( $item_id ) {
+
+		$item_data = [
+			'post_object'     => $this->get_post( $item_id ),
+			'post_meta'       => $this->post_meta( $item_id ),
+			'taxonomies'      => $this->taxonomies( $item_id ),
+			'post_thumbnail'  => $this->thumbnail_url( $item_id ),
+		];
+
+		return apply_filters( 'wp_data_sync_item_request', $item_data, $item_id, $this );
 
 	}
 
@@ -164,21 +212,24 @@ class ItemRequest extends Core {
 
 		unset( $item->ID );
 		unset( $item->guid );
+		unset( $item->post_parent );
+		unset( $item->post_date_gmt );
+		unset( $item->post_modified_gmt );
 
 		return $item;
 
 	}
 
 	/**
-	 * Get the item ID.
+	 * Get the item IDs.
 	 *
 	 * @return bool|mixed
 	 */
 
-	public function item_id() {
+	public function item_ids() {
 
-		$post_ids = get_posts( [
-			'numberposts' => 1,
+		$item_ids = get_posts( [
+			'numberposts' => $this->limit,
 			'post_type'   => $this->post_type,
 			'post_status' => [ 'publish', 'trash' ],
 			'fields'      => 'ids',
@@ -188,7 +239,7 @@ class ItemRequest extends Core {
 			] ]
 		] );
 		
-		return empty( $post_ids ) ? FALSE : $post_ids[0];
+		return empty( $item_ids ) ? FALSE : $item_ids;
 
 	}
 
@@ -202,9 +253,9 @@ class ItemRequest extends Core {
 
 	public function post_meta( $item_id ) {
 
-		$values            = [];
-		$values['item_id'] = $item_id;
-		$post_meta         = get_post_meta( $item_id );
+		$values                   = [];
+		$values['source_item_id'] = $item_id;
+		$post_meta                = get_post_meta( $item_id );
 
 		foreach ( $post_meta as $key => $value ) {
 			$values[ $key ] = $value[0];
