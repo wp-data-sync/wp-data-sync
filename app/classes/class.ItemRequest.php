@@ -21,8 +21,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class ItemRequest extends Core {
 
-	const sync_key = 'wp_data_sync_item_synced';
-
 	/**
 	 * @var string
 	 */
@@ -165,7 +163,7 @@ class ItemRequest extends Core {
 
 				$items[] = $this->get_item( $item_id );
 
-				update_post_meta( $item_id, self::sync_key, current_time( 'mysql' ) );
+				$this->insert_id( $item_id );
 
 			}
 
@@ -228,18 +226,34 @@ class ItemRequest extends Core {
 
 	public function item_ids() {
 
-		$item_ids = get_posts( [
-			'numberposts' => $this->limit,
-			'post_type'   => $this->post_type,
-			'post_status' => [ 'publish', 'trash' ],
-			'fields'      => 'ids',
-			'meta_query' => [ [
-				'key'     => self::sync_key,
-				'compare' => 'NOT EXISTS'
-			] ]
-		] );
-		
-		return empty( $item_ids ) ? FALSE : $item_ids;
+		global $wpdb;
+
+		$table = self::table();
+
+		$item_ids = $wpdb->get_col(
+			$wpdb->prepare(
+				"
+				SELECT SQL_CALC_FOUND_ROWS  p.ID 
+				FROM {$wpdb->prefix}posts p
+				LEFT JOIN $table i
+				ON (p.ID = i.item_id) 
+				WHERE (i.item_id IS NULL) 
+				AND p.post_type = %s 
+				AND (p.post_status = 'publish' OR p.post_status = 'trash')
+				GROUP BY p.ID 
+				ORDER BY p.ID DESC 
+				LIMIT %d
+				",
+				$this->post_type,
+				$this->limit
+			)
+		);
+
+		if ( null === $item_ids ) {
+			return FALSE;
+		}
+
+		return array_map( 'intval', $item_ids );
 
 	}
 
@@ -379,6 +393,80 @@ class ItemRequest extends Core {
 		}
 
 		return array_filter( $terms );
+
+	}
+
+	/**
+	 * Insert Item ID.
+	 *
+	 * @param $item_id
+	 */
+
+	public function insert_id( $item_id ) {
+
+		global $wpdb;
+
+		$wpdb->insert(
+			self::table(),
+			[ 'item_id' => $item_id ]
+		);
+
+	}
+
+	/**
+	 * Delete Item ID.
+	 *
+	 * @param $item_id
+	 */
+
+	public static function delete_id( $item_id ) {
+
+		global $wpdb;
+
+		$wpdb->delete(
+			self::table(),
+			[ 'item_id' => $item_id ]
+		);
+
+	}
+
+	/**
+	 * DB Table name.
+	 *
+	 * @return string
+	 */
+
+	public static function table() {
+
+		global $wpdb;
+
+		return $wpdb->prefix . 'data_sync_item_request';
+
+	}
+
+	/**
+	 * Create the item request table.
+	 */
+
+	public static function create_table() {
+
+		global $wpdb;
+
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+
+		$charset_collate = $wpdb->get_charset_collate();
+        $table           = self::table();
+
+		$sql = "
+			CREATE TABLE IF NOT EXISTS $table (
+  			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  			item_id bigint(20) NOT NULL,
+  			PRIMARY KEY (id),
+			KEY item_id (item_id)
+			) $charset_collate;
+        ";
+
+		dbDelta( $sql );
 
 	}
 
