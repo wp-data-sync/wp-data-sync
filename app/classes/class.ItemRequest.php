@@ -107,6 +107,14 @@ class ItemRequest extends Core {
 
 	public function request() {
 
+		if ( 'refresh' === $this->post_type ) {
+
+			$this->truncate_table();
+
+			return rest_ensure_response( FALSE );
+
+		}
+
 		$response = $this->get_items();
 
 		Log::write( 'data-request-response', $response );
@@ -186,6 +194,7 @@ class ItemRequest extends Core {
 	public function get_item( $item_id ) {
 
 		$item_data = [
+			'source_item_id'  => $item_id,
 			'post_object'     => $this->get_post( $item_id ),
 			'post_meta'       => $this->post_meta( $item_id ),
 			'taxonomies'      => $this->taxonomies( $item_id ),
@@ -233,7 +242,7 @@ class ItemRequest extends Core {
 		$item_ids = $wpdb->get_col(
 			$wpdb->prepare(
 				"
-				SELECT SQL_CALC_FOUND_ROWS  p.ID 
+				SELECT SQL_NO_CACHE SQL_CALC_FOUND_ROWS  p.ID 
 				FROM {$wpdb->prefix}posts p
 				LEFT JOIN $table i
 				ON (p.ID = i.item_id) 
@@ -248,6 +257,8 @@ class ItemRequest extends Core {
 				$this->limit
 			)
 		);
+
+		$wpdb->flush();
 
 		if ( null === $item_ids ) {
 			return FALSE;
@@ -267,9 +278,8 @@ class ItemRequest extends Core {
 
 	public function post_meta( $item_id ) {
 
-		$values                   = [];
-		$values['source_item_id'] = $item_id;
-		$post_meta                = get_post_meta( $item_id );
+		$values    = [];
+		$post_meta = get_post_meta( $item_id );
 
 		foreach ( $post_meta as $key => $value ) {
 			$values[ $key ] = $value[0];
@@ -436,11 +446,25 @@ class ItemRequest extends Core {
 	 * @return string
 	 */
 
-	public static function table() {
+	private static function table() {
 
 		global $wpdb;
 
 		return $wpdb->prefix . 'data_sync_item_request';
+
+	}
+
+	/**
+	 * Truncate Item Request table.
+	 */
+
+	private function truncate_table() {
+
+		global $wpdb;
+
+		$table = self::table();
+
+		$wpdb->query( "TRUNCATE TABLE $table" );
 
 	}
 
