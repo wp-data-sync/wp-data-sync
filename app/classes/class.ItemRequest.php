@@ -323,10 +323,10 @@ class ItemRequest extends Core {
 
 		foreach ( $taxonomies as $taxonomy ) {
 
-			$term_ids = wp_get_object_terms( $item_id, $taxonomy, [ 'fields' => 'ids', 'childless' => TRUE ] );
+			$term_ids = wp_get_object_terms( $item_id, $taxonomy, [ 'fields' => 'ids' ] );
 
 			if ( ! empty( $term_ids ) && is_array( $term_ids ) ) {
-				$results[ $taxonomy ] = $this->format_terms( $term_ids, $taxonomy );
+				$results[ $taxonomy ] = $this->format_term_ids( $term_ids, $taxonomy );
 			}
 
 		}
@@ -336,15 +336,16 @@ class ItemRequest extends Core {
 	}
 
 	/**
-	 * Formated terms.
+	 * Format Terms IDs.
+	 *
+	 * @see WC_CSV_Exporter::format_term_ids
 	 *
 	 * @param $term_ids
 	 * @param $taxonomy
 	 *
-	 * @return array|string
+	 * @return string
 	 */
-
-	public function format_terms( $term_ids, $taxonomy ) {
+	public function format_term_ids( $term_ids, $taxonomy ) {
 
 		$term_ids = wp_parse_id_list( $term_ids );
 
@@ -352,41 +353,32 @@ class ItemRequest extends Core {
 			return '';
 		}
 
-		$terms = [];
-		$i     = 1;
+		$formatted_terms = array();
 
 		if ( is_taxonomy_hierarchical( $taxonomy ) ) {
 
 			foreach ( $term_ids as $term_id ) {
 
-				$parents = [];
-				$p       = 1;
-				$parent_ids   = array_reverse( get_ancestors( $term_id, $taxonomy ) );
+				$formatted_term = array();
+				$ancestor_ids   = array_reverse( get_ancestors( $term_id, $taxonomy ) );
 
-				foreach ( $parent_ids as $parent_id ) {
+				foreach ( $ancestor_ids as $ancestor_id ) {
 
-					$term = get_term( $parent_id, $taxonomy );
+					$term = get_term( $ancestor_id, $taxonomy );
 
 					if ( $term && ! is_wp_error( $term ) ) {
-						$parents["parent_$p"] = $term->name;
+						$formatted_term[] = $term->name;
 					}
-
-					$p++;
 
 				}
 
 				$term = get_term( $term_id, $taxonomy );
 
 				if ( $term && ! is_wp_error( $term ) ) {
-
-					$terms["term_$i"] = array_filter( [
-						'name'    => $term->name,
-						'parents' => $parents
-					] );
-
+					$formatted_term[] = $term->name;
 				}
 
-				$i++;
+				$formatted_terms[] = implode( ' > ', $formatted_term );
 
 			}
 
@@ -397,19 +389,37 @@ class ItemRequest extends Core {
 				$term = get_term( $term_id, $taxonomy );
 
 				if ( $term && ! is_wp_error( $term ) ) {
-					$terms["term_$i"] = array_filter( [
-						'name'    => $term->name,
-						'parents' => []
-					] );
+					$formatted_terms[] = $term->name;
 				}
-
-				$i++;
 
 			}
 
 		}
 
-		return array_filter( $terms );
+		return $this->implode_values( $formatted_terms );
+
+	}
+
+	/**
+	 * Implode Values.
+	 *
+	 * @see WC_CSV_Exporter::implode_values
+	 *
+	 * @param $values
+	 *
+	 * @return string
+	 */
+
+	protected function implode_values( $values ) {
+
+		$values_to_implode = array();
+
+		foreach ( $values as $value ) {
+			$value               = (string) is_scalar( $value ) ? $value : '';
+			$values_to_implode[] = str_replace( ',', '\\,', $value );
+		}
+
+		return implode( ', ', $values_to_implode );
 
 	}
 

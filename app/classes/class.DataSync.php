@@ -353,7 +353,7 @@ class DataSync {
 				if ( ! empty( $term['parents'] ) ) {
 
 					foreach ( $term['parents'] as $parent ) {
-						$parent_ids[] = $parent_id = $this->term_id( $parent, $taxonomy, $parent_id );
+						$parent_id = $this->term_id( $parent, $taxonomy, $parent_id );
 					}
 
 				}
@@ -362,9 +362,7 @@ class DataSync {
 
 			}
 
-			$ids = array_merge( $term_ids, $parent_ids );
-
-			wp_set_object_terms( $post_id, $ids, $taxonomy, $append );
+			wp_set_object_terms( $post_id, $term_ids, $taxonomy, $append );
 
 		}
 
