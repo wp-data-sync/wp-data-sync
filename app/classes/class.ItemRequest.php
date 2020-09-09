@@ -135,6 +135,11 @@ class ItemRequest extends Core {
 
 		$this->post_type = $post_type;
 
+		// Allow 'refresh' as post type to trunacte the ItemRequest table.
+		if ( 'refresh' === $post_type ) {
+			return TRUE;
+		}
+
 		return post_type_exists( $post_type );
 
 	}
