@@ -283,7 +283,9 @@ class ItemRequest extends Core {
 
 	public function post_meta( $item_id ) {
 
-		$values    = [];
+		$values                    = [];
+		$values['_source_item_id']  = $item_id;
+
 		$post_meta = get_post_meta( $item_id );
 
 		foreach ( $post_meta as $key => $value ) {
