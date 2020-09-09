@@ -140,26 +140,25 @@ class WC_Product_ItemRequest {
 
 		$product_attributes = get_post_meta( $this->product_id, '_product_attributes', TRUE );
 		$attributes         = [];
-		$i                  = 1;
 
 		foreach ( $product_attributes as $attribute ) {
 
-			$attributes["attribute_$i"] = $attribute;
+			$slug = wc_attribute_taxonomy_slug( $attribute['name'] );
+
+			$attributes[ $slug ] = $attribute;
 
 			if ( $attribute['is_taxonomy'] ) {
 
-				$attributes["attribute_$i"]['name']   = wc_attribute_label( $attribute['name'] );
+				$attributes[ $slug ]['name']   = wc_attribute_label( $attribute['name'] );
 				$value = $this->product->get_attribute( $attribute['name'] );
-				$attributes["attribute_$i"]['values'] = $this->explode( $value );
+				$attributes[ $slug ]['values'] = $this->explode( $value );
 
 			}
 			else {
-				$attributes["attribute_$i"]['values'] = $this->explode( $attribute['value'] );
+				$attributes[ $slug ]['values'] = $this->explode( $attribute['value'] );
 			}
 
-			unset( $attributes["attribute_$i"]['value'] );
-
-			$i ++;
+			unset( $attributes[ $slug ]['value'] );
 
 		}
 
