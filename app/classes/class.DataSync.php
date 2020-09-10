@@ -305,12 +305,16 @@ class DataSync {
 
 		if ( is_array( $post_meta ) ) {
 
+			$restricted_meta_keys = $this->restricted_meta_keys();
+
 			foreach( $post_meta as $meta_key => $meta_value ) {
 
-				$meta_key   = apply_filters( 'wp_data_sync_meta_key', $meta_key, $meta_value, $post_id );
-				$meta_value = apply_filters( 'wp_data_sync_meta_value', $meta_value, $meta_key, $post_id );
+				$meta_key   = $this->post_meta_key( $meta_key, $meta_value, $post_id );
+				$meta_value = $this->post_meta_value( $meta_value, $meta_key, $post_id );
 
-				update_post_meta( $post_id, $meta_key, $meta_value );
+				if ( ! in_array( $meta_key, $restricted_meta_keys ) ) {
+					update_post_meta( $post_id, $meta_key, $meta_value );
+				}
 
 			}
 
@@ -318,6 +322,34 @@ class DataSync {
 
 		do_action( 'wp_data_sync_post_meta', $this->post_id, $this->post_meta );
 
+	}
+
+	/**
+	 * Post meta Key.
+	 *
+	 * @param $meta_key
+	 * @param $meta_value
+	 * @param $post_id
+	 *
+	 * @return mixed|void
+	 */
+
+	public function post_meta_key( $meta_key, $meta_value, $post_id ) {
+		return apply_filters( 'wp_data_sync_meta_key', $meta_key, $meta_value, $post_id );
+	}
+
+	/**
+	 * Post meta value.
+	 *
+	 * @param $meta_value
+	 * @param $meta_key
+	 * @param $post_id
+	 *
+	 * @return mixed|void
+	 */
+
+	public function post_meta_value( $meta_value, $meta_key, $post_id ) {
+		return apply_filters( 'wp_data_sync_meta_value', $meta_value, $meta_key, $post_id );
 	}
 
 	/**
@@ -602,7 +634,7 @@ class DataSync {
 
 	public function post_object_keys() {
 
-		return [
+		$post_object_keys = [
 			'post_title',
 			'post_status',
 			'post_author',
@@ -615,6 +647,29 @@ class DataSync {
 			'ping_status',
 			'comment_status'
 		];
+
+		return apply_filters( 'wp_data_sync_post_object_keys', $post_object_keys );
+
+	}
+
+	/**
+	 * Filter Restricted Meta Keys.
+	 *
+	 * An array of restricted meta keys.
+	 * Keys are restricted since their meta value may break other functionality.
+	 *
+	 * @return mixed|void
+	 */
+
+	public function restricted_meta_keys() {
+
+		$restricted_meta_keys = [
+			'_edit_lock',
+			'_edit_last',
+			'_thumbnail_id'
+		];
+
+		return apply_filters( 'wp_data_sync_restricted_meta_keys', $restricted_meta_keys );
 
 	}
 

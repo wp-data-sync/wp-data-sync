@@ -283,16 +283,22 @@ class ItemRequest extends Core {
 
 	public function post_meta( $item_id ) {
 
-		$values                    = [];
-		$values['_source_item_id']  = $item_id;
+		$meta_values = [];
+		$post_meta   = get_post_meta( $item_id );
 
-		$post_meta = get_post_meta( $item_id );
+		foreach ( $post_meta as $meta_key => $values ) {
 
-		foreach ( $post_meta as $key => $value ) {
-			$values[ $key ] = $value[0];
+			// Get the first element of array.
+			$meta_value = array_shift( $values );
+
+			$meta_values[ $meta_key ] = maybe_unserialize( $meta_value );
+
 		}
 
-		return $values;
+		// Save the post ID into meta data.
+		$meta_values['_source_item_id'] = $item_id;
+
+		return $meta_values;
 
 	}
 
