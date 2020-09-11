@@ -316,11 +316,13 @@ class DataSync {
 					update_post_meta( $post_id, $meta_key, $meta_value );
 				}
 
+				do_action( "wp_data_sync_post_meta_$meta_key", $post_id, $meta_value );
+
 			}
 
 		}
 
-		do_action( 'wp_data_sync_post_meta', $this->post_id, $this->post_meta );
+		do_action( 'wp_data_sync_post_meta', $post_id, $post_meta );
 
 	}
 
