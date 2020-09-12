@@ -116,7 +116,7 @@ class WC_Product_ItemRequest {
 
 		foreach ( $image_ids as $image_id ) {
 
-			$image_urls["image_$i"] = wp_get_attachment_image_url( $image_id );
+			$image_urls["image_$i"] = wp_get_attachment_image_url( $image_id, 'full' );
 
 			$i++;
 

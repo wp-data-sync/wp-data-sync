@@ -31,7 +31,9 @@ abstract class Core {
 
 				Log::write( 'access-attempt', "Referer Captured: $referer" );
 
-				if ( $referer === get_option( 'wp_data_sync_api_url' ) ) {
+				$api_url = get_option( 'wp_data_sync_api_url' );
+
+				if ( $referer === untrailingslashit( $api_url ) ) {
 
 					Log::write( 'access-attempt', "Referer Approved: $referer" );
 
@@ -129,7 +131,7 @@ abstract class Core {
 
 		Log::write( 'access-attempt', "Referer Available: $referer" );
 
-		return $referer;
+		return untrailingslashit( $referer );
 
 	}
 

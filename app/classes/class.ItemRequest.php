@@ -311,7 +311,7 @@ class ItemRequest extends Core {
 	 */
 
 	public function thumbnail_url( $item_id ) {
-		return get_the_post_thumbnail_url( $item_id );
+		return get_the_post_thumbnail_url( $item_id, 'full' );
 	}
 
 	/**
