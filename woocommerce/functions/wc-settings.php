@@ -38,6 +38,30 @@ add_filter( 'wp_data_sync_settings', function( $settings ) {
 				]
 			],
 			1 => (object) [
+				'key' 		=> 'wp_data_sync_process_cross_sells',
+				'label'		=> __( 'Process Cross Sells', 'wp-data-sync' ),
+				'callback'  => 'input',
+				'args'      => [
+					'sanitize_callback' => 'sanitize_text_field',
+					'basename'          => 'checkbox',
+					'type'		        => '',
+					'class'		        => '',
+					'placeholder'       => ''
+				]
+			],
+			2 => (object) [
+				'key' 		=> 'wp_data_sync_process_up_sells',
+				'label'		=> __( 'Process Up Sells', 'wp-data-sync' ),
+				'callback'  => 'input',
+				'args'      => [
+					'sanitize_callback' => 'sanitize_text_field',
+					'basename'          => 'checkbox',
+					'type'		        => '',
+					'class'		        => '',
+					'placeholder'       => ''
+				]
+			],
+			3 => (object) [
 				'key' 		=> 'wp_data_sync_order_details',
 				'label'		=> __( 'Sync Order Details (Coming Soon)', 'wp-data-sync' ),
 				'callback'  => 'input',

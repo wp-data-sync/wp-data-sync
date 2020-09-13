@@ -30,7 +30,7 @@ class WC_Product_DataSync {
 	private $data_sync;
 
 	/**
-	 * @var object
+	 * @var WC_Product|WC_Product_Variable
 	 */
 
 	private $product;
@@ -91,6 +91,14 @@ class WC_Product_DataSync {
 
 		if ( $taxonomies = $this->data_sync->get_taxonomies() ) {
 			$this->product_visibility( $product_id, $taxonomies );
+		}
+
+		if ( $cross_sells = $this->data_sync->get_cross_sells() ) {
+			$this->sells( $cross_sells, 'cross_sells' );
+		}
+
+		if ( $up_sells = $this->data_sync->get_up_sells() ) {
+			$this->sells( $up_sells, 'up_sells' );
 		}
 
 	}
@@ -420,6 +428,25 @@ class WC_Product_DataSync {
 			wp_set_object_terms( $product_id, $term_ids, $taxonomy );
 
 		}
+
+	}
+
+	/**
+	 * Cross sells and Up sells.
+	 *
+	 * @param $sells
+	 * @param $sells_type
+	 */
+
+	public function sells( $sells, $sells_type ) {
+
+		if ( 'checked' !== get_option( "wp_data_sync_process_$sells_type" ) ) {
+			return;
+		}
+
+		$product_sells = WC_Product_Sells::instance();
+		$product_sells->set_properties( $this->product, $sells, $sells_type );
+		$product_sells->save();
 
 	}
 

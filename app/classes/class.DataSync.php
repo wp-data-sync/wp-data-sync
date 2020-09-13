@@ -72,6 +72,18 @@ class DataSync {
 	private $product_gallery = FALSE;
 
 	/**
+	 * @var bool|array
+	 */
+
+	private $cross_sells = FALSE;
+
+	/**
+	 * @var bool|array
+	 */
+
+	private $up_sells = FALSE;
+
+	/**
 	 * @var DataSync
 	 */
 
@@ -134,37 +146,32 @@ class DataSync {
 			return [ 'primary_id' => 'Empty primary ID' ];
 		}
 
-		// Check to see if we already have this post.
-		$this->post_exists();
-
-		// A post object is required!!
-		if ( empty( $this->post_object ) ) {
-			return [ 'post_object' => 'Empty post object' ];
-		}
+		// Set the post ID.
+		$this->set_post_id();
 
 		if ( $this->maybe_trash_post() ) {
 			return [ 'post_object' => 'Trash Post' ];
 		}
 
-		if ( $this->post_object() ) {
-
-			if ( isset(  $this->post_meta ) ) {
-				$this->post_meta( $this->post_id, $this->post_meta );
-			}
-
-			if ( isset(  $this->taxonomies ) ) {
-				$this->taxonomy( $this->post_id, $this->taxonomies );
-			}
-
-			if ( isset( $this->post_thumbnail ) ) {
-				$this->post_thumbnail( $this->post_id, $this->post_thumbnail );
-			}
-
-			do_action( 'wp_data_sync_after_process', $this->post_id, $this );
-
-			return [ 'post_id' => $this->post_id ];
-
+		if ( isset( $this->post_object ) ) {
+			$this->post_object();
 		}
+
+		if ( isset(  $this->post_meta ) ) {
+			$this->post_meta( $this->post_id, $this->post_meta );
+		}
+
+		if ( isset(  $this->taxonomies ) ) {
+			$this->taxonomy( $this->post_id, $this->taxonomies );
+		}
+
+		if ( isset( $this->post_thumbnail ) ) {
+			$this->post_thumbnail( $this->post_id, $this->post_thumbnail );
+		}
+
+		do_action( 'wp_data_sync_after_process', $this->post_id, $this );
+
+		return [ 'post_id' => $this->post_id ];
 
 	}
 
@@ -172,7 +179,7 @@ class DataSync {
 	 * Set the post ID.
 	 */
 
-	public function post_exists() {
+	private function set_post_id() {
 
 		if ( $this->post_id = $this->post_id( $this->primary_id ) ) {
 			$this->post_object['ID'] = $this->post_id;
@@ -210,7 +217,13 @@ class DataSync {
 		);
 
 		if ( null === $post_id ) {
-			return FALSE;
+
+			$post_id = wp_insert_post( [
+				'post_title'  => 'WP Data Sync Placeholder',
+				'post_type'   => get_option( 'wp_data_sync_post_type' ),
+				'post_status' => 'draft'
+			] );
+
 		}
 
 		return (int) $post_id;
@@ -282,15 +295,9 @@ class DataSync {
 		$this->post_object_defaults();
 		$this->post_date_format();
 
-		if ( $this->post_id = wp_insert_post( $this->post_object ) ) {
-
+		if ( wp_update_post( $this->post_object ) ) {
 			do_action( 'wp_data_sync_after_post_object', $this->post_object );
-
-			return TRUE;
-
 		}
-
-		return FALSE;
 
 	}
 
@@ -309,20 +316,20 @@ class DataSync {
 
 			foreach( $post_meta as $meta_key => $meta_value ) {
 
-				$meta_key   = $this->post_meta_key( $meta_key, $meta_value, $post_id );
-				$meta_value = $this->post_meta_value( $meta_value, $meta_key, $post_id );
+				$meta_key   = $this->post_meta_key( $meta_key, $meta_value );
+				$meta_value = $this->post_meta_value( $meta_value, $meta_key );
 
 				if ( ! in_array( $meta_key, $restricted_meta_keys ) ) {
 					update_post_meta( $post_id, $meta_key, $meta_value );
 				}
 
-				do_action( "wp_data_sync_post_meta_$meta_key", $post_id, $meta_value );
+				do_action( "wp_data_sync_post_meta_$meta_key", $post_id, $meta_value, $this );
 
 			}
 
 		}
 
-		do_action( 'wp_data_sync_post_meta', $post_id, $post_meta );
+		do_action( 'wp_data_sync_post_meta', $post_id, $post_meta, $this );
 
 	}
 
@@ -336,8 +343,8 @@ class DataSync {
 	 * @return mixed|void
 	 */
 
-	public function post_meta_key( $meta_key, $meta_value, $post_id ) {
-		return apply_filters( 'wp_data_sync_meta_key', $meta_key, $meta_value, $post_id );
+	public function post_meta_key( $meta_key, $meta_value ) {
+		return apply_filters( 'wp_data_sync_meta_key', $meta_key, $meta_value, $this->post_id, $this );
 	}
 
 	/**
@@ -350,8 +357,8 @@ class DataSync {
 	 * @return mixed|void
 	 */
 
-	public function post_meta_value( $meta_value, $meta_key, $post_id ) {
-		return apply_filters( 'wp_data_sync_meta_value', $meta_value, $meta_key, $post_id );
+	public function post_meta_value( $meta_value, $meta_key ) {
+		return apply_filters( 'wp_data_sync_meta_value', $meta_value, $meta_key, $this->post_id, $this );
 	}
 
 	/**
@@ -763,6 +770,26 @@ class DataSync {
 
 	public function get_product_gallery() {
 		return $this->product_gallery;
+	}
+
+	/**
+	 * Get cross sells.
+	 *
+	 * @return array|bool
+	 */
+
+	public function get_cross_sells() {
+		return $this->cross_sells;
+	}
+
+	/**
+	 * Get up sells.
+	 *
+	 * @return array|bool
+	 */
+
+	public function get_up_sells() {
+		return $this->up_sells;
 	}
 
 }
