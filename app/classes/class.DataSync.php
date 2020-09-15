@@ -401,13 +401,16 @@ class DataSync {
 
 				$term_ids[] = $this->term_id( $term['name'], $taxonomy, $parent_id );
 
+				// Reset parent ID.
+				$parent_id = 0;
+
 			}
 
 			wp_set_object_terms( $post_id, $term_ids, $taxonomy, $append );
 
 		}
 
-		do_action( 'wp_data_sync_taxonomies', $this->post_id, $this->taxonomies );
+		do_action( 'wp_data_sync_taxonomies', $post_id, $taxonomies );
 
 	}
 
