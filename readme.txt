@@ -8,27 +8,31 @@ Stable tag: /trunk
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Sync raw data into your WordPress or WooCommerce website from mutiple data sources and formats.
+Sync data from almost any data source to your WordPress or WooCommerce website.
 
 == Description ==
 
-No more CSV import failures or server timeouts. The WP Data Sync API will import your raw data, then securely sync the data with your WordPress or WooCommerce wensite.
+Import data into your website from almost any data source. Posts, pages, products, or any other custom post type. After the data is set in your website, our API will keep the data up to date with the changes in your data feed. This can all be done without writing a single line of code.
 
-The WP Data Sync servers handle the heavy workload. Keeping your production server up and running. This results in a better overall user experience.
-
-__Supported Data Source__
+__Data Source Types__
 &#x2611; JSON
 &#x2611; XML
 &#x2611; CSV
+&#x2611; Google Sheets
 &#x2611; WordPress Website
 &#x2611; WooCommerce Website
-&#x2611; Google Sheets
+
+The WP Data Sync API is easy to set up and maintain. Map your data source with the data keys from your website and you are ready to go. If you need help mapping your data source, we have support experts available to help.
+
+WP Data Sync is developer friendly. The plugin is loaded with action and filter hooks to allow customization to every data field. In addition, our API offers several options to manipulate the data. Including conditional logic, combining multiple data fields into a single string, and much, much, more...
 
 __Helpful Resources__
 
-[WP Data Sync](https://wpdatasync.com "WP Data Sync")
-[WP Data Sync Blog](https://wpdatasync.com/blog/ "WP Data Sync Blog")
-[Developer Documentation](https://wpdatasync.com/docunentation/ "Developer Documentation")
+[WP Data Sync](https://wpdatasync.com/?affid=admin "WP Data Sync")
+[WP Data Sync Blog](https://wpdatasync.com/blog/?affid=admin "WP Data Sync Blog")
+[Developer Documentation - Getting Started](https://wpdatasync.com/documentation-type/getting-started/?affid=admin "Developer Documentation - Getting Started")
+[Developer Documentation - Actions](https://wpdatasync.com/documentation-type/actions/?affid=admin "Developer Documentation - Actions")
+[Developer Documentation - Filters](https://wpdatasync.com/documentation-type/filters/?affid=admin "Developer Documentation - Filters")
 
 == Installation ==
 
@@ -43,9 +47,9 @@ __Helpful Resources__
 
 We process data in 3 steps:
 
-1. WP Data Sync uses it's API to process raw data from your data source.
-2. WP Data Sync API sends a prefect WordPress post object to your website.
-3. WP Data Sync plugin inserts or updates the data in the WordPress website.
+1. WP Data Sync uses our API to process raw data from your data source.
+2. WP Data Sync API syncs the data to your website.
+3. WP Data Sync plugin manages updates of the data in the WordPress website.
 
 = How many websites can I sync using the same data? =
 
@@ -57,11 +61,11 @@ WP Data Sync can sync as many objects as you need. Your account is auto-scaled d
 
 = Is my data private or do other users have access to my data? =
 
-Your data is private to you. No one else has access to the data, except for the WP Data Sync team. We do not sell the data. We only have access so we can offer techinal support to our clients.
+Your data is private to you. No one else has access to the data, except for the WP Data Sync team. We do not sell the data.
 
 = Is WP Data Sync developer friendly? =
 
-Yes. We have WordPress hooks and filters throughout the plugin to allow for almost any situation. [Developer Documentation](https://wpdatasync.com/docunentation/ "Developer Documentation")
+Yes. We have WordPress hooks and filters throughout the plugin to allow for almost any situation. [Developer Documentation](https://wpdatasync.com/docunentation/?affid=admin "Developer Documentation")
 
 == Screenshots ==
 
@@ -69,6 +73,6 @@ Yes. We have WordPress hooks and filters throughout the plugin to allow for almo
 
 == Change Log ==
 
-[Change Log](https://wpdatasync.com/changelog/wp-data-sync-1/ "Change Log")
+[Change Log](https://wpdatasync.com/changelog/wp-data-sync-1/?affid=admin "Change Log")
 
  == Upgrade Notice ==
