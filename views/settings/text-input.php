@@ -9,6 +9,8 @@
  * @package WP_DataSync
  */
 
+namespace WP_DataSync\App;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	return;
 } ?>
@@ -23,5 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		class="<?php printf( esc_attr__( '%s' ), $args['class'] ); ?>"
 		placeholder="<?php printf( esc_attr__( '%s' ), $args['placeholder'] ); ?>"
 	>
+
+	<?php toottip( $args ); ?>
 
 </td>

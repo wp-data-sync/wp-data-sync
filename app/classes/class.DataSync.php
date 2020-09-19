@@ -237,18 +237,13 @@ class DataSync {
 
 	public function post_object_defaults() {
 
-		// Only set the defaults for a new post.
-		if ( empty( $this->post_id ) ) {
+		$keys = $this->post_object_keys();
 
-			$keys = $this->post_object_keys();
+		foreach ( $keys as $key ) {
 
-			foreach ( $keys as $key ) {
+			$value = isset( $this->post_object[ $key ] ) ? $this->post_object[ $key ] : get_option( "wp_data_sync_{$key}", '' );
 
-				$value = isset( $this->post_object[ $key ] ) ? $this->post_object[ $key ] : get_option( "wp_data_sync_{$key}", '' );
-
-				$this->post_object[ $key ] = apply_filters( "wp_data_sync_{$key}", $value );
-
-			}
+			$this->post_object[ $key ] = apply_filters( "wp_data_sync_{$key}", $value, $this->post_id, $this );
 
 		}
 
@@ -475,6 +470,14 @@ class DataSync {
 
 		require_once( ABSPATH . 'wp-admin/includes/image.php' );
 
+		if ( ! $this->is_valid_image( $image_url ) ) {
+
+			Log::write( 'attachemnt-invalid', $image_url );
+
+			return FALSE;
+
+		}
+
 		$basename   = $this->basename( $post_id, $image_url );
 		$post_title = preg_replace( '/\.[^.]+$/', '', $basename );
 
@@ -508,7 +511,7 @@ class DataSync {
 					'post_status'    => 'inherit'
 				];
 
-				// Insert featured image data
+				// Insert image data
 				$attach_id = wp_insert_attachment( $attachment, $file_path, $post_id );
 
 				if ( is_int( $attach_id ) && 0 < $attach_id ) {
@@ -523,6 +526,31 @@ class DataSync {
 
 				}
 
+			}
+
+		}
+
+		return FALSE;
+
+	}
+
+	/**
+	 * Is Valid Image.
+	 *
+	 * @param $image_url
+	 *
+	 * @return mixed|void
+	 */
+
+	public function is_valid_image( $image_url ) {
+
+		if ( preg_match( "/^(https?:\/\/)/i", $image_url ) ) {
+
+			if ( filter_var( $image_url, FILTER_VALIDATE_URL ) !== FALSE ) {
+
+				if ( file_is_valid_image( $image_url ) ) {
+					return apply_filters( 'wp_data_sync_is_valid_image', TRUE, $image_url );
+				}
 			}
 
 		}

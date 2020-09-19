@@ -46,7 +46,8 @@ add_filter( 'wp_data_sync_settings', function( $settings ) {
 					'basename'          => 'checkbox',
 					'type'		        => '',
 					'class'		        => '',
-					'placeholder'       => ''
+					'placeholder'       => '',
+					'info'              => __( 'This relates the IDs from your data source with the IDs from your website. Please note, if the related product does not exist, this system will relate the product when it is created in the data sync.' )
 				]
 			],
 			2 => (object) [
@@ -58,7 +59,8 @@ add_filter( 'wp_data_sync_settings', function( $settings ) {
 					'basename'          => 'checkbox',
 					'type'		        => '',
 					'class'		        => '',
-					'placeholder'       => ''
+					'placeholder'       => '',
+					'info'              => __( 'This relates the IDs from your data source with the IDs from your website. Please note, if the related product does not exist, this system will relate the product when it is created in the data sync.' )
 				]
 			],
 			3 => (object) [

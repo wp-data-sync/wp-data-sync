@@ -9,6 +9,8 @@
  * @package WP_DataSync
  */
 
+namespace WP_DataSync\App;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	return;
 } ?>
@@ -35,5 +37,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?php } ?>
 
 	</select>
+
+	<?php toottip( $args ); ?>
 
 </td>

@@ -9,9 +9,26 @@
  * @package WP_DataSync
  */
 
+namespace WP_DataSync\App;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	return;
 } ?>
+
+<style>
+	.wpds-tooltip {color: #222;cursor: pointer;}
+</style>
+
+<script>
+	jQuery(document).ready(function($) {
+		$( '.wpds-tooltip' ).tooltip({
+			show: {
+				effect: "slideDown",
+				delay: 250
+			}
+		});
+	});
+</script>
 
 <div class="wp-data-sync-settings wrap">
 

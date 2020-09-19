@@ -84,10 +84,19 @@ class Settings {
 		add_action( 'admin_init', [ $this, 'register_settings' ], 2 );
 		add_action( 'admin_menu', [ $this, 'add_pages' ], 5 );
 		add_action( 'wp_data_sync_help_buttons', [ $this, 'help_buttons' ] );
+		add_action( 'admin_enqueue_scripts', [ $this, 'scripts' ] );
 
 		// Delete log files on setting change.
 		add_action( 'update_option_wp_data_sync_allow_logging', [ $this, 'delete_log_files' ], 10, 2 );
 
+	}
+
+	/**
+	 * Scripts and styles.
+	 */
+
+	public function scripts() {
+		wp_register_style( 'jquery-ui-min', WP_DATA_SYNC_ASSETS . 'css/jquery-ui.min.css' );
 	}
 
 	/**
@@ -138,6 +147,9 @@ class Settings {
 		if ( ! current_user_can( WP_DATA_SYNC_CAP ) ) {
 			wp_die( __( 'You do not have sufficient permissions to access this page.', 'wp-data-sync' ) );
 		}
+
+		wp_enqueue_style( 'jquery-ui-min' );
+		wp_enqueue_script( 'jquery-ui-tooltip' );
 
 		if ( $view = $this->view( 'settings/page' ) ) {
 			include $view;
@@ -388,7 +400,8 @@ class Settings {
 						'basename'          => 'text-input',
 						'type'		        => 'url',
 						'class'		        => 'regular-text',
-						'placeholder'       => __( 'https://domain.com', 'wp-data-sync' )
+						'placeholder'       => __( 'https://domain.com', 'wp-data-sync' ),
+						'info'              => __( 'The URL of your WP Data Sync API account.' )
 					]
 				],
 				4 => (object) [
@@ -400,7 +413,8 @@ class Settings {
 						'basename'          => 'checkbox',
 						'type'		        => '',
 						'class'		        => '',
-						'placeholder'       => ''
+						'placeholder'       => '',
+						'info'              => __( 'We reccommend keeping this off unless you are having an issue with the data sync. If you do have an issue, please activate this before contacting support. Please note when this is deactivated all log files will be deleted.' )
 					]
 				],
 				5 => (object) [
@@ -412,7 +426,8 @@ class Settings {
 						'basename'          => 'checkbox',
 						'type'		        => '',
 						'class'		        => '',
-						'placeholder'       => ''
+						'placeholder'       => '',
+						'info'              => __( 'We reccommend keeping this activated to keep your website up to date with the Data Sync API.' )
 					]
 				],
 			],
@@ -506,7 +521,32 @@ class Settings {
 							'true'  => __( 'Yes, delete item and all associated data', 'wp-data-sync' )
 						]
 					]
-
+				],
+				6 => (object) [
+					'key' 		=> 'wp_data_sync_replace_post_content_images',
+					'label'		=> __( 'Replace Images in Content', 'wp-data-sync' ),
+					'callback'  => 'input',
+					'args'      => [
+						'sanitize_callback' => 'sanitize_text_field',
+						'basename'          => 'checkbox',
+						'type'		        => '',
+						'class'		        => '',
+						'placeholder'       => '',
+						'info'              => __( 'Replace all valid full image URLs. This will make a copy of the images in this websites media library and replace the image URLs in the content.' )
+					]
+				],
+				7 => (object) [
+					'key' 		=> 'wp_data_sync_replace_post_excerpt_images',
+					'label'		=> __( 'Replace Images in Excerpt', 'wp-data-sync' ),
+					'callback'  => 'input',
+					'args'      => [
+						'sanitize_callback' => 'sanitize_text_field',
+						'basename'          => 'checkbox',
+						'type'		        => '',
+						'class'		        => '',
+						'placeholder'       => '',
+						'info'              => __( 'Replace all valid full image URLs. This will make a copy of the images in this websites media library and replace the image URLs in the content.' )
+					]
 				]
 			]
 		];
