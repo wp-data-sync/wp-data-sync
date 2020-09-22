@@ -45,6 +45,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<tbody>
 
 				<?php settings_fields( $this->group ); ?>
+
+				<?php do_settings_sections( $this->group ); ?>
 				<?php do_settings_fields( WP_DATA_SYNC_CAP, 'default' ); ?>
 
 			</tbody>

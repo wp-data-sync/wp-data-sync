@@ -108,17 +108,27 @@ class Settings {
 	public function tabs() {
 
 		$tabs = [
-			0 => [
+			$this->main_tab => [
 				'label' => __( 'Dashboard', 'wp-data-sync' ),
 				'id'    => $this->main_tab
 			],
-			1 => [
-				'label' => __( 'Defaults', 'wp-data-sync' ),
-				'id'    => 'defaults'
+			'sync_settings' => [
+				'label' => __( 'Sync Settings', 'wp-data-sync' ),
+				'id'    => 'sync_settings'
 			]
 		];
 
-		return apply_filters( 'wp_data_sync_admin_tabs', $tabs );
+		$tabs = apply_filters( 'wp_data_sync_admin_tabs', $tabs, $this );
+
+		// Include logs as last tab.
+		$logs_tab = [
+			'logs' => [
+				'label' => __( 'Logs', 'wp-data-sync' ),
+				'id'    => 'logs'
+			]
+		];
+
+		return array_merge( $tabs, $logs_tab );
 
 	}
 
@@ -318,14 +328,29 @@ class Settings {
 			$option->args['key'] = $option->key;
 
 			register_setting( $this->group, $option->key, $option->args );
-			add_settings_field(
-				$option->key,
-				$option->label,
-				[ $this, $option->callback ],
-				WP_DATA_SYNC_CAP,
-				'default',
-				$option->args
-			);
+
+			if ( 'section' === $option->callback ) {
+
+				add_settings_section(
+					$option->key,
+					$option->label,
+					[ $this, $option->callback ],
+					$this->group
+				);
+
+			}
+			else {
+
+				add_settings_field(
+					$option->key,
+					$option->label,
+					[ $this, $option->callback ],
+					WP_DATA_SYNC_CAP,
+					'default',
+					$option->args
+				);
+
+			}
 
 		}
 
@@ -405,19 +430,6 @@ class Settings {
 					]
 				],
 				4 => (object) [
-					'key' 		=> 'wp_data_sync_allow_logging',
-					'label'		=> __( 'Allow Logging', 'wp-data-sync' ),
-					'callback'  => 'input',
-					'args'      => [
-						'sanitize_callback' => 'sanitize_text_field',
-						'basename'          => 'checkbox',
-						'type'		        => '',
-						'class'		        => '',
-						'placeholder'       => '',
-						'info'              => __( 'We reccommend keeping this off unless you are having an issue with the data sync. If you do have an issue, please activate this before contacting support. Please note when this is deactivated all log files will be deleted.' )
-					]
-				],
-				5 => (object) [
 					'key' 		=> 'wp_data_sync_auto_update',
 					'label'		=> __( 'Automatically Update Plugin', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -429,9 +441,9 @@ class Settings {
 						'placeholder'       => '',
 						'info'              => __( 'We reccommend keeping this activated to keep your website up to date with the Data Sync API.' )
 					]
-				],
+				]
 			],
-			'defaults' => [
+			'sync_settings' => [
 				0 => (object) [
 					'key' 		=> 'wp_data_sync_post_title',
 					'label'		=> __( 'Default Title', 'wp-data-sync' ),
@@ -548,11 +560,56 @@ class Settings {
 						'info'              => __( 'Replace all valid full image URLs. This will make a copy of the images in this websites media library and replace the image URLs in the content.' )
 					]
 				]
+			],
+			'logs' => [
+				0 => (object) [
+					'key' 		=> 'wp_data_sync_allow_logging',
+					'label'		=> __( 'Allow Logging', 'wp-data-sync' ),
+					'callback'  => 'input',
+					'args'      => [
+						'sanitize_callback' => 'sanitize_text_field',
+						'basename'          => 'checkbox',
+						'type'		        => '',
+						'class'		        => '',
+						'placeholder'       => '',
+						'info'              => __( 'We reccommend keeping this off unless you are having an issue with the data sync. If you do have an issue, please activate this before contacting support. Please note when this is deactivated all log files will be deleted.' )
+					]
+				]
 			]
 		];
 
-		return apply_filters( 'wp_data_sync_settings', $options );
+		return apply_filters( 'wp_data_sync_settings', $options, $this );
 
+	}
+
+	/**
+	 * Sanitize array.
+	 *
+	 * @param $input
+	 *
+	 * @return array
+	 */
+
+	public function sanitize_array( $input ) {
+
+		$new_input = array();
+
+		foreach ( $input as $key => $value ) {
+			$new_input[ $key ] = sanitize_text_field( $value );
+		}
+
+		return $new_input;
+
+	}
+
+	/**
+	 * Settings section.
+	 *
+	 * @param $args
+	 */
+
+	public function section( $args ) {
+		return;
 	}
 
 }

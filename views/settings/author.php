@@ -11,10 +11,6 @@
 
 if ( ! defined( 'ABSPATH' ) ) {
 	return;
-} ?>
+}
 
-<td>
-
-	<?php wp_dropdown_users( $args ); ?>
-
-</td>
+wp_dropdown_users( $args );

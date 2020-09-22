@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-add_filter( 'wp_data_sync_settings', function( $settings ) {
+add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 
 	$settings = array_merge( $settings, [
 		'woocommerce' => [
@@ -63,22 +63,86 @@ add_filter( 'wp_data_sync_settings', function( $settings ) {
 					'info'              => __( 'This relates the IDs from your data source with the IDs from your website. Please note, if the related product does not exist, this system will relate the product when it is created in the data sync.' )
 				]
 			],
-			3 => (object) [
-				'key' 		=> 'wp_data_sync_order_details',
-				'label'		=> __( 'Sync Order Details (Coming Soon)', 'wp-data-sync' ),
+			4 => (object) [
+				'key' 		=> 'wp_data_sync_orders',
+				'label'		=> __( 'Sync Orders', 'wp-data-sync' ),
 				'callback'  => 'input',
 				'args'      => [
 					'sanitize_callback' => 'sanitize_text_field',
 					'basename'          => 'checkbox',
-					'selected'          => get_option( 'wp_data_sync_order_details' ),
-					'name'              => 'wp_data_sync_order_details',
-					'class'             => 'sync-orders disabled',
-					'value'             => 'checked'
+					'selected'          => get_option( 'wp_data_sync_orders' ),
+					'name'              => 'wp_data_sync_orders',
+					'class'             => 'sync-orders',
+					'value'             => 'checked',
+					'info'              => __( 'Sync order details using the WP Data Sync API.')
+				]
+			]
+		],
+		'sync_orders' => [
+			0 => (object) [
+				'key'      => 'wp_data_sync_order_sync_on_status_section',
+				'label'    => __( 'Sync orders when order status changes to:', 'wp-data-sync' ),
+				'callback' => 'section',
+				'args'     => []
+			],
+			1 => (object) [
+				'key' 		=> 'wp_data_sync_order_sync_on_status',
+				'label'		=> '',
+				'callback'  => 'input',
+				'args'      => [
+					'sanitize_callback' => [ $_settings, 'sanitize_array' ],
+					'basename'          => 'checkboxes',
+					'type'		        => '',
+					'class'		        => 'this-class',
+					'placeholder'       => '',
+					'values'            => get_option( 'wp_data_sync_order_sync_on_status', [] ),
+					'options'           => [
+						0 => [
+							'value' => 'pending',
+							'id'    => 'order-pending',
+							'class' => 'order-pending',
+							'label' => __( 'Pending', 'woocommerce' )
+						],
+						1 => [
+							'value' => 'processing',
+							'id'    => 'order-processing',
+							'class' => 'order-processing',
+							'label' => __( 'Processing', 'woocommerce' )
+						],
+						2 => [
+							'value' => 'on-hold',
+							'id'    => 'order-on-hold',
+							'class' => 'order-on-hold',
+							'label' => __( 'On Hold', 'woocommerce' )
+						],
+						3 => [
+							'value' => 'completed',
+							'id'    => 'order-completed',
+							'class' => 'order-completed',
+							'label' => __( 'Completed', 'woocommerce' )
+						],
+						4 => [
+							'value' => 'cancelled',
+							'id'    => 'order-cancelled',
+							'class' => 'order-cancelled',
+							'label' => __( 'Cancelled', 'woocommerce' )
+						],
+						5 => [
+							'value' => 'refunded',
+							'id'    => 'order-refunded',
+							'class' => 'order-refunded',
+							'label' => __( 'Refunded', 'woocommerce' )
+						]
+					]
 				]
 			]
 		]
 	] );
 
+	if ( 'checked' !== get_option( 'wp_data_sync_orders' ) ) {
+		unset( $settings['sync_orders'] );
+	}
+
 	return $settings;
 
-} );
+}, 10, 2 );

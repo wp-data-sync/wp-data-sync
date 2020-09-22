@@ -26,7 +26,7 @@ class Log {
 
 	public static function write( $key, $data ) {
 
-		if ( 'checked' === get_option( 'wp_data_sync_allow_logging' ) ) {
+		if ( self::is_active() ) {
 
 			$msg        = self::message( $data );
 			$date       = date( 'Y-m-d' );
@@ -75,6 +75,16 @@ class Log {
 
 		return ob_get_clean();
 
+	}
+
+	/**
+	 * Is log active.
+	 *
+	 * @return bool
+	 */
+
+	public static function is_active() {
+		return 'checked' === get_option( 'wp_data_sync_allow_logging' );
 	}
 
 }

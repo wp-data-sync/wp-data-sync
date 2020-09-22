@@ -15,16 +15,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	return;
 } ?>
 
-<td>
-	<input
-		type="checkbox"
-		value="checked"
-		name="<?php printf( esc_attr__( '%s' ), $args['key'] ); ?>"
-		id="<?php printf( esc_attr__( '%s' ), $args['key'] ); ?>"
-		class="<?php printf( esc_attr__( '%s' ), $args['class'] ); ?>"
-		<?php printf( esc_attr__( '%s' ), $value ); ?>
-	>
+<input
+	type="checkbox"
+	value="checked"
+	name="<?php esc_attr_e( $args['key'] ); ?>"
+	id="<?php esc_attr_e( $args['key'] ); ?>"
+	class="<?php esc_attr_e( $args['class'] ); ?>"
+	<?php esc_attr_e( $value ); ?>
+>
 
-	<?php toottip( $args ); ?>
-
-</td>
+<?php toottip( $args ); ?>
