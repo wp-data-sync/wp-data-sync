@@ -27,6 +27,7 @@ function wc_update() {
 	if ( WC_DATA_SYNC_VERSION !== get_option( 'WC_DATA_SYNC_VERSION' ) ) {
 
 		WC_Product_Sells::create_table();
+		WC_Order_StageOrder::create_table();
 
 		update_option( 'WC_DATA_SYNC_VERSION', WC_DATA_SYNC_VERSION );
 

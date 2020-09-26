@@ -37,3 +37,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 </select>
 
 <?php toottip( $args ); ?>
+<?php message( $args ); ?>

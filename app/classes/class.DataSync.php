@@ -401,6 +401,8 @@ class DataSync {
 
 			}
 
+			Log::write( 'term-id', $term_ids );
+
 			wp_set_object_terms( $post_id, $term_ids, $taxonomy, $append );
 
 		}
@@ -412,14 +414,16 @@ class DataSync {
 	/**
 	 * Term id.
 	 *
-	 * @param $term_name
-	 * @param $taxonomy
-	 * @param $parent_id
+	 * @param $term_name string
+	 * @param $taxonomy string
+	 * @param $parent_id int
 	 *
-	 * @return int
+	 * @return int|bool
 	 */
 
 	public function term_id( $term_name, $taxonomy, $parent_id ) {
+
+		Log::write( 'term-id', "$term_name - $taxonomy - $parent_id" );
 
 		$term_name = apply_filters( 'wp_data_sync_term_name', $term_name, $taxonomy, $parent_id );
 		$taxonomy  = apply_filters( 'wp_data_sync_taxonomy', $taxonomy, $term_name, $parent_id );
@@ -431,10 +435,16 @@ class DataSync {
 		}
 
 		if ( is_wp_error( $term ) ) {
+
+			Log::write( 'term-id', $term );
+
 			return FALSE;
+
 		}
 
-		return intval( $term['term_id'] );
+		Log::write( 'term-id', $term['term_id'] );
+
+		return (int) $term['term_id'];
 
 	}
 

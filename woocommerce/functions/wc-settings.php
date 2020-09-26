@@ -80,10 +80,18 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 		],
 		'sync_orders' => [
 			0 => (object) [
-				'key'      => 'wp_data_sync_order_sync_on_status_section',
-				'label'    => __( 'Sync orders when order status changes to:', 'wp-data-sync' ),
-				'callback' => 'section',
-				'args'     => []
+				'key'      => 'wp_data_sync_existingl_orders',
+				'label'    => __( 'Sync all existing orders:', 'wp-data-sync' ),
+				'callback' => 'input',
+				'args'      => [
+					'sanitize_callback' => 'sanitize_text_field',
+					'basename'          => 'checkbox',
+					'type'		        => '',
+					'class'		        => '',
+					'placeholder'       => '',
+					'msg'               => WC_Order_StageOrder::count_msg(),
+					'info'              => __( 'Schedule a task to sync existing orders in small batches. This setting will reset itself when all orders have been processed.', 'wp-data-sync' )
+				]
 			],
 			1 => (object) [
 				'key' 		=> 'wp_data_sync_order_sync_on_status',
@@ -91,6 +99,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 				'callback'  => 'input',
 				'args'      => [
 					'sanitize_callback' => [ $_settings, 'sanitize_array' ],
+					'heading'            => __( 'Sync order when status is:', 'wp-data-sync' ),
 					'basename'          => 'checkboxes',
 					'type'		        => '',
 					'class'		        => 'this-class',

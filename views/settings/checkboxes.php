@@ -38,6 +38,7 @@ extract( $args ); ?>
 			>
 
 			<?php toottip( $args ); ?>
+			<?php message( $args ); ?>
 
 		</td>
 

@@ -9,8 +9,12 @@
  * @package WP_DataSync
  */
 
+namespace WP_DataSync\App;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	return;
 }
 
 wp_dropdown_users( $args );
+
+message( $args );

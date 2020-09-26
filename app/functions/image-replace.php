@@ -37,19 +37,23 @@ if ( 'checked' === get_option( 'wp_data_sync_replace_post_excerpt_images' ) ) {
 
 function image_replace( $content, $post_id, $data_sync ) {
 
-	$html_dom = new DOMDocument;
-	$html_dom->loadHTML( $content );
+	if ( ! empty( $content ) ) {
 
-	$image_tags = $html_dom->getElementsByTagName( 'img' );
+		$html_dom = new DOMDocument;
+		$html_dom->loadHTML( $content );
 
-	foreach( $image_tags as $image_tag ) {
+		$image_tags = $html_dom->getElementsByTagName( 'img' );
 
-		$image_url = $image_tag->getAttribute( 'src' );
+		foreach ( $image_tags as $image_tag ) {
 
-		if ( $attach_id = $data_sync->attachment( $post_id, $image_url ) ) {
+			$image_url = $image_tag->getAttribute( 'src' );
 
-			if ( $attach_url = wp_get_attachment_url( $attach_id ) ) {
-				$content = str_replace( $image_url, $attach_url, $content );
+			if ( $attach_id = $data_sync->attachment( $post_id, $image_url ) ) {
+
+				if ( $attach_url = wp_get_attachment_url( $attach_id ) ) {
+					$content = str_replace( $image_url, $attach_url, $content );
+				}
+
 			}
 
 		}

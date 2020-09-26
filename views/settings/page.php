@@ -17,6 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <style>
 	.wpds-tooltip {color: #222;cursor: pointer;}
+	.wpds-message {padding-left: 10px;}
 </style>
 
 <script>
@@ -47,7 +48,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<?php settings_fields( $this->group ); ?>
 
 				<?php do_settings_sections( $this->group ); ?>
-				<?php do_settings_fields( WP_DATA_SYNC_CAP, 'default' ); ?>
+				<?php do_settings_fields( WP_DATA_SYNC_CAP, $this->group ); ?>
 
 			</tbody>
 

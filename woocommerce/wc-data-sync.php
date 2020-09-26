@@ -16,12 +16,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Used to handle WooCommerce integration versions.
-define( 'WC_DATA_SYNC_VERSION', '1.0' );
+define( 'WC_DATA_SYNC_VERSION', '1.2' );
 
 // Load WooCommerce scripts
 foreach ( glob( plugin_dir_path( __FILE__ ) . '**/*.php' ) as $file ) {
 	require_once $file;
 }
+
+/**
+ * Register REST API Routes.
+ */
+
+add_action( 'rest_api_init', function() {
+
+	if ( 'checked' === get_option( 'wp_data_sync_orders' ) ) {
+		WC_Order_DataRequest::instance()->register_route();
+	}
+
+} );
 
 /**
  * Process WooCommerce.

@@ -211,6 +211,14 @@ class Settings {
 
 	public function input( $args ) {
 
+		if ( isset( $args['heading'] ) ) {
+
+			if ( $view = $this->view( 'settings/heading' ) ) {
+				include $view;
+			}
+
+		}
+
 		$value = $this->value( $args );
 
 		if ( $view = $this->view( "settings/{$args['basename']}" ) ) {
@@ -346,7 +354,7 @@ class Settings {
 					$option->label,
 					[ $this, $option->callback ],
 					WP_DATA_SYNC_CAP,
-					'default',
+					$this->group,
 					$option->args
 				);
 

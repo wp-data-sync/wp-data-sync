@@ -25,3 +25,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 >
 
 <?php toottip( $args ); ?>
+<?php message( $args ); ?>
