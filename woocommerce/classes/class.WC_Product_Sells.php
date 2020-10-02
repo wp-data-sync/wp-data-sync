@@ -121,6 +121,16 @@ class WC_Product_Sells {
 	}
 
 	/**
+	 * Set the sell ID relationship.
+	 */
+
+	public function set_relation() {
+
+		$this->product->update_meta_data( $this->relational_key, $this->sell_id );
+
+	}
+
+	/**
 	 * Relation exists.
 	 *
 	 * @param $sell_id
@@ -409,6 +419,7 @@ class WC_Product_Sells {
 
 	public function save() {
 		$this->set_sell_ids();
+		$this->set_relation();
 		$this->set_staged_sell_ids();
 		$this->product->save();
 	}

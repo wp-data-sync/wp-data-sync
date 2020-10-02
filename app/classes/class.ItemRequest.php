@@ -359,13 +359,13 @@ class ItemRequest extends Core {
 			return '';
 		}
 
-		$formatted_terms = array();
+		$formatted_terms = [];
 
 		if ( is_taxonomy_hierarchical( $taxonomy ) ) {
 
 			foreach ( $term_ids as $term_id ) {
 
-				$formatted_term = array();
+				$formatted_term = [];
 				$ancestor_ids   = array_reverse( get_ancestors( $term_id, $taxonomy ) );
 
 				foreach ( $ancestor_ids as $ancestor_id ) {
@@ -418,7 +418,7 @@ class ItemRequest extends Core {
 
 	protected function implode_values( $values ) {
 
-		$values_to_implode = array();
+		$values_to_implode = [];
 
 		foreach ( $values as $value ) {
 			$value               = (string) is_scalar( $value ) ? $value : '';
