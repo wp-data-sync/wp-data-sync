@@ -90,8 +90,12 @@ class WC_Product_ItemRequest {
 			$item_data['attributes'] = $attributes;
 		}
 
-		if ( $variations = $this->product_variations() ) {
-			$item_data['variations'] = $variations;
+		if ( $this->product->is_type( 'variable' ) ) {
+
+			if ( $variations = $this->product_variations() ) {
+				$item_data['variations'] = $variations;
+			}
+
 		}
 
 		return $item_data;
