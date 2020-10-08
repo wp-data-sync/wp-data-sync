@@ -175,6 +175,10 @@ class DataSync {
 			$this->post_thumbnail( $this->post_id, $this->post_thumbnail );
 		}
 
+		if ( isset( $this->integrations ) ) {
+			$this->integrations();
+		}
+
 		do_action( 'wp_data_sync_after_process', $this->post_id, $this );
 
 		return [ 'post_id' => $this->post_id ];
@@ -726,6 +730,18 @@ class DataSync {
 		];
 
 		return apply_filters( 'wp_data_sync_restricted_meta_keys', $restricted_meta_keys );
+
+	}
+
+	/**
+	 * Integartions.
+	 */
+
+	private function integrations() {
+
+		foreach ( $this->integrations as $integration => $values ) {
+			do_action( "wp_data_sync_integration_$integration", $this->post_id, $values, $this );
+		}
 
 	}
 
