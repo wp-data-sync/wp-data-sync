@@ -84,6 +84,12 @@ class DataSync {
 	private $up_sells = FALSE;
 
 	/**
+	 * @var bool|array
+	 */
+
+	private $integrations = FALSE;
+
+	/**
 	 * @var DataSync
 	 */
 
@@ -831,6 +837,16 @@ class DataSync {
 
 	public function get_up_sells() {
 		return $this->up_sells;
+	}
+
+	/**
+	 * Get Integrations.
+	 *
+	 * @return array|bool
+	 */
+
+	public function get_integrations() {
+		return $this->integrations;
 	}
 
 }

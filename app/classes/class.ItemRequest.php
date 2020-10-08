@@ -204,6 +204,7 @@ class ItemRequest extends Core {
 			'post_meta'       => $this->post_meta( $item_id ),
 			'taxonomies'      => $this->taxonomies( $item_id ),
 			'post_thumbnail'  => $this->thumbnail_url( $item_id ),
+			'integratiuons'   => apply_filters( 'wp_data_sync_item_request_integrations', [], $item_id )
 		];
 
 		return apply_filters( 'wp_data_sync_item_request', $item_data, $item_id, $this );
