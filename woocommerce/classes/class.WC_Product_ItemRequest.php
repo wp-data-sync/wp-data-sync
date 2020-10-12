@@ -205,7 +205,7 @@ class WC_Product_ItemRequest {
 
 		foreach ( $variation_ids as $variation_id ) {
 
-			$variation['post_object'] = $this->item_request->get_post( $variation_id );
+			$variation['post_data'] = $this->item_request->get_post( $variation_id );
             $variation['post_meta']   = $this->item_request->post_meta( $variation_id );
             $variation['attributes']  = $this->get_variation_attributes( $variation_id );
 

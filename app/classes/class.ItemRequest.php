@@ -72,7 +72,7 @@ class ItemRequest extends Core {
 	public function register_route() {
 
 		register_rest_route(
-			'wp-data-sync/1.0/',
+			'wp-data-sync/' . WP_DATA_SYNC_EP_VERSION . '/',
 			'get-item/(?P<access_token>\S+)/(?P<post_type>\S+)/(?P<limit>\d+)/',
 			[
 				'methods' => WP_REST_Server::READABLE,
@@ -200,7 +200,7 @@ class ItemRequest extends Core {
 
 		$item_data = [
 			'source_item_id'  => $item_id,
-			'post_object'     => $this->get_post( $item_id ),
+			'post_data'     => $this->get_post( $item_id ),
 			'post_meta'       => $this->post_meta( $item_id ),
 			'taxonomies'      => $this->taxonomies( $item_id ),
 			'post_thumbnail'  => $this->thumbnail_url( $item_id ),
@@ -333,7 +333,7 @@ class ItemRequest extends Core {
 			$term_ids = wp_get_object_terms( $item_id, $taxonomy, [ 'fields' => 'ids' ] );
 
 			if ( ! empty( $term_ids ) && is_array( $term_ids ) ) {
-				$results[ $taxonomy ] = $this->format_term_ids( $term_ids, $taxonomy );
+				$results[ $taxonomy ] = $this->format_terms( $term_ids, $taxonomy );
 			}
 
 		}
@@ -343,21 +343,20 @@ class ItemRequest extends Core {
 	}
 
 	/**
-	 * Format Terms IDs.
-	 *
-	 * @see WC_CSV_Exporter::format_term_ids
+	 * Format Terms.
 	 *
 	 * @param $term_ids
 	 * @param $taxonomy
 	 *
-	 * @return string
+	 * @return array
 	 */
-	public function format_term_ids( $term_ids, $taxonomy ) {
+
+	public function format_terms( $term_ids, $taxonomy ) {
 
 		$term_ids = wp_parse_id_list( $term_ids );
 
 		if ( ! count( $term_ids ) ) {
-			return '';
+			return [];
 		}
 
 		$formatted_terms = [];
@@ -366,15 +365,15 @@ class ItemRequest extends Core {
 
 			foreach ( $term_ids as $term_id ) {
 
-				$formatted_term = [];
-				$ancestor_ids   = array_reverse( get_ancestors( $term_id, $taxonomy ) );
+				$ancestor_ids = array_reverse( get_ancestors( $term_id, $taxonomy ) );
+				$ancestors    = [];
 
 				foreach ( $ancestor_ids as $ancestor_id ) {
 
 					$term = get_term( $ancestor_id, $taxonomy );
 
 					if ( $term && ! is_wp_error( $term ) ) {
-						$formatted_term[] = $term->name;
+						$ancestors[ $term->slug ] = $this->term_array( $term );
 					}
 
 				}
@@ -382,10 +381,10 @@ class ItemRequest extends Core {
 				$term = get_term( $term_id, $taxonomy );
 
 				if ( $term && ! is_wp_error( $term ) ) {
-					$formatted_term[] = $term->name;
+					$formatted_terms[ $term->slug ] = $this->term_array( $term );
 				}
 
-				$formatted_terms[] = implode( ' > ', $formatted_term );
+				$formatted_terms[ $term->slug ]['parents'] = $ancestors;
 
 			}
 
@@ -396,37 +395,79 @@ class ItemRequest extends Core {
 				$term = get_term( $term_id, $taxonomy );
 
 				if ( $term && ! is_wp_error( $term ) ) {
-					$formatted_terms[] = $term->name;
+					$formatted_terms[ $term->slug ] = $this->term_array( $term );
 				}
 
 			}
 
 		}
 
-		return $this->implode_values( $formatted_terms );
+		return $formatted_terms;
 
 	}
 
 	/**
-	 * Implode Values.
+	 * Term array.
 	 *
-	 * @see WC_CSV_Exporter::implode_values
+	 * @param $term
 	 *
-	 * @param $values
-	 *
-	 * @return string
+	 * @return array
 	 */
 
-	protected function implode_values( $values ) {
+	public function term_array( $term ) {
 
-		$values_to_implode = [];
+		$term_array = [
+			'name'        => $term->name,
+			'description' => $term->description,
+			'thumb_url'   => $this->terM_thumb_url( $term ),
+			'term_meta'   => $this->term_meta( $term )
+		];
 
-		foreach ( $values as $value ) {
-			$value               = (string) is_scalar( $value ) ? $value : '';
-			$values_to_implode[] = str_replace( ',', '\\,', $value );
+		return apply_filters( 'wp_data_sync_item_request_term_array', $term_array, $term->term_id );
+
+	}
+
+	/**
+	 * Get term thumnail URL.
+	 *
+	 * @param $term
+	 *
+	 * @return bool|false|string
+	 */
+
+	public function terM_thumb_url( $term ) {
+
+		if ( $attach_id = get_term_meta( $term->term_id, 'thumbnail_id', TRUE ) ) {
+			return wp_get_attachment_image_url( $attach_id, 'full' );
 		}
 
-		return implode( ', ', $values_to_implode );
+		return FALSE;
+
+	}
+
+	/**
+	 * Term meta.
+	 *
+	 * @param $term
+	 *
+	 * @return array
+	 */
+
+	public function term_meta( $term ) {
+
+		$meta_values = [];
+		$term_meta   = get_term_meta( $term->term_id );
+
+		foreach ( $term_meta as $meta_key => $values ) {
+
+			// Get the first element of array.
+			$meta_value = array_shift( $values );
+
+			$meta_values[ $meta_key ] = maybe_unserialize( $meta_value );
+
+		}
+
+		return $meta_values;
 
 	}
 

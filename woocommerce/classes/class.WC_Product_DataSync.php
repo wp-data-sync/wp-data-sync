@@ -167,7 +167,7 @@ class WC_Product_DataSync {
 		$term_ids   = [];
 
 		foreach ( $values as $value ) {
-			$term_ids[] = $this->data_sync->term_id( $value, $taxonomy, 0 );
+			$term_ids[] = $this->data_sync->set_term( $value, $taxonomy, 0 );
 		}
 
 		return $term_ids;
@@ -256,7 +256,7 @@ class WC_Product_DataSync {
 				}
 
 				// Extract the Post Object
-				extract( $post_object );
+				extract( $post_data );
 
 				// Check to see if we already have this variation
 				if ( $exists = get_page_by_title( $post_title, 'OBJECT', 'product_variation' ) ) {
@@ -420,7 +420,7 @@ class WC_Product_DataSync {
 				$terms = explode( ',', $terms );
 
 				foreach ( $terms as $term ) {
-					$term_ids[] = $this->data_sync->term_id( $term, $taxonomy, 0 );
+					$term_ids[] = $this->data_sync->set_term( $term, $taxonomy, 0 );
 				}
 
 			}

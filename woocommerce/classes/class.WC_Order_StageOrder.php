@@ -111,7 +111,7 @@ class WC_Order_StageOrder {
 			untrailingslashit( $api_url ),
 			'wp-json',
 			'wp-data-sync',
-			'1.0',
+			WP_DATA_SYNC_EP_VERSION,
 			'stage-order',
 			$access_key,
 			$this->order_id

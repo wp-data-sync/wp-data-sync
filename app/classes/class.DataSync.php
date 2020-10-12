@@ -33,7 +33,7 @@ class DataSync {
 	 * @var bool|array
 	 */
 
-	private $post_object = FALSE;
+	private $post_data = FALSE;
 
 	/**
 	 * @var bool|array
@@ -156,11 +156,11 @@ class DataSync {
 		$this->set_post_id();
 
 		if ( $this->maybe_trash_post() ) {
-			return [ 'post_object' => 'Trash Post' ];
+			return [ 'post_data' => 'Trash Post' ];
 		}
 
-		if ( isset( $this->post_object ) ) {
-			$this->post_object();
+		if ( isset( $this->post_data ) ) {
+			$this->post_data();
 		}
 
 		if ( isset(  $this->post_meta ) ) {
@@ -192,7 +192,7 @@ class DataSync {
 	private function set_post_id() {
 
 		if ( $this->post_id = $this->post_id( $this->primary_id ) ) {
-			$this->post_object['ID'] = $this->post_id;
+			$this->post_data['ID'] = $this->post_id;
 		}
 
 	}
@@ -245,15 +245,15 @@ class DataSync {
 	 *
 	 */
 
-	public function post_object_defaults() {
+	public function post_data_defaults() {
 
-		$keys = $this->post_object_keys();
+		$keys = $this->post_data_keys();
 
 		foreach ( $keys as $key ) {
 
-			$value = isset( $this->post_object[ $key ] ) ? $this->post_object[ $key ] : get_option( "wp_data_sync_{$key}", '' );
+			$value = isset( $this->post_data[ $key ] ) ? $this->post_data[ $key ] : get_option( "wp_data_sync_{$key}", '' );
 
-			$this->post_object[ $key ] = apply_filters( "wp_data_sync_{$key}", $value, $this->post_id, $this );
+			$this->post_data[ $key ] = apply_filters( "wp_data_sync_{$key}", $value, $this->post_id, $this );
 
 		}
 
@@ -267,7 +267,7 @@ class DataSync {
 
 	public function maybe_trash_post() {
 
-		if ( 0 < $this->post_id && 'trash' === $this->post_object['post_status'] ) {
+		if ( 0 < $this->post_id && 'trash' === $this->post_data['post_status'] ) {
 
 			if ( 'true' === get_option( 'wp_data_sync_force_delete' ) ) {
 
@@ -293,15 +293,15 @@ class DataSync {
 	 * @return int|\WP_Error
 	 */
 
-	public function post_object() {
+	public function post_data() {
 
-		do_action( 'wp_data_sync_before_post_object', $this->post_object );
+		do_action( 'wp_data_sync_before_post_data', $this->post_data );
 
-		$this->post_object_defaults();
+		$this->post_data_defaults();
 		$this->post_date_format();
 
-		if ( wp_update_post( $this->post_object ) ) {
-			do_action( 'wp_data_sync_after_post_object', $this->post_object );
+		if ( wp_update_post( $this->post_data ) ) {
+			do_action( 'wp_data_sync_after_post_data', $this->post_data );
 		}
 
 	}
@@ -399,12 +399,12 @@ class DataSync {
 				if ( ! empty( $term['parents'] ) ) {
 
 					foreach ( $term['parents'] as $parent ) {
-						$parent_id = $this->term_id( $parent, $taxonomy, $parent_id );
+						$parent_id = $this->set_term( $parent, $taxonomy, $parent_id );
 					}
 
 				}
 
-				$term_ids[] = $this->term_id( $term['name'], $taxonomy, $parent_id );
+				$term_ids[] = $this->set_term( $term, $taxonomy, $parent_id );
 
 				// Reset parent ID.
 				$parent_id = 0;
@@ -422,26 +422,28 @@ class DataSync {
 	}
 
 	/**
-	 * Term id.
+	 * Set term..
 	 *
-	 * @param $term_name string
+	 * @param $term array
 	 * @param $taxonomy string
 	 * @param $parent_id int
 	 *
 	 * @return int|bool
 	 */
 
-	public function term_id( $term_name, $taxonomy, $parent_id ) {
+	public function set_term( $term, $taxonomy, $parent_id ) {
 
-		Log::write( 'term-id', "$term_name - $taxonomy - $parent_id" );
+		extract( $term );
 
-		$term_name = apply_filters( 'wp_data_sync_term_name', $term_name, $taxonomy, $parent_id );
-		$taxonomy  = apply_filters( 'wp_data_sync_taxonomy', $taxonomy, $term_name, $parent_id );
+		Log::write( 'term-id', "$name - $taxonomy - $parent_id" );
 
-		$term = term_exists( $term_name, $taxonomy, $parent_id );
+		$name     = apply_filters( 'wp_data_sync_term_name', $name, $taxonomy, $parent_id );
+		$taxonomy = apply_filters( 'wp_data_sync_taxonomy', $taxonomy, $name, $parent_id );
+
+		$term = term_exists( $name, $taxonomy, $parent_id );
 
 		if ( 0 === $term || NULL === $term ) {
-			$term = wp_insert_term( $term_name, $taxonomy, [ 'parent' => $parent_id ] );
+			$term = wp_insert_term( $name, $taxonomy, [ 'parent' => $parent_id ] );
 		}
 
 		if ( is_wp_error( $term ) ) {
@@ -454,7 +456,75 @@ class DataSync {
 
 		Log::write( 'term-id', $term['term_id'] );
 
-		return (int) $term['term_id'];
+		$term_id = (int) $term['term_id'];
+
+		$this->term_desc( $description, $term_id, $taxonomy );
+		$this->term_thumb( $thumb_url, $term_id );
+		$this->term_meta( $term_meta, $term_id );
+
+		return $term_id;
+
+	}
+
+	/**
+	 * Term description.
+	 *
+	 * @param $description string
+	 * @param $term_id     int
+	 * @param $taxonomy    string
+	 */
+
+	public function term_desc( $description, $term_id, $taxonomy ) {
+
+		if ( empty( $description ) ) {
+			$description = '';
+		}
+
+		$args = [ 'description' => $description ];
+
+		wp_update_term( $term_id, $taxonomy, $args );
+
+	}
+
+	/**
+	 * term thumb.
+	 *
+	 * @param $thumb_url
+	 * @param $term_id
+	 */
+
+	public function term_thumb( $thumb_url, $term_id ) {
+
+		if ( ! $attach_id = $this->attachment( $this->post_id, $thumb_url ) ) {
+			$attach_id = '';
+		}
+
+		update_term_meta( $term_id, 'thumbnail_id', $attach_id );
+
+	}
+
+	/**
+	 * Term meta.
+	 *
+	 * @param $term_meta
+	 * @param $term_id
+	 */
+
+	public function term_meta( $term_meta, $term_id ) {
+
+		if ( is_array( $term_meta ) && ! empty( $term_meta ) ) {
+
+			$restricted_meta_keys = $this->restricted_meta_keys();
+
+			foreach ( $term_meta as $meta_key => $value ) {
+
+				if ( ! in_array( $meta_key, $restricted_meta_keys ) ) {
+					update_term_meta( $term_id, $meta_key, $value );
+				}
+
+			}
+
+		}
 
 	}
 
@@ -487,6 +557,10 @@ class DataSync {
 	 */
 
 	public function attachment( $post_id, $image_url ) {
+
+		if ( empty( $image_url ) ) {
+			return FALSE;
+		}
 
 		require_once( ABSPATH . 'wp-admin/includes/image.php' );
 
@@ -675,12 +749,12 @@ class DataSync {
 
 	public function post_date_format() {
 
-		if ( ! empty( $this->post_object['post_date'] ) ) {
+		if ( ! empty( $this->post_data['post_date'] ) ) {
 
 			// Convert the date to time.
-			$post_time = strtotime( $this->post_object['post_date'] );
+			$post_time = strtotime( $this->post_data['post_date'] );
 
-			$this->post_object['post_date'] = date( 'Y-m-d H:i:s', $post_time );
+			$this->post_data['post_date'] = date( 'Y-m-d H:i:s', $post_time );
 
 		}
 
@@ -692,9 +766,9 @@ class DataSync {
 	 * @return array
 	 */
 
-	public function post_object_keys() {
+	public function post_data_keys() {
 
-		$post_object_keys = [
+		$post_data_keys = [
 			'post_title',
 			'post_status',
 			'post_author',
@@ -708,7 +782,7 @@ class DataSync {
 			'comment_status'
 		];
 
-		return apply_filters( 'wp_data_sync_post_object_keys', $post_object_keys );
+		return apply_filters( 'wp_data_sync_post_data_keys', $post_data_keys );
 
 	}
 
@@ -726,7 +800,8 @@ class DataSync {
 		$restricted_meta_keys = [
 			'_edit_lock',
 			'_edit_last',
-			'_thumbnail_id'
+			'_thumbnail_id',
+			'product_count_product_cat'
 		];
 
 		return apply_filters( 'wp_data_sync_restricted_meta_keys', $restricted_meta_keys );
@@ -771,8 +846,8 @@ class DataSync {
 	 * @return array|bool
 	 */
 
-	public function get_post_object() {
-		return $this->post_object;
+	public function get_post_data() {
+		return $this->post_data;
 	}
 
 	/**

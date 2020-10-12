@@ -58,7 +58,7 @@ class VersionRequest extends Core {
 	public function register_route() {
 
 		register_rest_route(
-			'wp-data-sync/1.0/',
+			'wp-data-sync/' . WP_DATA_SYNC_EP_VERSION . '/',
 			'get-version/(?P<access_token>\S+)/',
 			[
 				'methods' => WP_REST_Server::READABLE,
