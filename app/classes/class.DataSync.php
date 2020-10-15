@@ -149,14 +149,16 @@ class DataSync {
 
 		// A primary ID is required!!
 		if ( empty( $this->primary_id ) ) {
-			return [ 'primary_id' => 'Empty primary ID' ];
+			return [ 'error' => 'Primary ID empty!!' ];
 		}
 
 		// Set the post ID.
-		$this->set_post_id();
+		if ( ! $this->set_post_id() ) {
+			return [ 'error' => 'Post ID failed!!' ];
+		}
 
 		if ( $this->maybe_trash_post() ) {
-			return [ 'post_data' => 'Trash Post' ];
+			return [ 'success' => 'Trash Post' ];
 		}
 
 		if ( isset( $this->post_data ) ) {
@@ -186,14 +188,30 @@ class DataSync {
 	}
 
 	/**
-	 * Set the post ID.
+	 * Set Post ID.
+	 *
+	 * @return bool
 	 */
 
 	private function set_post_id() {
 
-		if ( $this->post_id = $this->post_id( $this->primary_id ) ) {
-			$this->post_data['ID'] = $this->post_id;
+		if ( 'post_id' === $this->primary_id['search_in'] ) {
+
+			$this->post_id = (int) $this->primary_id['post_id'];
+
+			return TRUE;
+
 		}
+
+		if ( $this->post_id = $this->post_id( $this->primary_id ) ) {
+
+			$this->post_data['ID'] = $this->post_id;
+
+			return TRUE;
+
+		}
+
+		return FALSE;
 
 	}
 
@@ -476,6 +494,10 @@ class DataSync {
 
 	public function term_desc( $description, $term_id, $taxonomy ) {
 
+		if ( ! Settings::is_checked( 'wp_data_sync_sync_term_desc' ) ) {
+			return;
+		}
+
 		if ( empty( $description ) ) {
 			$description = '';
 		}
@@ -495,6 +517,10 @@ class DataSync {
 
 	public function term_thumb( $thumb_url, $term_id ) {
 
+		if ( ! Settings::is_checked( 'wp_data_sync_sync_term_thumb' ) ) {
+			return;
+		}
+
 		if ( ! $attach_id = $this->attachment( $this->post_id, $thumb_url ) ) {
 			$attach_id = '';
 		}
@@ -511,6 +537,10 @@ class DataSync {
 	 */
 
 	public function term_meta( $term_meta, $term_id ) {
+
+		if ( ! Settings::is_checked( 'wp_data_sync_sync_term_meta' ) ) {
+			return;
+		}
 
 		if ( is_array( $term_meta ) && ! empty( $term_meta ) ) {
 

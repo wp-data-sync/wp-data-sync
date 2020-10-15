@@ -200,7 +200,7 @@ class ItemRequest extends Core {
 
 		$item_data = [
 			'source_item_id'  => $item_id,
-			'post_data'     => $this->get_post( $item_id ),
+			'post_data'       => $this->get_post( $item_id ),
 			'post_meta'       => $this->post_meta( $item_id ),
 			'taxonomies'      => $this->taxonomies( $item_id ),
 			'post_thumbnail'  => $this->thumbnail_url( $item_id ),

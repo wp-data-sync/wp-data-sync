@@ -30,7 +30,7 @@ function auto_update_plugin( $update, $item ) {
 
 	if ( isset( $item->slug ) && 'wp-data-sync' === $item->slug ) {
 
-		if ( 'checked' === get_option( 'wp_data_sync_auto_update' ) ) {
+		if ( Settings::is_checked( 'wp_data_sync_auto_update' ) ) {
 			return TRUE;
 		}
 

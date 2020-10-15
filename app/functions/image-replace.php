@@ -17,11 +17,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( 'checked' === get_option( 'wp_data_sync_replace_post_content_images' ) ) {
+if ( Settings::is_checked( 'wp_data_sync_replace_post_content_images' ) ) {
 	add_filter( 'wp_data_sync_post_content', 'WP_DataSync\App\image_replace', 10, 3 );
 }
 
-if ( 'checked' === get_option( 'wp_data_sync_replace_post_excerpt_images' ) ) {
+if ( Settings::is_checked( 'wp_data_sync_replace_post_excerpt_images' ) ) {
 	add_filter( 'wp_data_sync_post_excerpt', 'WP_DataSync\App\image_replace', 10, 3 );
 }
 

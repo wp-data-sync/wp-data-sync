@@ -527,22 +527,54 @@ class Settings {
 					]
 				],
 				5 => (object) [
-					'key' 		=> 'wp_data_sync_force_delete',
-					'label'		=> __( 'Force Delete', 'wp-data-sync' ),
+					'key' 		=> 'wp_data_sync_sync_term_desc',
+					'label'		=> __( 'Sync Term Description', 'wp-data-sync' ),
 					'callback'  => 'input',
 					'args'      => [
 						'sanitize_callback' => 'sanitize_text_field',
 						'basename'          => 'select',
-						'selected'          => get_option( 'wp_data_sync_force_delete' ),
-						'name'              => 'wp_data_sync_force_delete',
-						'class'             => 'force-delete widefat',
+						'selected'          => get_option( 'wp_data_sync_sync_term_desc' ),
+						'name'              => 'wp_data_sync_sync_term_desc',
+						'class'             => 'sync-term-desc widefat',
 						'values'            => [
-							'false' => __( 'No, put item in the trash (Recommended)', 'wp-data-sync' ),
-							'true'  => __( 'Yes, delete item and all associated data', 'wp-data-sync' )
+							'true'  => __( 'Yes, I want to sync term descriptions', 'wp-data-sync' ),
+							'false' => __( 'No, I do not want to sync term descriptions', 'wp-data-sync' )
 						]
 					]
 				],
 				6 => (object) [
+					'key' 		=> 'wp_data_sync_sync_term_thumb',
+					'label'		=> __( 'Sync Term Thumbnail', 'wp-data-sync' ),
+					'callback'  => 'input',
+					'args'      => [
+						'sanitize_callback' => 'sanitize_text_field',
+						'basename'          => 'select',
+						'selected'          => get_option( 'wp_data_sync_sync_term_thumb' ),
+						'name'              => 'wp_data_sync_sync_term_thumb',
+						'class'             => 'sync-term-thumb widefat',
+						'values'            => [
+							'true'  => __( 'Yes, I want to sync term thumbnail', 'wp-data-sync' ),
+							'false' => __( 'No, I do not want to sync term thumbnail', 'wp-data-sync' )
+						]
+					]
+				],
+				7 => (object) [
+					'key' 		=> 'wp_data_sync_sync_term_meta',
+					'label'		=> __( 'Sync Term Meta', 'wp-data-sync' ),
+					'callback'  => 'input',
+					'args'      => [
+						'sanitize_callback' => 'sanitize_text_field',
+						'basename'          => 'select',
+						'selected'          => get_option( 'wp_data_sync_sync_term_meta' ),
+						'name'              => 'wp_data_sync_sync_term_meta',
+						'class'             => 'sync-term-meta widefat',
+						'values'            => [
+							'true'  => __( 'Yes, I want to sync term meta', 'wp-data-sync' ),
+							'false' => __( 'No, I do not want to sync term meta', 'wp-data-sync' )
+						]
+					]
+				],
+				8 => (object) [
 					'key' 		=> 'wp_data_sync_replace_post_content_images',
 					'label'		=> __( 'Replace Images in Content', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -555,7 +587,7 @@ class Settings {
 						'info'              => __( 'Replace all valid full image URLs. This will make a copy of the images in this websites media library and replace the image URLs in the content.' )
 					]
 				],
-				7 => (object) [
+				9 => (object) [
 					'key' 		=> 'wp_data_sync_replace_post_excerpt_images',
 					'label'		=> __( 'Replace Images in Excerpt', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -618,6 +650,18 @@ class Settings {
 
 	public function section( $args ) {
 		return;
+	}
+
+	/**
+	 * Is Checked.
+	 *
+	 * @param $option
+	 *
+	 * @return bool
+	 */
+
+	public static function is_checked( $option ) {
+		return 'checked' === get_option( $optin );
 	}
 
 }

@@ -58,7 +58,7 @@ abstract class Core {
 	 */
 
 	public function allowed() {
-		return 'checked' === get_option( 'wp_data_sync_allowed' );
+		return Settings::is_checked( 'wp_data_sync_allowed' );
 	}
 
 	/**

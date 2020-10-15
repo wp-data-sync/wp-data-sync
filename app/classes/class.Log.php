@@ -84,7 +84,7 @@ class Log {
 	 */
 
 	public static function is_active() {
-		return 'checked' === get_option( 'wp_data_sync_allow_logging' );
+		return Settings::is_checked( 'wp_data_sync_allow_logging' );
 	}
 
 }
