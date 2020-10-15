@@ -11,6 +11,8 @@
 
 namespace WP_DataSync\Woo;
 
+use WP_DataSync\App\Settings;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -29,7 +31,7 @@ foreach ( glob( plugin_dir_path( __FILE__ ) . '**/*.php' ) as $file ) {
 
 add_action( 'rest_api_init', function() {
 
-	if ( 'checked' === get_option( 'wp_data_sync_orders' ) ) {
+	if ( Settings::is_checked( 'wp_data_sync_orders' ) ) {
 		WC_Order_DataRequest::instance()->register_route();
 	}
 

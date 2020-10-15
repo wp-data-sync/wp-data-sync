@@ -153,7 +153,7 @@ class DataSync {
 		}
 
 		// Set the post ID.
-		if ( ! $this->set_post_id() ) {
+		if ( ! $this->post_id = $this->set_post_id() ) {
 			return [ 'error' => 'Post ID failed!!' ];
 		}
 
@@ -190,24 +190,16 @@ class DataSync {
 	/**
 	 * Set Post ID.
 	 *
-	 * @return bool
+	 * @return bool|int
 	 */
 
 	private function set_post_id() {
 
-		if ( 'post_id' === $this->primary_id['search_in'] ) {
+		if ( $post_id = $this->post_id( $this->primary_id ) ) {
 
-			$this->post_id = (int) $this->primary_id['post_id'];
+			$this->post_data['ID'] = $post_id;
 
-			return TRUE;
-
-		}
-
-		if ( $this->post_id = $this->post_id( $this->primary_id ) ) {
-
-			$this->post_data['ID'] = $this->post_id;
-
-			return TRUE;
+			return $post_id;
 
 		}
 
@@ -287,7 +279,7 @@ class DataSync {
 
 		if ( 0 < $this->post_id && 'trash' === $this->post_data['post_status'] ) {
 
-			if ( 'true' === get_option( 'wp_data_sync_force_delete' ) ) {
+			if ( Settings::is_true( 'wp_data_sync_force_delete' ) ) {
 
 				if ( wp_delete_post( $this->post_id, TRUE ) ) {
 					return TRUE;
@@ -410,7 +402,7 @@ class DataSync {
 			$parent_id  = 0;
 			$term_ids   = [];
 			$parent_ids = [];
-			$append     = ( 'true' === get_option( 'wp_data_sync_append_terms' ) ) ? TRUE : FALSE;
+			$append     = Settings::is_true( 'wp_data_sync_append_terms' );
 
 			foreach ( $terms as $term ) {
 
@@ -494,7 +486,7 @@ class DataSync {
 
 	public function term_desc( $description, $term_id, $taxonomy ) {
 
-		if ( ! Settings::is_checked( 'wp_data_sync_sync_term_desc' ) ) {
+		if ( ! Settings::is_true( 'wp_data_sync_sync_term_desc' ) ) {
 			return;
 		}
 
@@ -517,7 +509,7 @@ class DataSync {
 
 	public function term_thumb( $thumb_url, $term_id ) {
 
-		if ( ! Settings::is_checked( 'wp_data_sync_sync_term_thumb' ) ) {
+		if ( ! Settings::is_true( 'wp_data_sync_sync_term_thumb' ) ) {
 			return;
 		}
 
@@ -538,7 +530,7 @@ class DataSync {
 
 	public function term_meta( $term_meta, $term_id ) {
 
-		if ( ! Settings::is_checked( 'wp_data_sync_sync_term_meta' ) ) {
+		if ( ! Settings::is_true( 'wp_data_sync_sync_term_meta' ) ) {
 			return;
 		}
 

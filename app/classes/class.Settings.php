@@ -661,7 +661,19 @@ class Settings {
 	 */
 
 	public static function is_checked( $option ) {
-		return 'checked' === get_option( $optin );
+		return ( 'checked' === get_option( $option ) );
+	}
+
+	/**
+	 * Is value true.
+	 *
+	 * @param $option
+	 *
+	 * @return bool
+	 */
+
+	public static function is_true( $option ) {
+		return ( 'true' === get_option( $option ) );
 	}
 
 }
