@@ -419,7 +419,7 @@ class ItemRequest extends Core {
 		$term_array = [
 			'name'        => $term->name,
 			'description' => $term->description,
-			'thumb_url'   => $this->terM_thumb_url( $term ),
+			'thumb_url'   => $this->term_thumb_url( $term ),
 			'term_meta'   => $this->term_meta( $term )
 		];
 
@@ -435,10 +435,10 @@ class ItemRequest extends Core {
 	 * @return bool|false|string
 	 */
 
-	public function terM_thumb_url( $term ) {
+	public function term_thumb_url( $term ) {
 
 		if ( $attach_id = get_term_meta( $term->term_id, 'thumbnail_id', TRUE ) ) {
-			return wp_get_attachment_image_url( $attach_id, 'full' );
+			return wp_get_attachment_image_url( (int) $attach_id, 'full' );
 		}
 
 		return FALSE;
