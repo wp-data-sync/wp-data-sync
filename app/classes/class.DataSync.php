@@ -443,6 +443,10 @@ class DataSync {
 
 	public function set_term( $term, $taxonomy, $parent_id ) {
 
+		if ( ! is_array( $term ) ) {
+			return FALSE;
+		}
+
 		extract( $term );
 
 		Log::write( 'term-id', "$name - $taxonomy - $parent_id" );
@@ -823,6 +827,7 @@ class DataSync {
 			'_edit_lock',
 			'_edit_last',
 			'_thumbnail_id',
+			'thumbnail_id',
 			'product_count_product_cat'
 		];
 
