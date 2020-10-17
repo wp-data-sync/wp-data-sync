@@ -25,8 +25,6 @@ __What if I want to know more?__
 
 Here are a variety of links that we’ve found helpful in explaining our plugin and how to get started:
 
-__Helpful Resources__
-
 [WP Data Sync](https://wpdatasync.com/?affid=admin "WP Data Sync")
 [WP Data Sync Blog](https://wpdatasync.com/blog/?affid=admin "WP Data Sync Blog")
 [Developer Documentation - Getting Started](https://wpdatasync.com/documentation-type/getting-started/?affid=admin "Developer Documentation - Getting Started")

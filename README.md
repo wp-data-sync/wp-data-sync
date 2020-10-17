@@ -16,17 +16,15 @@ __What if I want to know more?__
 
 Here are a variety of links that we’ve found helpful in explaining our plugin and how to get started:
 
+* [WP Data Sync](https://wpdatasync.com "WP Data Sync")
+* [WP Data Sync Blog](https://wpdatasync.com/blog/ "WP Data Sync Blog")
+* [Developer Documentation](https://wpdatasync.com/docunentation/ "Developer Documentation")
+
 __Supported Data Formats__
 * JSON
 * XML
 * CSV
 * Google Sheets
-
-__Helpful Resources__
-
-* [WP Data Sync](https://wpdatasync.com "WP Data Sync")
-* [WP Data Sync Blog](https://wpdatasync.com/blog/ "WP Data Sync Blog")
-* [Developer Documentation](https://wpdatasync.com/docunentation/ "Developer Documentation")
 
 __Installation__
 
