@@ -109,10 +109,9 @@ class WC_Order_StageOrder {
 
 		return trailingslashit( join( '/', [
 			untrailingslashit( $api_url ),
-			'wp-json',
-			'wp-data-sync',
-			WP_DATA_SYNC_EP_VERSION,
+			'api',
 			'stage-order',
+			WP_DATA_SYNC_EP_VERSION,
 			$access_key,
 			$this->order_id
 		] ) );
