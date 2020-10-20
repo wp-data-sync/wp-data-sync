@@ -42,9 +42,17 @@ add_action( 'rest_api_init', function() {
  */
 
 add_action( 'wp_data_sync_after_process', function ( $post_id, $data_sync ) {
-	WC_Product_DataSync::instance()->wc_process( $post_id, $data_sync );
+
+	if ( 'product' === $data_sync->get_post_type() ) {
+		WC_Product_DataSync::instance()->wc_process( $post_id, $data_sync );
+	}
+
 }, 10, 2 );
 
 add_filter( 'wp_data_sync_item_request', function( $item_data, $item_id, $item_request ) {
-	return WC_Product_ItemRequest::instance()->wc_process( $item_data, $item_id, $item_request );
+
+	if ( 'product' === $item_request->get_post_type() ) {
+		return WC_Product_ItemRequest::instance()->wc_process( $item_data, $item_id, $item_request );
+	}
+
 }, 10, 3 );

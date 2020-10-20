@@ -559,4 +559,14 @@ class ItemRequest extends Core {
 
 	}
 
+	/**
+	 * Get the post type.
+	 *
+	 * @return string
+	 */
+
+	public function get_post_type() {
+		return $this->post_type;
+	}
+
 }
