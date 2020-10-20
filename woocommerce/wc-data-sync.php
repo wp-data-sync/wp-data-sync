@@ -55,4 +55,6 @@ add_filter( 'wp_data_sync_item_request', function( $item_data, $item_id, $item_r
 		return WC_Product_ItemRequest::instance()->wc_process( $item_data, $item_id, $item_request );
 	}
 
+	return $item_data;
+
 }, 10, 3 );
