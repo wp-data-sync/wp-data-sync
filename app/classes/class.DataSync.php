@@ -157,6 +157,8 @@ class DataSync {
 			return [ 'error' => 'Post ID failed!!' ];
 		}
 
+		$this->post_data['ID'] = $this->post_id;
+
 		if ( $this->maybe_trash_post() ) {
 			return [ 'success' => 'Trash Post' ];
 		}
@@ -195,12 +197,20 @@ class DataSync {
 
 	private function set_post_id() {
 
+		// This is only used to migrate content from cloned sites with the exact same post IDs.
+		// This will create a new post if the post types do not match.
+		if ( 'post_id' === $this->primary_id['search_in'] ) {
+
+			$post_id = (int) $this->primary_id['post_id'];
+
+			if ( get_post_status( $post_id ) && $this->post_data['post_type'] === get_post_type( $post_id ) ) {
+				return $post_id;
+			}
+
+		}
+
 		if ( $post_id = $this->post_id( $this->primary_id ) ) {
-
-			$this->post_data['ID'] = $post_id;
-
 			return $post_id;
-
 		}
 
 		return FALSE;

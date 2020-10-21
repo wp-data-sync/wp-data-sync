@@ -73,7 +73,7 @@ class ItemRequest extends Core {
 
 		register_rest_route(
 			'wp-data-sync/' . WP_DATA_SYNC_EP_VERSION . '/',
-			'get-item/(?P<access_token>\S+)/(?P<post_type>\S+)/(?P<limit>\d+)/',
+			'get-item/(?P<access_token>\S+)/(?P<post_type>\S+)/(?P<limit>\d+)/(?P<cache_buster>\S+)/',
 			[
 				'methods' => WP_REST_Server::READABLE,
 				'args'    => [
@@ -88,6 +88,11 @@ class ItemRequest extends Core {
 					'limit' => [
 						'sanitize_callback' => 'intval',
 						'validate_callback' => [ $this, 'limit' ]
+					],
+					'cache_buster' => [
+						'validate_callback' => function( $param ) {
+							return TRUE;
+						}
 					]
 				],
 				'permission_callback' => [ $this, 'access' ],
@@ -254,7 +259,7 @@ class ItemRequest extends Core {
 				ON (p.ID = i.item_id) 
 				WHERE (i.item_id IS NULL) 
 				AND p.post_type = %s 
-				AND (p.post_status = 'publish' OR p.post_status = 'trash')
+				AND (p.post_status != '')
 				GROUP BY p.ID 
 				ORDER BY p.ID DESC 
 				LIMIT %d
