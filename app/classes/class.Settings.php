@@ -115,6 +115,10 @@ class Settings {
 			'sync_settings' => [
 				'label' => __( 'Sync Settings', 'wp-data-sync' ),
 				'id'    => 'sync_settings'
+			],
+			'item_request' => [
+				'label' => __( 'Item Request', 'wp-data-sync' ),
+				'id'    => 'item_request'
 			]
 		];
 
@@ -598,6 +602,60 @@ class Settings {
 						'class'		        => '',
 						'placeholder'       => '',
 						'info'              => __( 'Replace all valid full image URLs. This will make a copy of the images in this websites media library and replace the image URLs in the content.' )
+					]
+				]
+			],
+			'item_request' => [
+				0 => (object) [
+					'key' 		=> 'wp_data_sync_item_request_status',
+					'label'		=> '',
+					'callback'  => 'input',
+					'args'      => [
+						'sanitize_callback' => [ $this, 'sanitize_array' ],
+						'heading'            => __( 'Include items with status', 'wp-data-sync' ),
+						'basename'          => 'checkboxes',
+						'type'		        => '',
+						'class'		        => 'item-request-status',
+						'placeholder'       => '',
+						'values'            => get_option( 'wp_data_sync_item_request_status', [] ),
+						'options'           => [
+							0 => [
+								'value' => 'publish',
+								'id'    => 'publish',
+								'class' => 'publish',
+								'label' => __( 'Publish' )
+							],
+							1 => [
+								'value' => 'pending',
+								'id'    => 'pending',
+								'class' => 'pending',
+								'label' => __( 'Pending' )
+							],
+							2 => [
+								'value' => 'draft',
+								'id'    => 'draft',
+								'class' => 'draft',
+								'label' => __( 'Draft' )
+							],
+							3 => [
+								'value' => 'future',
+								'id'    => 'future',
+								'class' => 'future',
+								'label' => __( 'Future' )
+							],
+							4 => [
+								'value' => 'private',
+								'id'    => 'private',
+								'class' => 'private',
+								'label' => __( 'Private' )
+							],
+							5 => [
+								'value' => 'trash',
+								'id'    => 'trash',
+								'class' => 'trash',
+								'label' => __( 'Trash' )
+							]
+						]
 					]
 				]
 			],

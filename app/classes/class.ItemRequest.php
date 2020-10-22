@@ -248,7 +248,11 @@ class ItemRequest extends Core {
 
 		global $wpdb;
 
-		$table = self::table();
+		$table        = self::table();
+		$status       = get_option( 'wp_data_sync_item_request_status', [ 'publish' ] );
+		$count        = count( $status );
+		$placeholders = join( ', ', array_fill( 0, $count, '%s' ) );
+		$args         = array_merge( [ $this->post_type ], $status, [ $this->limit ] );
 
 		$item_ids = $wpdb->get_col(
 			$wpdb->prepare(
@@ -259,13 +263,12 @@ class ItemRequest extends Core {
 				ON (p.ID = i.item_id) 
 				WHERE (i.item_id IS NULL) 
 				AND p.post_type = %s 
-				AND (p.post_status != '')
+				AND p.post_status IN ( $placeholders )
 				GROUP BY p.ID 
 				ORDER BY p.ID DESC 
 				LIMIT %d
 				",
-				$this->post_type,
-				$this->limit
+				$args
 			)
 		);
 
