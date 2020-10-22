@@ -607,6 +607,19 @@ class Settings {
 			],
 			'item_request' => [
 				0 => (object) [
+					'key' 		=> 'wp_data_sync_unset_post_author',
+					'label'		=> __( 'Unset Post Author', 'wp-data-sync' ),
+					'callback'  => 'input',
+					'args'      => [
+						'sanitize_callback' => 'sanitize_text_field',
+						'basename'          => 'checkbox',
+						'type'		        => '',
+						'class'		        => '',
+						'placeholder'       => '',
+						'info'              => __( 'Remove the post author ID from items. This will allow the default author to be assigned when syncing data.' )
+					]
+				],
+				1 => (object) [
 					'key' 		=> 'wp_data_sync_item_request_status',
 					'label'		=> '',
 					'callback'  => 'input',

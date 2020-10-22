@@ -234,6 +234,10 @@ class ItemRequest extends Core {
 		unset( $item->post_date_gmt );
 		unset( $item->post_modified_gmt );
 
+		if ( Settings::is_checked( 'wp_data_sync_unset_post_author' ) ) {
+			unset( $item->post_author );
+		}
+
 		return $item;
 
 	}
