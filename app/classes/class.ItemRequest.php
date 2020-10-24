@@ -138,14 +138,9 @@ class ItemRequest extends Core {
 
 	public function post_type( $post_type ) {
 
-		$this->post_type = $post_type;
+		$this->post_type = sanitize_text_field( $post_type );
 
-		// Allow 'refresh' as post type to trunacte the ItemRequest table.
-		if ( 'refresh' === $post_type ) {
-			return TRUE;
-		}
-
-		return post_type_exists( $post_type );
+		return TRUE;
 
 	}
 
@@ -226,7 +221,20 @@ class ItemRequest extends Core {
 
 	public function get_post( $item_id ) {
 
-		$item = get_post( $item_id );
+		global $wpdb;
+
+		$item = $wpdb->get_row( $wpdb->prepare(
+			"
+			SELECT * 
+			FROM $wpdb->posts
+			WHERE ID = %d
+			",
+			$item_id
+		) );
+
+		if ( null === $item || is_wp_error( $item ) ) {
+			return [];
+		}
 
 		unset( $item->ID );
 		unset( $item->guid );
@@ -332,20 +340,28 @@ class ItemRequest extends Core {
 	 * 
 	 * @param $item_id
 	 *
-	 * @return array|\WP_Error
+	 * @return array|\WP_Error|bool
 	 */
 
 	public function taxonomies( $item_id ) {
+
+		if ( ! post_type_exists( $this->post_type ) ) {
+			return FALSE;
+		}
 
 		$results = [];
 		$taxonomies = get_object_taxonomies( $this->post_type );
 
 		foreach ( $taxonomies as $taxonomy ) {
 
-			$term_ids = wp_get_object_terms( $item_id, $taxonomy, [ 'fields' => 'ids' ] );
+			if ( taxonomy_exists( $taxonomy ) ) {
 
-			if ( ! empty( $term_ids ) && is_array( $term_ids ) ) {
-				$results[ $taxonomy ] = $this->format_terms( $term_ids, $taxonomy );
+				$term_ids = wp_get_object_terms( $item_id, $taxonomy, [ 'fields' => 'ids' ] );
+
+				if ( ! empty( $term_ids ) && is_array( $term_ids ) ) {
+					$results[ $taxonomy ] = $this->format_terms( $term_ids, $taxonomy );
+				}
+
 			}
 
 		}
