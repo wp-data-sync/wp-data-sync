@@ -29,8 +29,18 @@ function wc_update() {
 		WC_Product_Sells::create_table();
 		WC_Order_StageOrder::create_table();
 
+		drop_sells_table();
+
 		update_option( 'WC_DATA_SYNC_VERSION', WC_DATA_SYNC_VERSION );
 
 	}
+
+}
+
+function drop_sells_table() {
+
+	global $wpdb;
+
+	$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}data_sync_sells" );
 
 }
