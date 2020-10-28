@@ -75,18 +75,6 @@ class DataSync {
 	 * @var bool|array
 	 */
 
-	private $cross_sells = FALSE;
-
-	/**
-	 * @var bool|array
-	 */
-
-	private $up_sells = FALSE;
-
-	/**
-	 * @var bool|array
-	 */
-
 	private $integrations = FALSE;
 
 	/**
@@ -846,7 +834,7 @@ class DataSync {
 	}
 
 	/**
-	 * Integartions.
+	 * Integrations.
 	 */
 
 	private function integrations() {
@@ -955,26 +943,6 @@ class DataSync {
 
 	public function get_product_gallery() {
 		return $this->product_gallery;
-	}
-
-	/**
-	 * Get cross sells.
-	 *
-	 * @return array|bool
-	 */
-
-	public function get_cross_sells() {
-		return $this->cross_sells;
-	}
-
-	/**
-	 * Get up sells.
-	 *
-	 * @return array|bool
-	 */
-
-	public function get_up_sells() {
-		return $this->up_sells;
 	}
 
 	/**

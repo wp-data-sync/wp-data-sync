@@ -11,8 +11,9 @@
 
 namespace WP_DataSync\Woo;
 
+use WP_DataSync\App\Settings;
+use WP_DataSync\App\Log;
 use WC_Product;
-use WC_Product_Variable;
 
 class WC_Product_Sells {
 
@@ -20,13 +21,7 @@ class WC_Product_Sells {
 	 * @var string
 	 */
 
-	private $sell_type;
-
-	/**
-	 * @var string
-	 */
-
-	private $sell_id;
+	private $type;
 
 	/**
 	 * @var array
@@ -38,13 +33,19 @@ class WC_Product_Sells {
 	 * @var string
 	 */
 
+	private $relational_id;
+
+	/**
+	 * @var string
+	 */
+
 	private $relational_key;
 
 	/**
-	 * @var WC_Product|WC_Product_Variable
+	 * @var int
 	 */
 
-	private $product;
+	private $product_id;
 
 	/**
 	 * @var WC_Product_Sells
@@ -79,44 +80,16 @@ class WC_Product_Sells {
 	/**
 	 * Set properties.
 	 *
-	 * @param $product
-	 * @param $sells
-	 * @param $sells_type
+	 * @param $values array
 	 */
 
-	public function set_properties( $product, $sells, $sell_type ) {
+	public function set_properties( $values ) {
 
-		$this->product        = $product;
-		$this->sell_id        = $sells['sell_id'];
-		$this->sell_ids       = $sells['sell_ids'];
-		$this->relational_key = $sells['relational_key'];
-		$this->sell_type      = $sell_type;
-
-	}
-
-	/**
-	 * Set sell IDs.
-	 */
-
-	public function set_sell_ids() {
-
-		if ( is_array( $this->sell_ids ) ) {
-
-			foreach ( $this->sell_ids as $sell_id ) {
-
-				if ( $product_id = $this->relation_exists( $sell_id ) ) {
-
-					$this->set_sell_id( $product_id, $sell_id );
-
-				}
-				elseif ( ! $this->is_sell_id_staged( $sell_id ) ) {
-
-					$this->stage_sell_id( $sell_id );
-				}
-
-			}
-
+		foreach ( $values as $key => $value ) {
+			$this->$key = $value;
 		}
+
+		return Settings::is_checked( "wp_data_sync_process_$this->type" );
 
 	}
 
@@ -125,24 +98,154 @@ class WC_Product_Sells {
 	 */
 
 	public function set_relation() {
+		update_post_meta( $this->product_id, $this->relational_key, $this->relational_id );
+	}
 
-		$this->product->update_meta_data( $this->relational_key, $this->sell_id );
+	/**
+	 * Set sell IDs.
+	 */
+
+	public function stage_sell_ids() {
+
+		if ( is_array( $this->sell_ids ) ) {
+
+			foreach ( $this->sell_ids as $sell_id ) {
+
+				if ( ! $this->sell_id_exists( $sell_id ) ) {
+					$this->insert_sell_id( $sell_id );
+				}
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * Sell id exists.
+	 *
+	 * @param $sell_id
+	 *
+	 * @return bool
+	 */
+
+	public function sell_id_exists( $sell_id ) {
+
+		global $wpdb;
+
+		$table = self::table();
+
+		$exists = $wpdb->get_var(
+			$wpdb->prepare(
+				"
+				SELECT id
+				FROM $table
+				WHERE type = %s
+				AND sell_id = %s
+				AND product_id = %d
+				AND relational_id = %s
+				AND relational_key = %s
+				",
+				$this->type,
+				$sell_id,
+				$this->product_id,
+				$this->relational_id,
+				$this->relational_key
+			)
+		);
+
+		if ( null === $exists || is_wp_error( $exists ) ) {
+			return FALSE;
+		}
+
+		return TRUE;
+
+	}
+
+	/**
+	 * Insert sell id.
+	 *
+	 * @param $sell_id
+	 */
+
+	public function insert_sell_id( $sell_id ) {
+
+		global $wpdb;
+
+		$wpdb->insert( self::table(), [
+			'type'           => $this->type,
+			'sell_id'        => $sell_id,
+			'product_id'     => $this->product_id,
+			'relational_id'  => $this->relational_id,
+			'relational_key' => $this->relational_key
+		] );
+
+	}
+
+	/**
+	 * Relate the unrelated IDs.
+	 */
+
+	public function relate_ids() {
+
+		if ( $unrelated = $this->get_unrelated() ) {
+
+			foreach ( $unrelated as $row ) {
+
+				if ( $post_id = $this->relation_exists( $row ) ) {
+
+					$this->update_relation( $row, $post_id );
+					$this->set_product_ids( $row, $post_id );
+
+				}
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * Get the unrelated rows.
+	 *
+	 * @return array|bool|object
+	 */
+
+	public function get_unrelated() {
+
+		global $wpdb;
+
+		$table = self::table();
+
+		$unrelated = $wpdb->get_results(
+			"
+			SELECT *
+			FROM $table
+			WHERE post_id = 0
+			"
+		);
+
+		if ( null === $unrelated || is_wp_error( $unrelated ) ) {
+			return FALSE;
+		}
+
+		return $unrelated;
 
 	}
 
 	/**
 	 * Relation exists.
 	 *
-	 * @param $sell_id
+	 * @param $row
 	 *
 	 * @return bool|int
 	 */
 
-	public function relation_exists( $sell_id ) {
+	public function relation_exists( $row ) {
 
 		global $wpdb;
 
-		$product_id = $wpdb->get_var(
+		$post_id = $wpdb->get_var(
 			$wpdb->prepare(
 				"
 				SELECT post_id
@@ -150,108 +253,78 @@ class WC_Product_Sells {
 				WHERE meta_key = %s
 				AND meta_value = %s
 				",
-				$this->relational_key,
-				$sell_id
+				$row->relational_key,
+				$row->sell_id
 			)
 		);
 
-		if ( null === $product_id || is_wp_error( $product_id ) ) {
+		if ( null === $post_id || is_wp_error( $post_id ) ) {
 			return FALSE;
 		}
 
-		return (int) $product_id;
+		return (int) $post_id;
 
 	}
 
 	/**
-	 * Set sell ID.
+	 * Update relation.
 	 *
-	 * @param $product_id
-	 * @param $sell_id
+	 * @param $row
+	 * @param $post_id
 	 */
 
-	public function set_sell_id( $product_id, $sell_id ) {
+	public function update_relation( $row, $post_id ) {
 
-		$product  = new WC_Product( $product_id );
-		$sell_ids = $this->get_sell_ids( $product, $sell_id );
+		global $wpdb;
 
-		switch( $this->sell_type ) {
-
-			case 'cross_sells':
-				$product->set_cross_sell_ids( $sell_ids );
-				break;
-			case 'up_sells':
-				$product->set_upsell_ids( $sell_ids );
-				break;
-
-		}
-
-		$product->save();
+		$wpdb->update(
+			self::table(),
+			[ 'post_id' => $post_id ],
+			[ 'id'      => $row->id ]
+		);
 
 	}
 
 	/**
-	 * Get the sell ids.
+	 * Set product IDs.
 	 *
-	 * @param $product
-	 * @param $sell_id
-	 *
-	 * @return array
+	 * @param $row
+	 * @param $post_id
 	 */
 
-	public function get_sell_ids( $product, $sell_id ) {
+	public function set_product_ids( $row, $post_id ) {
 
-		switch( $this->sell_type ) {
+		if( $product_ids = $this->get_product_ids( $row, $post_id ) ) {
 
-			case 'cross_sells':
-				$sell_ids = $product->get_cross_sell_ids();
-				break;
-			case 'up_sells':
-				$sell_ids = $product->get_upsell_ids();
-				break;
-			default:
-				$sell_ids = [];
+			$product  = new WC_Product( $post_id );
 
-		}
-
-		array_push( $sell_ids, $sell_id );
-
-		return $sell_ids;
-
-	}
-
-	/**
-	 * Get staged sell ids.
-	 */
-
-	public function set_staged_sell_ids() {
-
-		if ( $product_ids = $this->get_staged_sell_ids() ) {
-
-			switch( $this->sell_type ) {
+			switch( $row->type ) {
 
 				case 'cross_sells':
-					$this->product->set_cross_sell_ids( $product_ids );
+					$product->set_cross_sell_ids( $product_ids );
 					break;
 				case 'up_sells':
-					$this->product->set_upsell_ids( $product_ids );
+					$product->set_upsell_ids( $product_ids );
 					break;
 
 			}
 
-			$this->process_staged_sell_ids( $product_ids );
+			$product->save();
 
 		}
 
 	}
 
 	/**
-	 * Get staged sell ids.
+	 * Get product IDs.
+	 *
+	 * @param $row
+	 * @param $post_id
 	 *
 	 * @return array|bool
 	 */
 
-	public function get_staged_sell_ids() {
+	public function get_product_ids( $row, $post_id ) {
 
 		global $wpdb;
 
@@ -262,14 +335,11 @@ class WC_Product_Sells {
 				"
 				SELECT product_id
 				FROM $table
-				WHERE relational_key = %s
-				AND sell_type = %s
-				AND sell_id = %s
-				AND processed = 0
+				WHERE post_id = %d
+				AND type = %s
 				",
-				$this->relational_key,
-				$this->sell_type,
-				$this->sell_id
+				$post_id,
+				$row->type
 			)
 		);
 
@@ -282,87 +352,14 @@ class WC_Product_Sells {
 	}
 
 	/**
-	 * Process staged sell ids.
-	 *
-	 * @param $product_ids
+	 * Save the sell ids.
 	 */
 
-	public function process_staged_sell_ids( $product_ids ) {
+	public function save() {
 
-		global $wpdb;
-
-		foreach ( $product_ids as $product_id ) {
-
-			$wpdb->update(
-				self::table(),
-				[ 'processed' => 1 ],
-				[
-					'product_id'     => $product_id,
-					'sell_type'      => $this->sell_type,
-					'sell_id'        => $this->sell_id,
-					'relational_key' => $this->relational_key,
-				]
-			);
-
-		}
-
-	}
-
-	/**
-	 * Stage sell id.
-	 *
-	 * @param $sell_id
-	 */
-
-	public function stage_sell_id( $sell_id ) {
-
-		global $wpdb;
-
-		$wpdb->insert( self::table(), [
-			'product_id'     => $this->product->get_id(),
-			'sell_type'      => $this->sell_type,
-			'sell_id'        => $sell_id,
-			'relational_key' => $this->relational_key,
-		] );
-
-	}
-
-	/**
-	 * Is sell id staged.
-	 *
-	 * @param $sell_id
-	 *
-	 * @return bool
-	 */
-
-	public function is_sell_id_staged( $sell_id ) {
-
-		global $wpdb;
-
-		$table = self::table();
-
-		$staged = $wpdb->get_var(
-			$wpdb->prepare(
-				"
-				SELECT id
-				FROM $table
-				WHERE product_id = %d
-				AND relational_key = %s
-				AND sell_type = %s
-				AND sell_id = %s
-				",
-				$this->product->get_id(),
-				$this->relational_key,
-				$this->sell_type,
-				$sell_id
-			)
-		);
-
-		if ( null === $staged || is_wp_error( $exists ) ) {
-			return FALSE;
-		}
-
-		return TRUE;
+		$this->set_relation();
+		$this->stage_sell_ids();
+		$this->relate_ids();
 
 	}
 
@@ -376,7 +373,7 @@ class WC_Product_Sells {
 
 		global $wpdb;
 
-		return $wpdb->prefix . 'data_sync_sells';
+		return $wpdb->prefix . 'data_sync_related_sells';
 
 	}
 
@@ -396,32 +393,22 @@ class WC_Product_Sells {
 		$sql = "
 			CREATE TABLE IF NOT EXISTS $table (
   			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  			type varchar(40) NOT NULL,
+  			sell_id varchar(300) NOT NULL,
   			product_id bigint(20) NOT NULL,
-  			sell_type varchar(40) NOT NULL,
-  			sell_id varchar(200) NOT NULL,
-  			relational_key varchar(200) NOT NULL,
-  			processed tinyint(4) NOT NULL DEFAULT 0,
+  			relational_id varchar(300) NOT NULL,
+  			relational_key varchar(300) NOT NULL,
+  			post_id bigint(20) NOT NULL DEFAULT 0,
   			PRIMARY KEY (id),
-			KEY product_id (product_id),
-			KEY sell_type (sell_type),
-			KEY relational_key (relational_key),
-			KEY processed (processed)
+  			KEY type (type),
+			KEY sell_id (sell_id),
+			KEY relational_id (relational_id),
+			KEY relational_key (relational_key)
 			) $charset_collate;
         ";
 
 		dbDelta( $sql );
 
-	}
-
-	/**
-	 * Save the sell ids.
-	 */
-
-	public function save() {
-		$this->set_sell_ids();
-		$this->set_relation();
-		$this->set_staged_sell_ids();
-		$this->product->save();
 	}
 
 }

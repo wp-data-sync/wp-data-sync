@@ -685,6 +685,17 @@ class Settings {
 						'placeholder'       => '',
 						'info'              => __( 'We reccommend keeping this off unless you are having an issue with the data sync. If you do have an issue, please activate this before contacting support. Please note when this is deactivated all log files will be deleted.' )
 					]
+				],
+				1 => (object) [
+					'key' 		=> 'wp_data_sync_log_file',
+					'label'		=> __( 'Log File', 'wp-data-sync' ),
+					'callback'  => 'input',
+					'args'      => [
+						'sanitize_callback' => 'sanitize_text_field',
+						'files'             => Log::log_files(),
+						'log'               => Log::log_file(),
+						'basename'          => 'log-file'
+					]
 				]
 			]
 		];

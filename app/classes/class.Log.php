@@ -87,4 +87,44 @@ class Log {
 		return Settings::is_checked( 'wp_data_sync_allow_logging' );
 	}
 
+	/**
+	 * Log file contents.
+	 *
+	 * @return string
+	 */
+
+	public static function log_file() {
+
+		if ( $file_name = get_option('wp_data_sync_log_file') ) {
+
+			$file = WP_DATA_SYNC_LOG_DIR . $file_name;
+
+			if ( file_exists( $file ) ) {
+				return file_get_contents( $file );
+			}
+
+		}
+
+		return __( 'File does not exist. Please choose a different file and save changes.', 'wp-data-sync' );
+
+	}
+
+	/**
+	 * Log files.
+	 *
+	 * @return array|bool
+	 */
+
+	public static function log_files() {
+
+		$files = glob( WP_DATA_SYNC_LOG_DIR . '*.log' );
+
+		if ( is_array( $files ) && ! empty( $files ) ) {
+			return array_map( 'basename', $files );
+		}
+
+		return FALSE;
+
+	}
+
 }

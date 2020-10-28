@@ -266,23 +266,27 @@ class ItemRequest extends Core {
 		$placeholders = join( ', ', array_fill( 0, $count, '%s' ) );
 		$args         = array_merge( [ $this->post_type ], $status, [ $this->limit ] );
 
-		$item_ids = $wpdb->get_col(
-			$wpdb->prepare(
-				"
-				SELECT SQL_NO_CACHE SQL_CALC_FOUND_ROWS  p.ID 
-				FROM {$wpdb->prefix}posts p
-				LEFT JOIN $table i
-				ON (p.ID = i.item_id) 
-				WHERE (i.item_id IS NULL) 
-				AND p.post_type = %s 
-				AND p.post_status IN ( $placeholders )
-				GROUP BY p.ID 
-				ORDER BY p.ID DESC 
-				LIMIT %d
-				",
-				$args
-			)
+		$sql = $wpdb->prepare(
+			"
+			SELECT SQL_NO_CACHE SQL_CALC_FOUND_ROWS  p.ID 
+			FROM {$wpdb->prefix}posts p
+			LEFT JOIN $table i
+			ON (p.ID = i.item_id) 
+			WHERE (i.item_id IS NULL) 
+			AND p.post_type = %s 
+			AND p.post_status IN ( $placeholders )
+			GROUP BY p.ID 
+			ORDER BY p.ID DESC 
+			LIMIT %d
+			",
+			$args
 		);
+
+		Log::write( 'item-request-sql', $sql );
+
+		$item_ids = $wpdb->get_col( $sql );
+
+		Log::write( 'item-request-sql', $item_ids );
 
 		$wpdb->flush();
 

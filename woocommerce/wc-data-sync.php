@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Used to handle WooCommerce integration versions.
-define( 'WC_DATA_SYNC_VERSION', '1.2' );
+define( 'WC_DATA_SYNC_VERSION', '1.0.3' );
 
 // Load WooCommerce scripts
 foreach ( glob( plugin_dir_path( __FILE__ ) . '**/*.php' ) as $file ) {
@@ -48,6 +48,44 @@ add_action( 'wp_data_sync_after_process', function ( $post_id, $data_sync ) {
 	}
 
 }, 10, 2 );
+
+/**
+ * Process WooCommece Cross Sells.
+ */
+
+add_action( 'wp_data_sync_integration_woo_cross_sells', function( $product_id, $values ) {
+
+	$values['product_id'] = $product_id;
+	$values['type']       = 'cross_sells';
+
+	$product_sells = WC_Product_Sells::instance();
+
+	if ( $product_sells->set_properties( $values ) ) {
+		$product_sells->save();
+	}
+
+}, 10, 2 );
+
+/**
+ * Process WooCommece Cross Sells.
+ */
+
+add_action( 'wp_data_sync_integration_woo_up_sells', function( $product_id, $values ) {
+
+	$values['product_id'] = $product_id;
+	$values['type']       = 'up_sells';
+
+	$product_sells = WC_Product_Sells::instance();
+
+	if ( $product_sells->set_properties( $values ) ) {
+		$product_sells->save();
+	}
+
+}, 10, 2 );
+
+/**
+ * WooCommerce ItemRequest
+ */
 
 add_filter( 'wp_data_sync_item_request', function( $item_data, $item_id, $item_request ) {
 
