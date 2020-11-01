@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Used to handle WooCommerce integration versions.
-define( 'WC_DATA_SYNC_VERSION', '1.0.4' );
+define( 'WC_DATA_SYNC_VERSION', '1.0.5' );
 
 // Load WooCommerce scripts
 foreach ( glob( plugin_dir_path( __FILE__ ) . '**/*.php' ) as $file ) {

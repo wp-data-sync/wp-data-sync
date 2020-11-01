@@ -30,7 +30,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 					'name'              => 'wp_data_sync_product_visibility',
 					'class'             => 'product-visibility widefat',
 					'values'            => [
-						'null'                                     => __( 'Shop and search results', 'woocommerce' ),
+						'visible'                                  => __( 'Shop and search results', 'woocommerce' ),
 						'exclude-from-search'                      => __( 'Shop only', 'woocommerce' ),
 						'exclude-from-catalog'                     => __( 'Search results only', 'woocommerce' ),
 						'exclude-from-catalog,exclude-from-search' => __( 'Hidden', 'woocommerce' )

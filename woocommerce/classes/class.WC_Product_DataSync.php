@@ -16,6 +16,7 @@ use WC_Product_Variable;
 use WC_Product_Attribute;
 use WC_Product_Variation;
 use WP_DataSync\App\DataSync;
+use WP_DataSync\App\Log;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -90,7 +91,7 @@ class WC_Product_DataSync {
 		}
 
 		if ( $taxonomies = $this->data_sync->get_taxonomies() ) {
-			$this->product_visibility( $product_id, $taxonomies );
+			$this->product_visibility( $taxonomies );
 		}
 
 	}
@@ -391,35 +392,33 @@ class WC_Product_DataSync {
 	/**
 	 * Product visibility.
 	 *
-	 * @param $product_id
 	 * @param $taxonomies
 	 */
 
-	public function product_visibility( $product_id, $taxonomies ) {
+	public function product_visibility( $taxonomies ) {
 
-		$taxonomy = 'product_visibility';
+		Log::write( 'product-visibility', $taxonomies );
 
-		if ( is_array( $taxonomies ) && array_key_exists( $taxonomy, $taxonomies ) ) {
-			return;
-		}
+		if ( is_array( $taxonomies ) && array_key_exists( 'product_visibility', $taxonomies ) ) {
 
-		if ( $terms = get_option( 'wp_data_sync_product_visibility' ) ) {
-
-			$term_ids = [];
-
-			if ( 'null' !== $terms ) {
-
-				$terms = explode( ',', $terms );
-
-				foreach ( $terms as $term ) {
-					$term_ids[] = $this->data_sync->set_term( $term, $taxonomy, 0 );
-				}
-
+			foreach( $taxonomies['product_visibility'] as $term_array ) {
+				$term = $term_array['name'];
 			}
 
-			wp_set_object_terms( $product_id, $term_ids, $taxonomy );
+		}
+
+		Log::write( 'product-visibility', "API Term: $term " );
+
+		if ( empty( $term ) ) {
+
+			$term = get_option( 'wp_data_sync_product_visibility', 'visible' );
+
+			Log::write( 'product-visibility', "Default Term: $term " );
 
 		}
+
+		$this->product->set_catalog_visibility( $term );
+		$this->product->save();
 
 	}
 

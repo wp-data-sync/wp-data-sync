@@ -29,7 +29,7 @@ function wc_update() {
 		WC_Product_Sells::create_table();
 		WC_Order_StageOrder::create_table();
 
-		drop_sells_table();
+		reset_product_visibilty_defualt();
 
 		update_option( 'WC_DATA_SYNC_VERSION', WC_DATA_SYNC_VERSION );
 
@@ -37,10 +37,11 @@ function wc_update() {
 
 }
 
-function drop_sells_table() {
+// TODO: Temporary function
+function reset_product_visibilty_defualt() {
 
-	global $wpdb;
-
-	$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}data_sync_sells" );
+	if ( 'null' === get_option( 'wp_data_sync_product_visibility', 'visible' ) ) {
+		update_option( 'wp_data_sync_product_visibility', 'visible' );
+	}
 
 }
