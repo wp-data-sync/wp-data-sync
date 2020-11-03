@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class WC_Order_StageOrder {
+class WC_Order_StageOrder extends WC_Order_Data {
 
 	const EVENT_HOOK = 'wp_data_sync_stage_order_event';
 
@@ -31,7 +31,7 @@ class WC_Order_StageOrder {
 	 * @var int
 	 */
 
-	private $order_id;
+	protected $order_id;
 
 	/**
 	 * WC_Order_StageOrder constructor.
@@ -92,29 +92,16 @@ class WC_Order_StageOrder {
 	/**
 	 * Endpoint.
 	 *
-	 * @param $order_id
-	 *
 	 * @return string|void
 	 */
 
 	protected function endpoint() {
 
-		if ( ! $api_url = get_option( 'wp_data_sync_api_url' ) ) {
-			return;
+		if ( $webhook_url = get_option( 'wp_data_sync_orders_webhook_url' ) ) {
+			trailingslashit( trailingslashit( $webhook_url ) . $this->order_id );
 		}
 
-		if ( ! $access_key = get_option( 'wp_data_sync_access_key' ) ) {
-			return;
-		}
-
-		return trailingslashit( join( '/', [
-			untrailingslashit( $api_url ),
-			'api',
-			'stage-order',
-			WP_DATA_SYNC_EP_VERSION,
-			$access_key,
-			$this->order_id
-		] ) );
+		return FALSE;
 
 	}
 
@@ -132,10 +119,9 @@ class WC_Order_StageOrder {
 
 		return [
 			'timeout'   => 5,
-			'sslverify' => FALSE,
 			// Wait for response only if logging is active.
 			'blocking'  => Log::is_active(),
-			'body'      => json_encode( $this->order_id ),
+			'body'      => json_encode( $this->order() ),
 			'headers'   => [
 				'Accept'         => 'application/json',
 				'Authentication' => $private_key,

@@ -11,17 +11,14 @@
 
 namespace WP_DataSync\Woo;
 
-use WP_DataSync\App\Core;
 use WP_DataSync\App\Log;
 use WP_REST_Server;
-use WP_REST_Request;
-use WP_REST_Response;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class WC_Order_DataRequest extends Core {
+class WC_Order_DataRequest extends WC_Order_Data {
 
 	/**
 	 * @var WC_Order_DataRequest
@@ -33,7 +30,7 @@ class WC_Order_DataRequest extends Core {
 	 * @var integer
 	 */
 
-	private $order_id;
+	protected $order_id;
 
 	/**
 	 * WC_Order_DataRequest constructor.
@@ -114,44 +111,11 @@ class WC_Order_DataRequest extends Core {
 
 	public function request() {
 
-		$responce = [];
-
-		if ( $order = wc_get_order( $this->order_id ) ) {
-
-			$response          = $order->get_data();
-			$response['items'] = $this->get_items( $order );
-
-		}
+		$responce = $this->order();
 
 		Log::write( 'order-request', $response );
 
 		return rest_ensure_response( $response );
-
-	}
-
-	/**
-	 * @param $order \WC_Order
-	 *
-	 * @return array
-	 */
-
-	public function get_items( $order ) {
-
-		$order_items = [];
-		$i = 0;
-
-		foreach ( $order->get_items() as $item ) {
-
-			$product = wc_get_product( $item->get_product_id() );
-
-			$order_items[ $i ]        = $item->get_data();
-			$order_items[ $i ]['sku'] = $product->get_sku();
-
-			$i++;
-
-		}
-
-		return apply_filters( 'wp_data_sync_order_items', $order_items, $order );
 
 	}
 
