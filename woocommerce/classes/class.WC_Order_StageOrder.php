@@ -71,7 +71,11 @@ class WC_Order_StageOrder extends WC_Order_Data {
 
 		if ( $endpoint = $this->endpoint() ) {
 
+			Log::write( 'stage-order', $endpoint );
+
 			if ( $args = $this->args() ) {
+
+				Log::write( 'stage-order', $args );
 
 				if ( $response = wp_remote_post( $endpoint, $args ) ) {
 
@@ -98,7 +102,7 @@ class WC_Order_StageOrder extends WC_Order_Data {
 	protected function endpoint() {
 
 		if ( $webhook_url = get_option( 'wp_data_sync_orders_webhook_url' ) ) {
-			trailingslashit( trailingslashit( $webhook_url ) . $this->order_id );
+			return trailingslashit( trailingslashit( $webhook_url ) . $this->order_id );
 		}
 
 		return FALSE;
@@ -119,6 +123,7 @@ class WC_Order_StageOrder extends WC_Order_Data {
 
 		return [
 			'timeout'   => 5,
+			'sslverify' => FALSE,
 			// Wait for response only if logging is active.
 			'blocking'  => Log::is_active(),
 			'body'      => json_encode( $this->order() ),
