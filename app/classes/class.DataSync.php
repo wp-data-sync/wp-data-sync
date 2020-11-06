@@ -151,27 +151,31 @@ class DataSync {
 			return [ 'success' => 'Trash Post' ];
 		}
 
-		if ( isset( $this->post_data ) ) {
+		if ( $this->post_data ) {
 			$this->post_data();
 		}
 
-		if ( isset(  $this->post_meta ) ) {
+		if ( $this->post_meta ) {
 			$this->post_meta( $this->post_id, $this->post_meta );
 		}
 
-		if ( isset(  $this->taxonomies ) ) {
+		if ( $this->taxonomies ) {
 			$this->taxonomy( $this->post_id, $this->taxonomies );
 		}
 
-		if ( isset( $this->post_thumbnail ) ) {
+		if ( $this->post_thumbnail ) {
 			$this->post_thumbnail( $this->post_id, $this->post_thumbnail );
 		}
 
-		if ( isset( $this->integrations ) ) {
+		if ( $this->integrations ) {
 			$this->integrations();
 		}
 
 		do_action( 'wp_data_sync_after_process', $this->post_id, $this );
+
+		if ( $this->taxonomies || $this->attributes ) {
+			$this->reset_term_taxonomy_count();
+		}
 
 		return [ 'post_id' => $this->post_id ];
 
@@ -549,6 +553,31 @@ class DataSync {
 			}
 
 		}
+
+	}
+
+	/**
+	 * Reset the term taxonomy count.
+	 */
+
+	public function reset_term_taxonomy_count() {
+
+		global $wpdb;
+
+		$wpdb->query(
+			"
+			UPDATE $wpdb->term_taxonomy tt SET count = (
+				SELECT COUNT(*) FROM $wpdb->term_relationships tr 
+    			LEFT JOIN $wpdb->posts p ON (p.ID = tr.object_id) 
+    			WHERE 
+        		tr.term_taxonomy_id = tt.term_taxonomy_id 
+        		AND 
+        		tt.taxonomy NOT IN ('link_category')
+        		AND 
+        		p.post_status IN ('publish', 'future')
+			)
+			"
+		);
 
 	}
 
