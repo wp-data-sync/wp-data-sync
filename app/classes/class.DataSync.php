@@ -558,6 +558,10 @@ class DataSync {
 
 	/**
 	 * Reset the term taxonomy count.
+	 *
+	 * @since 1.4.22
+	 *
+	 * @link https://stackoverflow.com/questions/18669256/how-to-update-wordpress-taxonomiescategories-tags-count-field-after-bulk-impo
 	 */
 
 	public function reset_term_taxonomy_count() {
