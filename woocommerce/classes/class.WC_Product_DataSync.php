@@ -117,28 +117,27 @@ class WC_Product_DataSync {
 
 			extract( $attribute );
 
-			$product_attribute = new WC_Product_Attribute();
-
 			if ( $is_taxonomy ) {
+
 				$taxonomy = $this->attribute_taxonomy( $name );
 				$term_ids = $this->attribute_term_ids( $taxonomy, $attribute );
+
+				wp_set_object_terms( $product_id, $term_ids, $taxonomy );
+
 			}
 
-			$product_attribute->set_name( $name );
-			$product_attribute->set_options( $values );
-			$product_attribute->set_position( $position );
-			$product_attribute->set_visible( $is_visible );
-			$product_attribute->set_variation( $is_variation );
-
-			$product_attributes[ $is_taxonomy ? $taxonomy : $name ] = $product_attribute;
-
-			$position++;
+			$product_attributes[ $is_taxonomy ? $taxonomy : $name ] = [
+				'name'         => $is_taxonomy ? $taxonomy : $name,
+				'value'        => $is_taxonomy ? '' : join( ',', $values ),
+				'position'     => $position,
+				'is_visible'   => (int) $is_visible,
+				'is_variation' => (int) $is_variation,
+				'is_taxonomy'  => (int) $is_taxonomy
+			];
 
 		}
 
-		$this->product->set_attributes( $product_attributes );
-
-		$this->product->save();
+		update_post_meta( $product_id, '_product_attributes', $product_attributes );
 
 		do_action( 'wp_data_sync_attributes', $product_id, $product_attributes );
 
@@ -160,8 +159,10 @@ class WC_Product_DataSync {
 		$term_ids   = [];
 
 		foreach ( $values as $value ) {
-			$term_ids[] = $this->data_sync->set_term( $value, $taxonomy, 0 );
+			$term_ids[] = $this->data_sync->set_term( [ 'name' => $value ], $taxonomy, 0 );
 		}
+
+		Log::write('test-value', $term_ids);
 
 		return $term_ids;
 
