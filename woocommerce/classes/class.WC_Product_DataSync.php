@@ -13,7 +13,6 @@ namespace WP_DataSync\Woo;
 
 use WC_Product;
 use WC_Product_Variable;
-use WC_Product_Attribute;
 use WC_Product_Variation;
 use WP_DataSync\App\DataSync;
 use WP_DataSync\App\Log;
