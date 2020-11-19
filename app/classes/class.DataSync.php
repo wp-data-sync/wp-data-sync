@@ -451,15 +451,18 @@ class DataSync {
 
 		extract( $term );
 
+		$name = trim( wp_unslash( $name ) );
+
 		Log::write( 'term-id', "$name - $taxonomy - $parent_id" );
 
 		$name     = apply_filters( 'wp_data_sync_term_name', $name, $taxonomy, $parent_id );
 		$taxonomy = apply_filters( 'wp_data_sync_taxonomy', $taxonomy, $name, $parent_id );
+		$slug     = sanitize_title( $name );
 
-		$term = term_exists( $name, $taxonomy, $parent_id );
+		$term = term_exists( $slug, $taxonomy, $parent_id );
 
 		if ( 0 === $term || NULL === $term ) {
-			$term = wp_insert_term( $name, $taxonomy, [ 'parent' => $parent_id ] );
+			$term = wp_insert_term( $name, $taxonomy, [ 'parent' => $parent_id, 'slug' => $slug ] );
 		}
 
 		if ( is_wp_error( $term ) ) {
