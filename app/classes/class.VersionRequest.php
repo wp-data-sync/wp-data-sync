@@ -17,7 +17,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class VersionRequest extends Core {
+class VersionRequest extends Access {
+
+	/**
+	 * @var string
+	 */
+
+	protected $access_token_key = 'wp_data_sync_access_token';
+
+	/**
+	 * @var string
+	 */
+
+	protected $private_token_key = 'wp_data_sync_private_token';
 
 	/**
 	 * @var VersionRequest
@@ -65,7 +77,7 @@ class VersionRequest extends Core {
 				'args'    => [
 					'access_token' => [
 						'sanitize_callback' => 'sanitize_text_field',
-						'validate_callback' => [ $this, 'access_key' ]
+						'validate_callback' => [ $this, 'access_token' ]
 					]
 				],
 				'permission_callback' => [ $this, 'access' ],

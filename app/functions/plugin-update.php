@@ -28,8 +28,24 @@ function plugin_update() {
 
 		ItemRequest::create_table();
 
+		remane_api_tokens();
+
 		update_option( 'WP_DATA_SYNC_VERSION', WP_DATA_SYNC_VERSION );
 
+	}
+
+}
+
+function remane_api_tokens() {
+
+	if ( $access_token = get_option( 'wp_data_sync_access_key' ) ) {
+		update_option( 'wp_data_sync_access_token', $access_token );
+		delete_option( 'wp_data_sync_access_key' );
+	}
+
+	if ( $private_token = get_option( 'wp_data_sync_private_key' ) ) {
+		update_option( 'wp_data_sync_private_token', $private_token );
+		delete_option( 'wp_data_sync_private_key' );
 	}
 
 }

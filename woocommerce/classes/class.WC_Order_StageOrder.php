@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class WC_Order_StageOrder extends WC_Order_Data {
+class WC_Order_StageOrder {
 
 	const EVENT_HOOK = 'wp_data_sync_stage_order_event';
 
@@ -117,16 +117,18 @@ class WC_Order_StageOrder extends WC_Order_Data {
 
 	protected function args() {
 
-		if ( ! $private_key = get_option( 'wp_data_sync_private_key' ) ) {
+		if ( ! $private_key = get_option( 'wp_data_sync_private_token' ) ) {
 			return;
 		}
+
+		$order_data = WC_Order_Data::instance();
 
 		return [
 			'timeout'   => 5,
 			'sslverify' => FALSE,
 			// Wait for response only if logging is active.
 			'blocking'  => Log::is_active(),
-			'body'      => json_encode( $this->order() ),
+			'body'      => json_encode( $order_data->get( $this->order_id ) ),
 			'headers'   => [
 				'Accept'         => 'application/json',
 				'Authentication' => $private_key,

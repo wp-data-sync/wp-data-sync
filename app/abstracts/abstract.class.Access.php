@@ -1,8 +1,8 @@
 <?php
 /**
- * Data Sync Core
+ * Data Sync Access
  *
- * Abstract Core
+ * Abstract Access
  *
  * @since   1.0.0
  *
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-abstract class Core {
+abstract class Access {
 
 	/**
 	 * Allow access to sync data.
@@ -62,22 +62,26 @@ abstract class Core {
 	}
 
 	/**
-	 * Verify the access_key.
+	 * Verify the access_token.
 	 *
 	 * @return bool|string
 	 */
 
-	public function access_key( $param ) {
+	public function access_token( $param ) {
 
-		$access_key = sanitize_key( $param );
+		$access_token = sanitize_key( $param );
 
-		$access_key = empty( $access_key ) ? FALSE : $access_key;
+		if ( empty( $access_token ) ) {
+			return FALSE;
+		}
 
-		$local_key = get_option( 'wp_data_sync_access_key' );
+		if ( ! $local_token = get_option( $this->access_token_key ) ) {
+			return FALSE;
+		}
 
 		Log::write( 'access-attempt', "Access Key Available" );
 
-		if ( $access_key && $access_key === $local_key ) {
+		if ( $access_token === $local_token ) {
 
 			Log::write( 'access-attempt', "Access Key Approved" );
 
@@ -99,13 +103,17 @@ abstract class Core {
 
 		$private_key = sanitize_key( $_SERVER['HTTP_AUTHENTICATION'] );
 
-		$private_key = empty( $private_key ) ? FALSE : $private_key;
+		if ( empty( $private_key ) ) {
+			return FALSE;
+		}
 
-		$local_key = get_option( 'wp_data_sync_private_key' );
+		if ( ! $local_token = get_option( $this->private_token_key ) ) {
+			return FALSE;
+		}
 
 		Log::write( 'access-attempt', "Private Key Available" );
 
-		if ( $private_key && $private_key === $local_key ) {
+		if ( $private_key === $local_token ) {
 
 			Log::write( 'access-attempt', "Private Key Approved" );
 
@@ -127,7 +135,9 @@ abstract class Core {
 
 		$referer = sanitize_text_field( $_SERVER['HTTP_REFERER'] );
 
-		$referer = empty( $referer ) ? FALSE : $referer;
+		if ( empty( $referer )  ) {
+			return FALSE;
+		}
 
 		Log::write( 'access-attempt', "Referer Available: $referer" );
 

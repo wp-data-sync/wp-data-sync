@@ -19,7 +19,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class ItemRequest extends Core {
+class ItemRequest extends Access {
+
+	/**
+	 * @var string
+	 */
+
+	protected $access_token_key = 'wp_data_sync_item_request_access_token';
+
+	/**
+	 * @var string
+	 */
+
+	protected $private_token_key = 'wp_data_sync_item_request_private_token';
 
 	/**
 	 * @var string
@@ -79,7 +91,7 @@ class ItemRequest extends Core {
 				'args'    => [
 					'access_token' => [
 						'sanitize_callback' => 'sanitize_text_field',
-						'validate_callback' => [ $this, 'access_key' ]
+						'validate_callback' => [ $this, 'access_token' ]
 					],
 					'post_type' => [
 						'sanitize_callback' => 'sanitize_text_field',

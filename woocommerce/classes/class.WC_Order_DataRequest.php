@@ -11,6 +11,7 @@
 
 namespace WP_DataSync\Woo;
 
+use WP_DataSync\App\Access;
 use WP_DataSync\App\Log;
 use WP_REST_Server;
 
@@ -18,7 +19,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class WC_Order_DataRequest extends WC_Order_Data {
+class WC_Order_DataRequest extends Access {
+
+	/**
+	 * @var string
+	 */
+
+	protected $access_token_key = 'wp_data_sync_access_token';
+
+	/**
+	 * @var string
+	 */
+
+	protected $private_token_key = 'wp_data_sync_private_token';
 
 	/**
 	 * @var WC_Order_DataRequest
@@ -70,7 +83,7 @@ class WC_Order_DataRequest extends WC_Order_Data {
 				'args'    => [
 					'access_token' => [
 						'sanitize_callback' => 'sanitize_text_field',
-						'validate_callback' => [ $this, 'access_key' ]
+						'validate_callback' => [ $this, 'access_token' ]
 					],
 					'order_id' => [
 						'sanitize_callback' => 'intval',
@@ -111,7 +124,9 @@ class WC_Order_DataRequest extends WC_Order_Data {
 
 	public function request() {
 
-		$responce = $this->order();
+		$order_data = WC_Order_Data::instance();
+
+		$responce = $order_data->get( $this->order_id );
 
 		Log::write( 'order-request', $response );
 

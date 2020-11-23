@@ -19,7 +19,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class KeyRequest extends Core {
+class KeyRequest extends Access {
+
+	/**
+	 * @var string
+	 */
+
+	protected $access_token_key = 'wp_data_sync_access_token';
+
+	/**
+	 * @var string
+	 */
+
+	protected $private_token_key = 'wp_data_sync_private_token';
 
 	/**
 	 * @var KeyRequest
@@ -67,7 +79,7 @@ class KeyRequest extends Core {
 				'args'    => [
 					'access_token' => [
 						'sanitize_callback' => 'sanitize_text_field',
-						'validate_callback' => [ $this, 'access_key' ]
+						'validate_callback' => [ $this, 'access_token' ]
 					]
 				],
 				'permission_callback' => [ $this, 'access' ],

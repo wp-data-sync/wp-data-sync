@@ -405,30 +405,6 @@ class Settings {
 					]
 				],
 				1 => (object) [
-					'key' 		=> 'wp_data_sync_access_key',
-					'label'		=> __( 'API Access Key', 'wp-data-sync' ),
-					'callback'  => 'input',
-					'args'      => [
-						'sanitize_callback' => 'sanitize_key',
-						'basename'          => 'text-input',
-						'type'		        => 'password',
-						'class'		        => 'regular-text',
-						'placeholder'       => ''
-					]
-				],
-				2 => (object) [
-					'key' 		=> 'wp_data_sync_private_key',
-					'label'		=> __( 'API Private Key', 'wp-data-sync' ),
-					'callback'  => 'input',
-					'args'      => [
-						'sanitize_callback' => 'sanitize_key',
-						'basename'          => 'text-input',
-						'type'		        => 'password',
-						'class'		        => 'regular-text',
-						'placeholder'       => ''
-					]
-				],
-				3 => (object) [
 					'key' 		=> 'wp_data_sync_api_url',
 					'label'		=> __( 'API URL', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -439,6 +415,30 @@ class Settings {
 						'class'		        => 'regular-text',
 						'placeholder'       => __( 'https://domain.com', 'wp-data-sync' ),
 						'info'              => __( 'The URL of your WP Data Sync API account.' )
+					]
+				],
+				2 => (object) [
+					'key' 		=> 'wp_data_sync_access_token',
+					'label'		=> __( 'API Access Token', 'wp-data-sync' ),
+					'callback'  => 'input',
+					'args'      => [
+						'sanitize_callback' => 'sanitize_key',
+						'basename'          => 'text-input',
+						'type'		        => 'password',
+						'class'		        => 'regular-text',
+						'placeholder'       => ''
+					]
+				],
+				3 => (object) [
+					'key' 		=> 'wp_data_sync_private_token',
+					'label'		=> __( 'API Private Token', 'wp-data-sync' ),
+					'callback'  => 'input',
+					'args'      => [
+						'sanitize_callback' => 'sanitize_key',
+						'basename'          => 'text-input',
+						'type'		        => 'password',
+						'class'		        => 'regular-text',
+						'placeholder'       => ''
 					]
 				],
 				4 => (object) [
@@ -607,6 +607,30 @@ class Settings {
 			],
 			'item_request' => [
 				0 => (object) [
+					'key' 		=> 'wp_data_sync_item_request_access_token',
+					'label'		=> __( 'Item Request Access Token', 'wp-data-sync' ),
+					'callback'  => 'input',
+					'args'      => [
+						'sanitize_callback' => 'sanitize_key',
+						'basename'          => 'text-input',
+						'type'		        => 'password',
+						'class'		        => 'regular-text',
+						'placeholder'       => ''
+					]
+				],
+				1 => (object) [
+					'key' 		=> 'wp_data_sync_item_request_private_token',
+					'label'		=> __( 'Item Request Private Token', 'wp-data-sync' ),
+					'callback'  => 'input',
+					'args'      => [
+						'sanitize_callback' => 'sanitize_key',
+						'basename'          => 'text-input',
+						'type'		        => 'password',
+						'class'		        => 'regular-text',
+						'placeholder'       => ''
+					]
+				],
+				2 => (object) [
 					'key' 		=> 'wp_data_sync_unset_post_author',
 					'label'		=> __( 'Unset Post Author', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -619,55 +643,25 @@ class Settings {
 						'info'              => __( 'Remove the post author ID from items. This will allow the default author to be assigned when syncing data.' )
 					]
 				],
-				1 => (object) [
+				3 => (object) [
 					'key' 		=> 'wp_data_sync_item_request_status',
-					'label'		=> '',
+					'label'		=> __( 'Include items with status', 'wp-data-sync' ),
 					'callback'  => 'input',
 					'args'      => [
 						'sanitize_callback' => [ $this, 'sanitize_array' ],
-						'heading'            => __( 'Include items with status', 'wp-data-sync' ),
-						'basename'          => 'checkboxes',
+						'basename'          => 'select-multiple',
+						'name'              => 'wp_data_sync_item_request_status',
 						'type'		        => '',
-						'class'		        => 'item-request-status',
+						'class'		        => 'item-request-status regular-text',
 						'placeholder'       => '',
-						'values'            => get_option( 'wp_data_sync_item_request_status', [] ),
+						'selected'          => get_option( 'wp_data_sync_item_request_status', [] ),
 						'options'           => [
-							0 => [
-								'value' => 'publish',
-								'id'    => 'publish',
-								'class' => 'publish',
-								'label' => __( 'Publish' )
-							],
-							1 => [
-								'value' => 'pending',
-								'id'    => 'pending',
-								'class' => 'pending',
-								'label' => __( 'Pending' )
-							],
-							2 => [
-								'value' => 'draft',
-								'id'    => 'draft',
-								'class' => 'draft',
-								'label' => __( 'Draft' )
-							],
-							3 => [
-								'value' => 'future',
-								'id'    => 'future',
-								'class' => 'future',
-								'label' => __( 'Future' )
-							],
-							4 => [
-								'value' => 'private',
-								'id'    => 'private',
-								'class' => 'private',
-								'label' => __( 'Private' )
-							],
-							5 => [
-								'value' => 'trash',
-								'id'    => 'trash',
-								'class' => 'trash',
-								'label' => __( 'Trash' )
-							]
+							'publish' => __( 'Publish' ),
+							'pending' => __( 'Pending' ),
+							'draft'   => __( 'Draft' ),
+							'future'  => __( 'Future' ),
+							'private' => __( 'Private' ),
+							'trash'   => __( 'Trash' )
 						]
 					]
 				]
