@@ -12,8 +12,13 @@
 namespace WP_DataSync\Woo;
 
 use WC_Product;
+use WC_Product_Simple;
 use WC_Product_Variable;
 use WC_Product_Variation;
+use WC_Product_Grouped;
+use WC_Product_External;
+use WC_Product_Subscription_Legacy;
+use WC_Product_Subscription_Variation;
 use WP_DataSync\App\DataSync;
 use WP_DataSync\App\Log;
 
@@ -75,7 +80,7 @@ class WC_Product_DataSync {
 	public function wc_process( $product_id, $data_sync ) {
 
 		$this->data_sync = $data_sync;
-		$this->product   = $this->data_sync->get_variations() ? new WC_Product_Variable( $product_id ) : new WC_Product( $product_id );
+		$this->product   = $this->product( $product_id );
 
 		if ( $attributes = $this->data_sync->get_attributes() ) {
 			$this->attributes( $product_id, $attributes );
@@ -92,6 +97,64 @@ class WC_Product_DataSync {
 		if ( $taxonomies = $this->data_sync->get_taxonomies() ) {
 			$this->product_visibility( $taxonomies );
 		}
+
+	}
+
+	/**
+	 * Product.
+	 *
+	 * @param $product_id
+	 *
+	 * @return WC_Product|WC_Product_External|WC_Product_Grouped|WC_Product_Simple|WC_Product_Subscription_Legacy|WC_Product_Subscription_Variation|WC_Product_Variable
+	 */
+
+	public function product( $product_id ) {
+
+		if ( $this->data_sync->get_variations() ) {
+			return new WC_Product_Variable( $product_id );
+		}
+
+		if ( $taxonomies = $this->data_sync->get_taxonomies() ) {
+
+			if ( isset( $taxonomies['product_type'] ) ) {
+
+				if ( array_key_exists( 'simple', $taxonomies['product_type'] ) ) {
+					return new WC_Product_Simple( $product_id );
+				}
+
+				if ( array_key_exists( 'external', $taxonomies['product_type'] ) ) {
+					return new WC_Product_External( $product_id );
+				}
+
+				if ( array_key_exists( 'grouped', $taxonomies['product_type'] ) ) {
+					return new WC_Product_Grouped( $product_id );
+				}
+
+				if ( array_key_exists( 'variable', $taxonomies['product_type'] ) ) {
+					return new WC_Product_Variable( $product_id );
+				}
+
+				if ( array_key_exists( 'subscription', $taxonomies['product_type'] ) ) {
+
+					if ( class_exists( 'WC_Product_Subscription_Legacy' ) ) {
+						return new WC_Product_Subscription_Legacy( $product_id );
+					}
+
+				}
+
+				if ( array_key_exists( 'variable-subscription', $taxonomies['product_type'] ) ) {
+
+					if ( class_exists( 'WC_Product_Subscription_Variation' ) ) {
+						return new WC_Product_Subscription_Variation( $product_id );
+					}
+
+				}
+
+			}
+
+		}
+
+		return new WC_Product( $product_id );
 
 	}
 
