@@ -600,6 +600,7 @@ class DataSync {
 		if ( is_array( $post_thumbnail ) ) {
 			extract( $post_thumbnail );
 		}
+		// TODO: remove this after remote site are past this update
 		else {
 			$image_url  = $post_thumbnail;
 			$image_meta = [];
