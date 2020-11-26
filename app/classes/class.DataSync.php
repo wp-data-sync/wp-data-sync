@@ -108,14 +108,14 @@ class DataSync {
 	}
 
 	/**
-	 * Init.
+	 * Set Properties
 	 *
 	 * Set property values.
 	 *
 	 * @param $data
 	 */
 
-	public function init( $data ) {
+	public function set_properties( $data ) {
 
 		if ( is_array( $data ) ) {
 

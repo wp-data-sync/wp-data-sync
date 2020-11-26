@@ -100,13 +100,29 @@ class SyncRequest extends Access {
 	public function request( WP_REST_Request $request ) {
 
 		$start_request = microtime();
+		$response      = [];
+		$data_sync     = DataSync::instance();
+		$raw_data      = $request->get_params();
+		$data          = $this->request_data( $raw_data );
 
-		$raw_data = $request->get_params();
-		$data     = $this->request_data( $raw_data );
+		if ( isset( $data['items'] ) && is_array( $data['items'] ) ) {
 
-		$sync     = DataSync::instance();
-		$sync->init( $data );
-		$response = $sync->process();
+			foreach ( $data['items'] as $key => $data ) {
+
+				$data_sync->set_properties( $data );
+
+				$response['items'][ $key ] = $data_sync->process();
+
+			}
+
+		}
+		else {
+
+			$data_sync->set_properties( $data );
+
+			$response['items'][] = $data_sync->process();
+
+		}
 
 		$response['request_time'] = microtime() - $start_request;
 		Log::write( 'sync-request-response', $response );
