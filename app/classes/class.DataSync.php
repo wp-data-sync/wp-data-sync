@@ -660,7 +660,7 @@ class DataSync {
 
 			if ( $image_data = $this->fetch_image_data( $image_url ) ) {
 
-				$image_meta = $this->image_meta( $image_meta, $post_id );
+				$image_meta = $this->image_meta( $image_meta, $image_url, $post_id );
 				$upload_dir = wp_upload_dir();
 				$file_path  = $this->file_path( $upload_dir, $basename );
 
@@ -821,14 +821,15 @@ class DataSync {
 	/**
 	 * Image meta.
 	 *
-	 * @param $image_meta
-	 * @param $post_id
+	 * @param array  $image_meta
+	 * @param string $image_url
+	 * @param int    $post_id
 	 *
 	 * @return mixed|void
 	 */
 
-	public function image_meta( $image_meta, $post_id ) {
-		return apply_filters( 'wp_data_sync_image_meta', $image_meta, $post_id );
+	public function image_meta( $image_meta, $image_url, $post_id ) {
+		return apply_filters( 'wp_data_sync_image_meta', $image_meta, $image_url, $post_id );
 	}
 
 	/**
