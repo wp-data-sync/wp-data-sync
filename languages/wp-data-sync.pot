@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the WP Data Sync plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: WP Data Sync 1.4.5\n"
+"Project-Id-Version: WP Data Sync 1.5.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wp-data-sync\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-10-15T00:46:03+00:00\n"
+"POT-Creation-Date: 2020-11-26T04:07:49+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.1.0\n"
 "X-Domain: wp-data-sync\n"
@@ -48,15 +48,23 @@ msgid "Sync Orders"
 msgstr ""
 
 #: woocommerce/functions/wc-settings.php:84
-msgid "Sync all existing orders:"
+msgid "Orders Webhook URL"
 msgstr ""
 
-#: woocommerce/functions/wc-settings.php:93
+#: woocommerce/functions/wc-settings.php:96
+msgid "Sync all existing orders"
+msgstr ""
+
+#: woocommerce/functions/wc-settings.php:105
 msgid "Schedule a task to sync existing orders in small batches. This setting will reset itself when all orders have been processed."
 msgstr ""
 
-#: woocommerce/functions/wc-settings.php:102
-msgid "Sync order when status is:"
+#: woocommerce/functions/wc-settings.php:110
+msgid "Sync order when status is"
+msgstr ""
+
+#: app/classes/class.Log.php:108
+msgid "File does not exist. Please choose a different file and save changes."
 msgstr ""
 
 #: app/classes/class.Settings.php:112
@@ -67,136 +75,164 @@ msgstr ""
 msgid "Sync Settings"
 msgstr ""
 
-#: app/classes/class.Settings.php:126
+#: app/classes/class.Settings.php:120
+msgid "Item Request"
+msgstr ""
+
+#: app/classes/class.Settings.php:130
 msgid "Logs"
 msgstr ""
 
-#: app/classes/class.Settings.php:158
+#: app/classes/class.Settings.php:162
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
-#: app/classes/class.Settings.php:393
+#: app/classes/class.Settings.php:397
 msgid "Allow Data Sync API Access"
 msgstr ""
 
-#: app/classes/class.Settings.php:405
-msgid "API Access Key"
-msgstr ""
-
-#: app/classes/class.Settings.php:417
-msgid "API Private Key"
-msgstr ""
-
-#: app/classes/class.Settings.php:429
+#: app/classes/class.Settings.php:409
 msgid "API URL"
 msgstr ""
 
-#: app/classes/class.Settings.php:436
+#: app/classes/class.Settings.php:416
 msgid "https://domain.com"
 msgstr ""
 
-#: app/classes/class.Settings.php:442
+#: app/classes/class.Settings.php:422
+msgid "API Access Token"
+msgstr ""
+
+#: app/classes/class.Settings.php:434
+msgid "API Private Token"
+msgstr ""
+
+#: app/classes/class.Settings.php:446
 msgid "Automatically Update Plugin"
 msgstr ""
 
-#: app/classes/class.Settings.php:457
+#: app/classes/class.Settings.php:461
 msgid "Default Title"
 msgstr ""
 
-#: app/classes/class.Settings.php:469
+#: app/classes/class.Settings.php:473
 msgid "Default Author"
 msgstr ""
 
-#: app/classes/class.Settings.php:482
+#: app/classes/class.Settings.php:486
 msgid "Default Status"
 msgstr ""
 
-#: app/classes/class.Settings.php:491
+#: app/classes/class.Settings.php:495
 msgid "Publish"
 msgstr ""
 
-#: app/classes/class.Settings.php:492
+#: app/classes/class.Settings.php:496
 msgid "Pending"
 msgstr ""
 
-#: app/classes/class.Settings.php:493
+#: app/classes/class.Settings.php:497
 msgid "Draft"
 msgstr ""
 
-#: app/classes/class.Settings.php:494
+#: app/classes/class.Settings.php:498
 msgid "Future"
 msgstr ""
 
-#: app/classes/class.Settings.php:495
+#: app/classes/class.Settings.php:499
 msgid "Private"
 msgstr ""
 
-#: app/classes/class.Settings.php:496
+#: app/classes/class.Settings.php:500
 msgid "Trash"
 msgstr ""
 
-#: app/classes/class.Settings.php:502
+#: app/classes/class.Settings.php:506
 msgid "Default Type"
 msgstr ""
 
-#: app/classes/class.Settings.php:515
+#: app/classes/class.Settings.php:519
 msgid "Append Terms"
 msgstr ""
 
-#: app/classes/class.Settings.php:524
+#: app/classes/class.Settings.php:528
 msgid "No, I want old terms to be replaced (Recommended)"
 msgstr ""
 
-#: app/classes/class.Settings.php:525
+#: app/classes/class.Settings.php:529
 msgid "Yes, I want to keep the old terms"
 msgstr ""
 
-#: app/classes/class.Settings.php:531
+#: app/classes/class.Settings.php:535
 msgid "Sync Term Description"
 msgstr ""
 
-#: app/classes/class.Settings.php:540
+#: app/classes/class.Settings.php:544
 msgid "Yes, I want to sync term descriptions"
 msgstr ""
 
-#: app/classes/class.Settings.php:541
+#: app/classes/class.Settings.php:545
 msgid "No, I do not want to sync term descriptions"
 msgstr ""
 
-#: app/classes/class.Settings.php:547
+#: app/classes/class.Settings.php:551
 msgid "Sync Term Thumbnail"
 msgstr ""
 
-#: app/classes/class.Settings.php:556
+#: app/classes/class.Settings.php:560
 msgid "Yes, I want to sync term thumbnail"
 msgstr ""
 
-#: app/classes/class.Settings.php:557
+#: app/classes/class.Settings.php:561
 msgid "No, I do not want to sync term thumbnail"
 msgstr ""
 
-#: app/classes/class.Settings.php:563
+#: app/classes/class.Settings.php:567
 msgid "Sync Term Meta"
 msgstr ""
 
-#: app/classes/class.Settings.php:572
+#: app/classes/class.Settings.php:576
 msgid "Yes, I want to sync term meta"
 msgstr ""
 
-#: app/classes/class.Settings.php:573
+#: app/classes/class.Settings.php:577
 msgid "No, I do not want to sync term meta"
 msgstr ""
 
-#: app/classes/class.Settings.php:579
+#: app/classes/class.Settings.php:583
 msgid "Replace Images in Content"
 msgstr ""
 
-#: app/classes/class.Settings.php:592
+#: app/classes/class.Settings.php:596
 msgid "Replace Images in Excerpt"
 msgstr ""
 
-#: app/classes/class.Settings.php:607
+#: app/classes/class.Settings.php:611
+msgid "Item Request Access Token"
+msgstr ""
+
+#: app/classes/class.Settings.php:623
+msgid "Item Request Private Token"
+msgstr ""
+
+#: app/classes/class.Settings.php:635
+msgid "Unset Post Author"
+msgstr ""
+
+#: app/classes/class.Settings.php:648
+msgid "Include items with status"
+msgstr ""
+
+#: app/classes/class.Settings.php:672
 msgid "Allow Logging"
+msgstr ""
+
+#: app/classes/class.Settings.php:685
+msgid "Log File"
+msgstr ""
+
+#: views/settings/log-file.php:22
+msgid "You must allow logging so a log file can be created."
 msgstr ""
 
 #: views/settings/help-buttons.php:28

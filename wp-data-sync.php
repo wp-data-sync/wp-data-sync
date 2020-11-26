@@ -12,7 +12,7 @@
  * Domain Path: /languages
  *
  * WC requires at least: 3.0
- * WC tested up to: 4.6.2
+ * WC tested up to: 4.7.0
  *
  * Package:     WP_DataSync
 */
