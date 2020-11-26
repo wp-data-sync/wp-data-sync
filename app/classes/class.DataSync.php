@@ -597,11 +597,19 @@ class DataSync {
 
 	public function post_thumbnail( $post_id, $post_thumbnail ) {
 
-		if ( $attach_id = $this->attachment( $post_id, $post_thumbnail ) ) {
+		if ( is_array( $post_thumbnail ) ) {
+			extract( $post_thumbnail );
+		}
+		else {
+			$image_url  = $post_thumbnail;
+			$image_meta = [];
+		}
+
+		if ( $attach_id = $this->attachment( $post_id, $image_url, $image_meta ) ) {
 
 			set_post_thumbnail( $post_id, $attach_id );
 
-			do_action( 'wp_data_sync_post_thumbnail', $post_id, $post_thumbnail );
+			do_action( 'wp_data_sync_post_thumbnail', $post_id, $image_url );
 
 		}
 
@@ -610,13 +618,14 @@ class DataSync {
 	/**
 	 * Attachemnt.
 	 *
-	 * @param $post_id
-	 * @param $image_url
+	 * @param int    $post_id
+	 * @param string $image_url
+	 * @param array $image_meta
 	 *
 	 * @return bool|int|\WP_Post
 	 */
 
-	public function attachment( $post_id, $image_url ) {
+	public function attachment( $post_id, $image_url, $image_meta = [] ) {
 
 		if ( empty( $image_url ) ) {
 			return FALSE;
@@ -651,6 +660,7 @@ class DataSync {
 
 			if ( $image_data = $this->fetch_image_data( $image_url ) ) {
 
+				$image_meta = $this->image_meta( $image_meta, $post_id );
 				$upload_dir = wp_upload_dir();
 				$file_path  = $this->file_path( $upload_dir, $basename );
 
@@ -660,8 +670,9 @@ class DataSync {
 				$attachment = [
 					'guid'           => "{$upload_dir['url']}/{$basename}",
 					'post_mime_type' => $file_type['type'],
-					'post_title'     => $post_title,
-					'post_content'   => '',
+					'post_title'     => isset( $image_meta['title'] ) ? $image_meta['title'] : $post_title,
+					'post_content'   => isset( $image_meta['description'] ) ? $image_meta['description'] : '',
+					'post_excerpt'   => isset( $image_meta['caption'] ) ? $image_meta['caption'] : '',
 					'post_status'    => 'inherit'
 				];
 
@@ -669,6 +680,10 @@ class DataSync {
 				$attach_id = wp_insert_attachment( $attachment, $file_path, $post_id );
 
 				if ( is_int( $attach_id ) && 0 < $attach_id ) {
+
+					if ( isset( $image_meta['alt'] ) ) {
+						update_post_meta( $attach_id, '_wp_attachment_image_alt', $image_meta['alt'] );
+					}
 
 					// Get metadata for featured image
 					$attach_data = wp_generate_attachment_metadata( $attach_id, $file_path );
@@ -759,30 +774,30 @@ class DataSync {
 	 *
 	 * @param $post_title
 	 *
-	 * @return bool|\WP_Post
+	 * @return bool|int
 	 */
 
 	public function attachment_exists( $post_title ) {
 
 		global $wpdb;
 
-		$row = $wpdb->get_row(
+		$attach_id = $wpdb->get_var(
 			$wpdb->prepare(
 				"
 				SELECT ID
 				FROM $wpdb->posts
-				WHERE post_title = '%s'
+				WHERE post_title = %s
 				AND post_type = 'attachment'
 				",
 				$post_title
 			)
 		);
 
-		if ( null === $row ) {
+		if ( null === $attach_id || is_wp_error( $attach_id ) ) {
 			return FALSE;
 		}
 
-		return $row->ID;
+		return (int) $attach_id;
 
 	}
 
@@ -801,6 +816,19 @@ class DataSync {
 
 		return apply_filters( 'wp_data_sync_basename', $basename, $post_id );
 
+	}
+
+	/**
+	 * Image meta.
+	 *
+	 * @param $image_meta
+	 * @param $post_id
+	 *
+	 * @return mixed|void
+	 */
+
+	public function image_meta( $image_meta, $post_id ) {
+		return apply_filters( 'wp_data_sync_image_meta', $image_meta, $post_id );
 	}
 
 	/**
