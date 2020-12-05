@@ -48,10 +48,19 @@ class DataSync {
 	private $taxonomies = FALSE;
 
 	/**
+	 * @since 1.6.0 Deprecated
+	 * @use   DataSync::featured_image instaed
+	 *
 	 * @var bool|string
 	 */
 
 	private $post_thumbnail = FALSE;
+
+	/**
+	 * @var bool|array
+	 */
+
+	private $featured_image = FALSE;
 
 	/**
 	 * @var bool|array
@@ -75,7 +84,19 @@ class DataSync {
 	 * @var bool|array
 	 */
 
+	private $gallery_images = FALSE;
+
+	/**
+	 * @var bool|array
+	 */
+
 	private $integrations = FALSE;
+
+	/**
+	 * @var bool
+	 */
+
+	private $is_new = FALSE;
 
 	/**
 	 * @var DataSync
@@ -163,8 +184,16 @@ class DataSync {
 			$this->taxonomy( $this->post_id, $this->taxonomies );
 		}
 
+		/**
+		 * @since 1.6.0 Deprecated
+		 * @use   DataSync::featured_image instaed
+		 */
 		if ( $this->post_thumbnail ) {
 			$this->post_thumbnail( $this->post_id, $this->post_thumbnail );
+		}
+
+		if ( $this->featured_image ) {
+			$this->featured_image( $this->post_id, $this->featured_image );
 		}
 
 		if ( $this->integrations ) {
@@ -240,6 +269,8 @@ class DataSync {
 
 		if ( null === $post_id ) {
 
+			$this->is_new = TRUE;
+
 			$post_id = wp_insert_post( [
 				'post_title'  => 'WP Data Sync Placeholder',
 				'post_type'   => get_option( 'wp_data_sync_post_type' ),
@@ -309,7 +340,10 @@ class DataSync {
 
 		do_action( 'wp_data_sync_before_post_data', $this->post_data );
 
-		$this->post_data_defaults();
+		if ( $this->is_new ) {
+			$this->post_data_defaults();
+		}
+
 		$this->post_date_format();
 
 		if ( wp_update_post( $this->post_data ) ) {
@@ -393,6 +427,8 @@ class DataSync {
 
 		foreach ( $taxonomies as $taxonomy => $terms ) {
 
+			$taxonomy = trim( wp_unslash( $taxonomy ) );
+
 			if ( empty( $taxonomy ) || ! taxonomy_exists( $taxonomy ) ) {
 
 				Log::write( 'invalid-taxonomy', $taxonomy );
@@ -449,6 +485,14 @@ class DataSync {
 			return FALSE;
 		}
 
+		/**
+		 * Extract.
+		 *
+		 * $name
+		 * $description
+		 * $thumb_url
+		 * $term_meta
+		 */
 		extract( $term );
 
 		$name = trim( wp_unslash( $name ) );
@@ -459,29 +503,58 @@ class DataSync {
 		$taxonomy = apply_filters( 'wp_data_sync_taxonomy', $taxonomy, $name, $parent_id );
 		$slug     = sanitize_title( $name );
 
-		$term = term_exists( $slug, $taxonomy, $parent_id );
+		if ( ! $term_id = $this->term_exists( $slug, $taxonomy, $parent_id ) ) {
 
-		if ( 0 === $term || NULL === $term ) {
 			$term = wp_insert_term( $name, $taxonomy, [ 'parent' => $parent_id, 'slug' => $slug ] );
-		}
 
-		if ( is_wp_error( $term ) ) {
-
-			Log::write( 'term-id', $term );
-
-			return FALSE;
+			$term_id = (int) $term['term_id'];
 
 		}
 
-		Log::write( 'term-id', $term['term_id'] );
-
-		$term_id = (int) $term['term_id'];
+		Log::write( 'term-id', $term_id );
 
 		$this->term_desc( $description, $term_id, $taxonomy );
 		$this->term_thumb( $thumb_url, $term_id );
 		$this->term_meta( $term_meta, $term_id );
 
 		return $term_id;
+
+	}
+
+	/**
+	 * Term exists.
+	 *
+	 * @param $slug
+	 * @param $taxonomy
+	 * @param $parent_id
+	 *
+	 * @return bool|int
+	 */
+
+	public function term_exists( $slug, $taxonomy, $parent_id ) {
+
+		global $wpdb;
+
+		$term_id = $wpdb->get_var( $wpdb->prepare(
+			"
+			SELECT t.term_id
+			FROM $wpdb->terms t
+			INNER JOIN $wpdb->term_taxonomy tt
+			ON tt.term_id = t.term_id
+			WHERE t.slug = %s
+			AND tt.taxonomy = %s
+			AND tt.parent = %d
+			",
+			$slug,
+			$taxonomy,
+			$parent_id
+		) );
+
+		if ( null === $term_id || is_wp_error( $term_id ) ) {
+			return FALSE;
+		}
+
+		return (int) $term_id;
 
 	}
 
@@ -591,26 +664,41 @@ class DataSync {
 	/**
 	 * Set the post thumbnail.
 	 *
+	 * @since 1.6.0 Deprecated
+	 * @use   DataSync::featured_image instaed
+	 *
 	 * @param $post_id
 	 * @param $post_thumbnail
 	 */
 
 	public function post_thumbnail( $post_id, $post_thumbnail ) {
 
-		if ( is_array( $post_thumbnail ) ) {
-			extract( $post_thumbnail );
-		}
-		// TODO: remove this after remote site are past this update
-		else {
-			$image_url  = $post_thumbnail;
-			$image_meta = [];
-		}
-
-		if ( $attach_id = $this->attachment( $post_id, $image_url, $image_meta ) ) {
+		if ( $attach_id = $this->attachment( $post_id, $post_thumbnail ) ) {
 
 			set_post_thumbnail( $post_id, $attach_id );
 
-			do_action( 'wp_data_sync_post_thumbnail', $post_id, $image_url );
+			do_action( 'wp_data_sync_post_thumbnail', $post_id, $post_thumbnail );
+
+		}
+
+	}
+
+	/**
+	 * Set the featured image.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param $post_id
+	 * @param $featured_image
+	 */
+
+	public function featured_image( $post_id, $featured_image ) {
+
+		if ( $attach_id = $this->attachment( $post_id, $featured_image ) ) {
+
+			set_post_thumbnail( $post_id, $attach_id );
+
+			do_action( 'wp_data_sync_featured_imagel', $post_id, $featured_image );
 
 		}
 
@@ -620,13 +708,18 @@ class DataSync {
 	 * Attachemnt.
 	 *
 	 * @param int    $post_id
-	 * @param string $image_url
-	 * @param array $image_meta
+	 * @param string $image
 	 *
 	 * @return bool|int|\WP_Post
 	 */
 
-	public function attachment( $post_id, $image_url, $image_meta = [] ) {
+	public function attachment( $post_id, $image ) {
+
+		Log::write( 'attachment', $image );
+
+		extract( $this->image( $image, $post_id ) );
+
+		Log::write( 'attachment', "Image URL: $image_url" );
 
 		if ( empty( $image_url ) ) {
 			return FALSE;
@@ -634,63 +727,74 @@ class DataSync {
 
 		require_once( ABSPATH . 'wp-admin/includes/image.php' );
 
-		if ( ! $this->is_valid_image( $image_url ) ) {
-
-			Log::write( 'attachemnt-invalid', $image_url );
-
+		if ( ! $image_url = $this->is_valid_image_url( $image_url ) ) {
 			return FALSE;
+		}
+
+		$basename    = $this->basename( $post_id, $image_url );
+		$image_title = preg_replace( '/\.[^.]+$/', '', $basename );
+
+		$attachment = [
+			'post_title'   => empty( $title ) ? $image_title : $title,
+			'post_content' => $description,
+			'post_excerpt' => $caption
+		];
+
+		if ( $attachment['ID'] = $this->attachment_exists( $image_url, $image_title ) ) {
+
+			Log::write( 'attachment', "Exists: {$attachment['ID']} - $image_title" );
+
+			// Update the attachement
+			wp_update_post( $attachment );
+
+			// Update image alt
+			update_post_meta( $attachment['ID'], '_wp_attachment_image_alt', $alt );
+
+			// Update the image source URL.
+			update_post_meta( $attachment['ID'], '_source_url', $image_url );
+
+			return $attachment['ID'];
 
 		}
 
-		$basename   = $this->basename( $post_id, $image_url );
-		$post_title = preg_replace( '/\.[^.]+$/', '', $basename );
-
-		if ( $attachment_id = $this->attachment_exists( $post_title ) ) {
-
-			Log::write( 'attachemnt-exists', $post_title );
-
-			return $attachment_id;
-
-		}
-
-		Log::write( 'attachemnt-file', $image_url );
-
-		$file_type = wp_check_filetype( $basename );
-
-		if ( FALSE !== strpos( $file_type['type'], 'image' ) ) {
+		if ( $file_type = $this->file_type( $image_url ) ) {
 
 			if ( $image_data = $this->fetch_image_data( $image_url ) ) {
 
-				$image_meta = $this->image_meta( $image_meta, $image_url, $post_id );
 				$upload_dir = wp_upload_dir();
 				$file_path  = $this->file_path( $upload_dir, $basename );
+
+				Log::write( 'attachment', "File Path: $file_path" );
 
 				// Copy the image to image upload dir
 				file_put_contents( $file_path, $image_data );
 
-				$attachment = [
+				$attachment = array_merge( [
 					'guid'           => "{$upload_dir['url']}/{$basename}",
-					'post_mime_type' => $file_type['type'],
-					'post_title'     => isset( $image_meta['title'] ) ? $image_meta['title'] : $post_title,
-					'post_content'   => isset( $image_meta['description'] ) ? $image_meta['description'] : '',
-					'post_excerpt'   => isset( $image_meta['caption'] ) ? $image_meta['caption'] : '',
+					'post_mime_type' => $file_type,
 					'post_status'    => 'inherit'
-				];
+				], $attachment );
 
 				// Insert image data
 				$attach_id = wp_insert_attachment( $attachment, $file_path, $post_id );
 
-				if ( is_int( $attach_id ) && 0 < $attach_id ) {
+				Log::write( 'attachment', "Attachment ID: $attach_id" );
 
-					if ( isset( $image_meta['alt'] ) ) {
-						update_post_meta( $attach_id, '_wp_attachment_image_alt', $image_meta['alt'] );
-					}
+				if ( is_int( $attach_id ) && 0 < $attach_id ) {
 
 					// Get metadata for featured image
 					$attach_data = wp_generate_attachment_metadata( $attach_id, $file_path );
 
+					Log::write( 'attachment', $attach_data );
+
 					// Update metadata
 					wp_update_attachment_metadata( $attach_id, $attach_data );
+
+					// Update image alt
+					update_post_meta( $attach_id, '_wp_attachment_image_alt', $alt );
+
+					// Update the image source URL.
+					update_post_meta( $attach_id, '_source_url', $image_url );
 
 					return $attach_id;
 
@@ -705,27 +809,67 @@ class DataSync {
 	}
 
 	/**
-	 * Is Valid Image.
+	 * Is Valid Image URL.
 	 *
 	 * @param $image_url
 	 *
 	 * @return mixed|void
 	 */
 
-	public function is_valid_image( $image_url ) {
+	public function is_valid_image_url( $image_url ) {
 
-		if ( preg_match( "/^(https?:\/\/)/i", $image_url ) ) {
+		// Check for a valid URL.
+		if ( FALSE !== filter_var( $image_url, FILTER_VALIDATE_URL ) ) {
+			return apply_filters( 'wp_data_sync_is_valid_image_url', $image_url );
+		}
 
-			if ( filter_var( $image_url, FILTER_VALIDATE_URL ) !== FALSE ) {
+		Log::write( 'attachment', "Invalid URL: $image_url" );
 
-				if ( file_is_valid_image( $image_url ) ) {
-					return apply_filters( 'wp_data_sync_is_valid_image', TRUE, $image_url );
-				}
+		return FALSE;
+
+	}
+
+	/**
+	 * File type.
+	 *
+	 * @param $image_url
+	 *
+	 * @return bool|mixed|string
+	 */
+
+	public function file_type( $image_url ) {
+
+		$file_type = wp_check_filetype( $image_url );
+
+		if ( ! empty( $file_type['type'] ) ) {
+			return $file_type['type'];
+		}
+
+		$file_type = FALSE;
+
+		if ( $type = exif_imagetype( $image_url ) ) {
+
+			switch ( $type ) {
+
+				case IMAGETYPE_JPEG :
+					$file_type = 'image/jpeg';
+					break;
+
+				case IMAGETYPE_PNG :
+					$file_type = 'image/png';
+					break;
+
+				case IMAGETYPE_GIF :
+					$file_type = 'image/gif';
+					break;
+
 			}
 
 		}
 
-		return FALSE;
+		Log::write( 'attachment-filetype', $file_type );
+
+		return $file_type;
 
 	}
 
@@ -773,26 +917,45 @@ class DataSync {
 	/**
 	 * Check to see if attachment exists.
 	 *
+	 * @since 1.6.0 Query _source_url
+	 *
+	 * @param $image_url
 	 * @param $post_title
 	 *
 	 * @return bool|int
 	 */
 
-	public function attachment_exists( $post_title ) {
+	public function attachment_exists( $image_url, $post_title ) {
 
 		global $wpdb;
 
-		$attach_id = $wpdb->get_var(
-			$wpdb->prepare(
-				"
-				SELECT ID
-				FROM $wpdb->posts
-				WHERE post_title = %s
-				AND post_type = 'attachment'
-				",
-				$post_title
-			)
-		);
+		$attach_id = $wpdb->get_var( $wpdb->prepare(
+			"
+			SELECT post_id
+			FROM $wpdb->postmeta
+			WHERE meta_key = '_source_url'
+			AND meta_value = %s
+			",
+			$image_url
+		) );
+
+		if ( null !== $attach_id && 0 < $attach_id && ! is_wp_error( $attach_id ) ) {
+			return (int) $attach_id;
+		}
+
+		/**
+		 * TODO: remove the query below once all images have a saved _source_url
+		 */
+
+		$attach_id = $wpdb->get_var( $wpdb->prepare(
+			"
+			SELECT ID
+			FROM $wpdb->posts
+			WHERE post_title = %s
+			AND post_type = 'attachment'
+			",
+			$post_title
+		) );
 
 		if ( null === $attach_id || is_wp_error( $attach_id ) ) {
 			return FALSE;
@@ -820,17 +983,30 @@ class DataSync {
 	}
 
 	/**
-	 * Image meta.
+	 * Image.
 	 *
-	 * @param array  $image_meta
-	 * @param string $image_url
+	 * @param array  $image
 	 * @param int    $post_id
 	 *
 	 * @return mixed|void
 	 */
 
-	public function image_meta( $image_meta, $image_url, $post_id ) {
-		return apply_filters( 'wp_data_sync_image_meta', $image_meta, $image_url, $post_id );
+	public function image( $image, $post_id ) {
+
+		if ( ! is_array( $image ) ) {
+
+			$image = [
+				'image_url'   => $image,
+				'title'       => '',
+				'description' => '',
+				'caption'     => '',
+				'alt'         => ''
+			];
+
+		}
+
+		return apply_filters( 'wp_data_sync_image', $image, $post_id );
+
 	}
 
 	/**
@@ -974,11 +1150,24 @@ class DataSync {
 	/**
 	 * Get the post thumbnail.
 	 *
+	 * @since 1.6.0 Deprecated
+	 * @use   DataSync::get_featured_image instaed
+	 *
 	 * @return string|bool
 	 */
 
 	public function get_post_thumbnail() {
 		return $this->post_thumbnail;
+	}
+
+	/**
+	 * Get featured image.
+	 *
+	 * @return array|bool
+	 */
+
+	public function get_featured_image() {
+		return $this->featured_image;
 	}
 
 	/**
@@ -1004,11 +1193,24 @@ class DataSync {
 	/**
 	 * Get the product gallery.
 	 *
+	 * @since 1.6.0 Deprecated
+	 * @use   DataSync::get_gallery_images instaed
+	 *
 	 * @return array|bool
 	 */
 
 	public function get_product_gallery() {
 		return $this->product_gallery;
+	}
+
+	/**
+	 * Get gallery images.
+	 *
+	 * @return array|bool
+	 */
+
+	public function get_gallery_images() {
+		return $this->gallery_images;
 	}
 
 	/**

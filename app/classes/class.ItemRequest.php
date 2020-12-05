@@ -216,6 +216,7 @@ class ItemRequest extends Access {
 			'post_meta'       => $this->post_meta( $item_id ),
 			'taxonomies'      => $this->taxonomies( $item_id ),
 			'post_thumbnail'  => $this->thumbnail_url( $item_id ),
+			'featured_image'  => $this->featured_image( $item_id ),
 			'integratiuons'   => apply_filters( 'wp_data_sync_item_request_integrations', [], $item_id )
 		];
 
@@ -347,6 +348,30 @@ class ItemRequest extends Access {
 
 	public function thumbnail_url( $item_id ) {
 		return get_the_post_thumbnail_url( $item_id, 'full' );
+	}
+
+	/**
+	 * Featured image.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param $item_id
+	 *
+	 * @return mixed|void
+	 */
+
+	public function featured_image( $item_id ) {
+
+		$featured_image = [
+			'image_url'   => get_the_post_thumbnail_url( $item_id, 'full' ),
+			'title'       => get_the_title( $item_id ) ?: '',
+			'description' => get_the_content( $item_id ) ?: '',
+			'caption'     => get_the_excerpt( $item_id ) ?: '',
+			'alt'         => get_post_meta( $item_id, '_wp_attachment_image_alt', TRUE ) ?: ''
+		];
+
+		return apply_filters( 'wp_data_sync_item_request_featured_image', $featured_image );
+
 	}
 
 	/**

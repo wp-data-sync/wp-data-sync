@@ -90,8 +90,16 @@ class WC_Product_DataSync {
 			$this->variations( $product_id, $variations );
 		}
 
+		/**
+		 * @since 1.6.0 Deprecated
+		 * @use   WC_Product_DataSync::gallery_images instaed
+		 */
 		if ( $product_gallery = $this->data_sync->get_product_gallery() ) {
 			$this->product_gallery( $product_id, $product_gallery );
+		}
+
+		if ( $gallery_images = $this->data_sync->get_gallery_images() ) {
+			$this->gallery_images( $product_id, $gallery_images );
 		}
 
 		if ( $taxonomies = $this->data_sync->get_taxonomies() ) {
@@ -425,6 +433,9 @@ class WC_Product_DataSync {
 	/**
 	 * Create a WooCommerce image gallery.
 	 *
+	 * @since 1.6.0 Deprecated
+	 * @use   WC+Product_DataSync::gallery_images instaed
+	 *
 	 * @param $product_id
 	 * @param $product_gallery
 	 */
@@ -449,6 +460,38 @@ class WC_Product_DataSync {
 		update_post_meta( $product_id, $product_gallery_key, $product_gallery_ids );
 
 		do_action( 'wp_data_sync_product_gallery', $product_id, $product_gallery );
+
+	}
+
+	/**
+	 * Gallery images.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param $product_id
+	 * @param $gallery_images
+	 */
+
+	public function gallery_images( $product_id, $gallery_images ) {
+
+		$attach_ids = [];
+
+		foreach ( $gallery_images as $image ) {
+
+			$image = apply_filters( 'wp_data_sync_product_gallery_image', $image, $product_id );
+
+			if ( $attach_id = $this->data_sync->attachment( $product_id, $image ) ) {
+				$attach_ids[] = $attach_id;
+			}
+
+		}
+
+		$product_gallery_ids = apply_filters( 'wp_data_sync_product_gallery_images__ids', join( ',', $attach_ids ), $product_id );
+		$product_gallery_key = apply_filters( 'wp_data_sync_product_gallery_images_meta_key', '_product_image_gallery', $product_id );
+
+		update_post_meta( $product_id, $product_gallery_key, $product_gallery_ids );
+
+		do_action( 'wp_data_sync_product_gallery_images', $product_id, $gallery_images );
 
 	}
 

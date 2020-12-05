@@ -86,6 +86,10 @@ class WC_Product_ItemRequest {
 			$item_data['product_gallery'] = $image_urls;
 		}
 
+		if ( $images = $this->gallery_images() ) {
+			$item_data['gallery_images'] = $images;
+		}
+
 		if ( $attributes = $this->product_attributes() ) {
 			$item_data['attributes'] = $attributes;
 		}
@@ -105,6 +109,9 @@ class WC_Product_ItemRequest {
 	/**
 	 * Product image gallery.
 	 *
+	 * @since 1.6.0 Deprecated
+	 * @use WC_Product_ItemRequest::gallery_images instead
+	 *
 	 * @return array|bool
 	 */
 
@@ -121,6 +128,42 @@ class WC_Product_ItemRequest {
 		foreach ( $image_ids as $image_id ) {
 
 			$image_urls["image_$i"] = wp_get_attachment_image_url( $image_id, 'full' );
+
+			$i++;
+
+		}
+
+		return $image_urls;
+
+	}
+
+	/**
+	 * Gallery images.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @return array|bool
+	 */
+
+	public function gallery_images() {
+
+		$image_ids  = $this->product->get_gallery_image_ids();
+		$image_urls = [];
+		$i          = 1;
+
+		if ( empty ( $image_ids ) ) {
+			return FALSE;
+		}
+
+		foreach ( $image_ids as $image_id ) {
+
+			$image_urls["image_$i"] = [
+				'image_url'   => get_the_post_thumbnail_url( $image_id, 'full' ),
+				'title'       => get_the_title( $image_id ) ?: '',
+				'description' => get_the_content( $image_id ) ?: '',
+				'caption'     => get_the_excerpt( $image_id ) ?: '',
+				'alt'         => get_post_meta( $image_id, '_wp_attachment_image_alt', TRUE ) ?: ''
+			];
 
 			$i++;
 
