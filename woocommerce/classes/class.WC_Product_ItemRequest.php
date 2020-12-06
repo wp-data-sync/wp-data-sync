@@ -158,7 +158,7 @@ class WC_Product_ItemRequest {
 		foreach ( $image_ids as $image_id ) {
 
 			$image_urls["image_$i"] = [
-				'image_url'   => get_the_post_thumbnail_url( $image_id, 'full' ),
+				'image_url'   => wp_get_attachment_image_url( $image_id, 'full' ),
 				'title'       => get_the_title( $image_id ) ?: '',
 				'description' => get_the_content( $image_id ) ?: '',
 				'caption'     => get_the_excerpt( $image_id ) ?: '',
