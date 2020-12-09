@@ -501,11 +501,10 @@ class DataSync {
 
 		$name     = apply_filters( 'wp_data_sync_term_name', $name, $taxonomy, $parent_id );
 		$taxonomy = apply_filters( 'wp_data_sync_taxonomy', $taxonomy, $name, $parent_id );
-		$slug     = sanitize_title( $name );
 
-		if ( ! $term_id = $this->term_exists( $slug, $taxonomy, $parent_id ) ) {
+		if ( ! $term_id = $this->term_exists( $name, $taxonomy, $parent_id ) ) {
 
-			$term = wp_insert_term( $name, $taxonomy, [ 'parent' => $parent_id, 'slug' => $slug ] );
+			$term = wp_insert_term( $name, $taxonomy, [ 'parent' => $parent_id ] );
 
 			$term_id = (int) $term['term_id'];
 
@@ -524,35 +523,45 @@ class DataSync {
 	/**
 	 * Term exists.
 	 *
-	 * @param $slug
+	 * @param $name
 	 * @param $taxonomy
 	 * @param $parent_id
 	 *
 	 * @return bool|int
 	 */
 
-	public function term_exists( $slug, $taxonomy, $parent_id ) {
+	public function term_exists( $name, $taxonomy, $parent_id ) {
 
 		global $wpdb;
 
-		$term_id = $wpdb->get_var( $wpdb->prepare(
+		Log::write( 'term-exists', "Name: $name - Taxonomy: $taxonomy - Parent ID: $parent_id" );
+
+		$sql = $wpdb->prepare(
 			"
 			SELECT SQL_NO_CACHE t.term_id
 			FROM $wpdb->terms t
 			INNER JOIN $wpdb->term_taxonomy tt
 			ON tt.term_id = t.term_id
-			WHERE t.slug = %s
+			WHERE t.name = %s
 			AND tt.taxonomy = %s
 			AND tt.parent = %d
 			",
-			$slug,
+			$name,
 			$taxonomy,
 			$parent_id
-		) );
+		);
+
+		Log::write( 'term-exists', $sql );
+
+		$term_id = $wpdb->get_var( $sql );
 
 		if ( null === $term_id || is_wp_error( $term_id ) ) {
+			Log::write( 'term-exists', 'Term Does Not Exist' );
+			Log::write( 'term-exists', $term_id );
 			return FALSE;
 		}
+
+		Log::write( 'term-exists', "Term ID: $term_id" );
 
 		return (int) $term_id;
 
