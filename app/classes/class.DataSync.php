@@ -537,7 +537,7 @@ class DataSync {
 
 		$term_id = $wpdb->get_var( $wpdb->prepare(
 			"
-			SELECT t.term_id
+			SELECT SQL_NO_CACHE t.term_id
 			FROM $wpdb->terms t
 			INNER JOIN $wpdb->term_taxonomy tt
 			ON tt.term_id = t.term_id

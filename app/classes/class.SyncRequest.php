@@ -72,14 +72,19 @@ class SyncRequest extends Access {
 	public function register_route() {
 
 		register_rest_route(
-			'wp-data-sync/' . WP_DATA_SYNC_EP_VERSION . '/',
-			'sync/(?P<access_token>\S+)/',
+			'wp-data-sync/' . WP_DATA_SYNC_EP_VERSION,
+			'/sync/(?P<access_token>\S+)/(?P<cache_buster>\S+)/',
 			[
 				'methods' => WP_REST_Server::CREATABLE,
 				'args'    => [
 					'access_token' => [
 						'sanitize_callback' => 'sanitize_text_field',
 						'validate_callback' => [ $this, 'access_token' ]
+					],
+					'cache_buster' => [
+						'validate_callback' => function( $param ) {
+							return is_string( $param );
+						}
 					]
 				],
 				'permission_callback' => [ $this, 'access' ],

@@ -76,8 +76,8 @@ class WC_Order_DataRequest extends Access {
 	public function register_route() {
 
 		register_rest_route(
-			'wp-data-sync/' . WP_DATA_SYNC_EP_VERSION . '/',
-			'order-request/(?P<access_token>\S+)/(?P<order_id>\d+)/',
+			'wp-data-sync/' . WP_DATA_SYNC_EP_VERSION,
+			'/order-request/(?P<access_token>\S+)/(?P<order_id>\d+)/',
 			[
 				'methods' => WP_REST_Server::READABLE,
 				'args'    => [

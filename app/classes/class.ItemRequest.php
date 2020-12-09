@@ -84,8 +84,8 @@ class ItemRequest extends Access {
 	public function register_route() {
 
 		register_rest_route(
-			'wp-data-sync/' . WP_DATA_SYNC_EP_VERSION . '/',
-			'get-item/(?P<access_token>\S+)/(?P<post_type>\S+)/(?P<limit>\d+)/(?P<cache_buster>\S+)/',
+			'wp-data-sync/' . WP_DATA_SYNC_EP_VERSION,
+			'/get-item/(?P<access_token>\S+)/(?P<post_type>\S+)/(?P<limit>\d+)/(?P<cache_buster>\S+)/',
 			[
 				'methods' => WP_REST_Server::READABLE,
 				'args'    => [
@@ -103,7 +103,7 @@ class ItemRequest extends Access {
 					],
 					'cache_buster' => [
 						'validate_callback' => function( $param ) {
-							return TRUE;
+							return is_string( $param );
 						}
 					]
 				],
