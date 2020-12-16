@@ -186,14 +186,14 @@ class DataSync {
 
 		/**
 		 * @since 1.6.0 Deprecated
-		 * @use   DataSync::featured_image instaed
+		 * @use   DataSync::set_featured_image instaed
 		 */
 		if ( $this->post_thumbnail ) {
 			$this->post_thumbnail( $this->post_id, $this->post_thumbnail );
 		}
 
 		if ( $this->featured_image ) {
-			$this->featured_image( $this->post_id, $this->featured_image );
+			$this->set_featured_image();
 		}
 
 		if ( $this->integrations ) {
@@ -674,7 +674,7 @@ class DataSync {
 	 * Set the post thumbnail.
 	 *
 	 * @since 1.6.0 Deprecated
-	 * @use   DataSync::featured_image instaed
+	 * @use   DataSync::set_featured_image instaed
 	 *
 	 * @param $post_id
 	 * @param $post_thumbnail
@@ -696,18 +696,15 @@ class DataSync {
 	 * Set the featured image.
 	 *
 	 * @since 1.6.0
-	 *
-	 * @param $post_id
-	 * @param $featured_image
 	 */
 
-	public function featured_image( $post_id, $featured_image ) {
+	public function set_featured_image() {
 
-		if ( $attach_id = $this->attachment( $post_id, $featured_image ) ) {
+		if ( $attach_id = $this->attachment( $this->post_id, $this->featured_image ) ) {
 
-			set_post_thumbnail( $post_id, $attach_id );
+			set_post_thumbnail( $this->post_id, $attach_id );
 
-			do_action( 'wp_data_sync_featured_imagel', $post_id, $featured_image );
+			do_action( 'wp_data_sync_featured_imagel', $this->post_id, $this->featured_image );
 
 		}
 
@@ -726,7 +723,9 @@ class DataSync {
 
 		Log::write( 'attachment', $image );
 
-		extract( $this->image( $image, $post_id ) );
+		$image = $this->image( $image, $post_id );
+
+		extract( $image );
 
 		Log::write( 'attachment', "Image URL: $image_url" );
 
@@ -740,18 +739,18 @@ class DataSync {
 			return FALSE;
 		}
 
-		$basename    = $this->basename( $post_id, $image_url );
+		$basename    = $this->basename( $post_id, $image );
 		$image_title = preg_replace( '/\.[^.]+$/', '', $basename );
 
 		$attachment = [
-			'post_title'   => empty( $title ) ? $image_title : $title,
+			'post_title'   => empty( $name ) ? $image_title : $name,
 			'post_content' => $description,
 			'post_excerpt' => $caption
 		];
 
-		if ( $attachment['ID'] = $this->attachment_exists( $image_url, $image_title ) ) {
+		if ( $attachment['ID'] = $this->attachment_exists( $image_url, $attachment['post_title'] ) ) {
 
-			Log::write( 'attachment', "Exists: {$attachment['ID']} - $image_title" );
+			Log::write( 'attachment', "Exists: {$attachment['ID']} - {$attachment['post_title']}" );
 
 			// Update the attachement
 			wp_update_post( $attachment );
@@ -977,17 +976,17 @@ class DataSync {
 	/**
 	 * Basename.
 	 *
-	 * @param $post_id
-	 * @param $image_url
+	 * @param int   $post_id
+	 * @param array $image
 	 *
 	 * @return mixed|void
 	 */
 
-	public function basename( $post_id, $image_url ) {
+	public function basename( $post_id, $image ) {
 
-		$basename = sanitize_file_name( basename( $image_url  ) );
+		$basename = sanitize_file_name( basename( $image['image_url'] ) );
 
-		return apply_filters( 'wp_data_sync_basename', $basename, $post_id );
+		return apply_filters( 'wp_data_sync_basename', $basename, $post_id, $image );
 
 	}
 
