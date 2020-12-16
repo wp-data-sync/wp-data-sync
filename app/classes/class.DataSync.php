@@ -704,7 +704,7 @@ class DataSync {
 
 			set_post_thumbnail( $this->post_id, $attach_id );
 
-			do_action( 'wp_data_sync_featured_imagel', $this->post_id, $this->featured_image );
+			do_action( 'wp_data_sync_featured_image', $this->post_id, $this->featured_image );
 
 		}
 
@@ -741,6 +741,9 @@ class DataSync {
 
 		$basename    = $this->basename( $post_id, $image );
 		$image_title = preg_replace( '/\.[^.]+$/', '', $basename );
+
+		Log::write( 'attachment', "Basename: $basename" );
+		Log::write( 'attachment', "Image Title: $image_title" );
 
 		$attachment = [
 			'post_title'   => empty( $name ) ? $image_title : $name,
@@ -850,7 +853,11 @@ class DataSync {
 		$file_type = wp_check_filetype( $image_url );
 
 		if ( ! empty( $file_type['type'] ) ) {
+
+			Log::write( 'attachment', "File Type: {$file_type['type']}" );
+
 			return $file_type['type'];
+
 		}
 
 		$file_type = FALSE;
@@ -875,7 +882,7 @@ class DataSync {
 
 		}
 
-		Log::write( 'attachment-filetype', $file_type );
+		Log::write( 'attachment', "File Type: $file_type" );
 
 		return $file_type;
 
@@ -891,15 +898,31 @@ class DataSync {
 
 	public function fetch_image_data( $image_url ) {
 
-		if ( $response = wp_remote_get( $image_url ) ) {
+		$response = wp_remote_get( $image_url, [ 'sslverify' => $this->ssl_verify() ] );
 
-			if ( 200 === wp_remote_retrieve_response_code( $response ) ) {
-				return wp_remote_retrieve_body( $response );
-			}
+		Log::write( 'attachment', $response );
 
+		if ( 200 === wp_remote_retrieve_response_code( $response ) ) {
+			return wp_remote_retrieve_body( $response );
 		}
 
 		return FALSE;
+
+	}
+
+	/**
+	 * Verify if SSL certificate is valid.
+	 *
+	 * @return bool
+	 */
+
+	public function ssl_verify() {
+
+		if ( Settings::is_checked( 'wp_data_sync_allow_unsecure_images' ) ) {
+			return FALSE;
+		}
+
+		return TRUE;
 
 	}
 

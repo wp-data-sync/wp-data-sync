@@ -579,6 +579,19 @@ class Settings {
 					]
 				],
 				8 => (object) [
+					'key' 		=> 'wp_data_sync_allow_unsecure_images',
+					'label'		=> __( 'Allow Unsecure Images', 'wp-data-sync' ),
+					'callback'  => 'input',
+					'args'      => [
+						'sanitize_callback' => 'sanitize_text_field',
+						'basename'          => 'checkbox',
+						'type'		        => '',
+						'class'		        => '',
+						'placeholder'       => '',
+						'info'              => __( 'Allow images without valid SSL certificates to be imported.' )
+					]
+				],
+				9 => (object) [
 					'key' 		=> 'wp_data_sync_replace_post_content_images',
 					'label'		=> __( 'Replace Images in Content', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -591,7 +604,7 @@ class Settings {
 						'info'              => __( 'Replace all valid full image URLs. This will make a copy of the images in this websites media library and replace the image URLs in the content.' )
 					]
 				],
-				9 => (object) [
+				10 => (object) [
 					'key' 		=> 'wp_data_sync_replace_post_excerpt_images',
 					'label'		=> __( 'Replace Images in Excerpt', 'wp-data-sync' ),
 					'callback'  => 'input',

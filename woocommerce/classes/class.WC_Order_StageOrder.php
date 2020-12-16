@@ -125,7 +125,7 @@ class WC_Order_StageOrder {
 
 		return [
 			'timeout'   => 5,
-			'sslverify' => FALSE,
+			'sslverify' => TRUE,
 			// Wait for response only if logging is active.
 			'blocking'  => Log::is_active(),
 			'body'      => json_encode( $order_data->get( $this->order_id ) ),
