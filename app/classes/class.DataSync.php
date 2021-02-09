@@ -30,6 +30,12 @@ class DataSync {
 	private $post_id = FALSE;
 
 	/**
+	 * @var bool
+	 */
+
+	private $is_accelerated = FALSE;
+
+	/**
 	 * @var bool|array
 	 */
 
@@ -250,6 +256,8 @@ class DataSync {
 
 		global $wpdb;
 
+		extract( $primary_id );
+
 		$post_id = $wpdb->get_var(
 			$wpdb->prepare(
 				"
@@ -262,17 +270,22 @@ class DataSync {
       			ORDER BY meta_id DESC
     			LIMIT 1
 				",
-				$primary_id['meta_key'],
-				$primary_id['meta_value']
+				$meta_key,
+				$meta_value
 			)
 		);
 
-		if ( null === $post_id ) {
+		if ( null === $post_id || is_wp_error( $post_id ) ) {
+
+			// Do not create a new post if accelerated sync.
+			if ( $this->is_accelerated ) {
+				return FALSE;
+			}
 
 			$this->is_new = TRUE;
 
 			$post_id = wp_insert_post( [
-				'post_title'  => 'WP Data Sync Placeholder',
+				'post_title'  => __( 'WP Data Sync Placeholder', 'wp-data-sync' ),
 				'post_type'   => get_option( 'wp_data_sync_post_type' ),
 				'post_status' => 'draft'
 			] );

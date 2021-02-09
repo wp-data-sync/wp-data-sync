@@ -198,7 +198,7 @@ class WC_Product_DataSync {
 
 			$product_attributes[ $is_taxonomy ? $taxonomy : $name ] = [
 				'name'         => $is_taxonomy ? $taxonomy : $name,
-				'value'        => $is_taxonomy ? '' : join( ',', $values ),
+				'value'        => $is_taxonomy ? $values : join( ',', $values ),
 				'position'     => $position,
 				'is_visible'   => (int) $is_visible,
 				'is_variation' => (int) $is_variation,

@@ -1,8 +1,8 @@
 === WP Data Sync ===
 Contributors: kevin-brent
-Tags: sync data, api feed, data feed, json feed, woocommerce, data transfer, csv import, data sync, sync products, google sheets, google forms
+Tags: sync data, api feed, data feed, json feed, woocommerce, data transfer, csv import, data sync, sync products, google sheets, google forms, wp data sync
 Requires at least: 5.0
-Tested up to: 5.5.3
+Tested up to: 5.6
 Requires PHP: 5.6
 Stable tag: /trunk
 License: GPLv2
