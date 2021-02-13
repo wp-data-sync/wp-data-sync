@@ -215,7 +215,6 @@ class ItemRequest extends Access {
 			'post_data'       => $this->get_post( $item_id ),
 			'post_meta'       => $this->post_meta( $item_id ),
 			'taxonomies'      => $this->taxonomies( $item_id ),
-			'post_thumbnail'  => $this->thumbnail_url( $item_id ),
 			'featured_image'  => $this->featured_image( $item_id ),
 			'integratiuons'   => apply_filters( 'wp_data_sync_item_request_integrations', [], $item_id )
 		];
@@ -336,18 +335,6 @@ class ItemRequest extends Access {
 
 		return $meta_values;
 
-	}
-
-	/**
-	 * Thumbnail URL.
-	 *
-	 * @param $item_id
-	 *
-	 * @return bool|false|string
-	 */
-
-	public function thumbnail_url( $item_id ) {
-		return get_the_post_thumbnail_url( $item_id, 'full' );
 	}
 
 	/**

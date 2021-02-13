@@ -79,12 +79,8 @@ class WC_Product_ItemRequest {
 	public function wc_process( $item_data, $product_id, $item_request ) {
 
 		$this->product_id   = $product_id;
-		$this->product      = new WC_Product( $product_id );
+		$this->product      = wc_get_product( $product_id );
 		$this->item_request = $item_request;
-
-		if ( $image_urls = $this->product_gallery() ) {
-			$item_data['product_gallery'] = $image_urls;
-		}
 
 		if ( $images = $this->gallery_images() ) {
 			$item_data['gallery_images'] = $images;
@@ -103,37 +99,6 @@ class WC_Product_ItemRequest {
 		}
 
 		return $item_data;
-
-	}
-
-	/**
-	 * Product image gallery.
-	 *
-	 * @since 1.6.0 Deprecated
-	 * @use WC_Product_ItemRequest::gallery_images instead
-	 *
-	 * @return array|bool
-	 */
-
-	public function product_gallery() {
-
-		$image_ids  = $this->product->get_gallery_image_ids();
-		$image_urls = [];
-		$i          = 1;
-
-		if ( empty ( $image_ids ) ) {
-			return FALSE;
-		}
-
-		foreach ( $image_ids as $image_id ) {
-
-			$image_urls["image_$i"] = wp_get_attachment_image_url( $image_id, 'full' );
-
-			$i++;
-
-		}
-
-		return $image_urls;
 
 	}
 
@@ -248,12 +213,12 @@ class WC_Product_ItemRequest {
 
 		foreach ( $variation_ids as $variation_id ) {
 
-			$variation['post_data'] = $this->item_request->get_post( $variation_id );
-            $variation['post_meta']   = $this->item_request->post_meta( $variation_id );
-            $variation['attributes']  = $this->get_variation_attributes( $variation_id );
+			$variation['post_data']  = $this->item_request->get_post( $variation_id );
+            $variation['post_meta']  = $this->item_request->post_meta( $variation_id );
+            $variation['attributes'] = $this->get_variation_attributes( $variation_id );
 
             if ( has_post_thumbnail( $variation_id ) ) {
-	            $variation['post_thumbnail'] = $this->item_request->thumbnail_url( $variation_id );
+	            $variation['featured_image'] = $this->item_request->featured_image( $variation_id );
             }
 
 			$variations["variation_$i"] = $variation;
