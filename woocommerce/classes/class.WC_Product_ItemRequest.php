@@ -85,7 +85,7 @@ class WC_Product_ItemRequest {
 			$item_data['gallery_images'] = $images;
 		}
 
-		if ( $attributes = $this->product_attributes( $product_id ) ) {
+		if ( $attributes = $this->product_attributes() ) {
 			$item_data['attributes'] = $attributes;
 		}
 
@@ -138,46 +138,42 @@ class WC_Product_ItemRequest {
 	}
 
 	/**
-	 * Get product attributes.
-	 *
-	 * @param $product_id
+	 * Product attributes.
 	 *
 	 * @return array|bool
 	 */
 
-	public function product_attributes( $product_id ) {
+	public function product_attributes() {
 
-		$product = wc_get_product( $product_id );
+		if ( $product_attributes = get_post_meta( $this->product_id, '_product_attributes', TRUE ) ) {
 
-		if ( ! $product->has_attributes() ) {
-			return FALSE;
-		}
+			$attributes = [];
 
-		$product_attributes = get_post_meta( $product_id, '_product_attributes', TRUE );
-		$attributes         = [];
+			foreach ( $product_attributes as $attribute ) {
 
-		foreach ( $product_attributes as $attribute ) {
+				$slug = wc_attribute_taxonomy_slug( $attribute['name'] );
 
-			$slug = wc_attribute_taxonomy_slug( $attribute['name'] );
+				$attributes[ $slug ] = $attribute;
 
-			$attributes[ $slug ] = $attribute;
+				if ( $attribute['is_taxonomy'] ) {
 
-			if ( $attribute['is_taxonomy'] ) {
+					$attributes[ $slug ]['name']   = wc_attribute_label( $attribute['name'] );
+					$value                         = $this->product->get_attribute( $attribute['name'] );
+					$attributes[ $slug ]['values'] = $this->explode( $value );
 
-				$attributes[ $slug ]['name']   = wc_attribute_label( $attribute['name'] );
-				$value = $product->get_attribute( $attribute['name'] );
-				$attributes[ $slug ]['values'] = $this->explode( $value );
+				} else {
+					$attributes[ $slug ]['values'] = $this->explode( $attribute['value'] );
+				}
+
+				unset( $attributes[ $slug ]['value'] );
 
 			}
-			else {
-				$attributes[ $slug ]['values'] = $this->explode( $attribute['value'] );
-			}
 
-			unset( $attributes[ $slug ]['value'] );
+			return array_filter( $attributes );
 
 		}
 
-		return array_filter( $attributes );
+		return FALSE;
 
 	}
 
@@ -226,7 +222,6 @@ class WC_Product_ItemRequest {
 
 			$variation['post_data']  = $this->item_request->get_post( $variation_id );
             $variation['post_meta']  = $this->item_request->post_meta( $variation_id );
-            $variation['attributes'] = $this->product_attributes( $variation_id );
 
             if ( has_post_thumbnail( $variation_id ) ) {
 	            $variation['featured_image'] = $this->item_request->featured_image( $variation_id );
