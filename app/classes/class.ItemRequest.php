@@ -186,7 +186,9 @@ class ItemRequest extends Access {
 
 			foreach ( $item_ids as $item_id ) {
 
-				$items[] = $this->get_item( $item_id );
+				$items[] = $item_data = $this->get_item( $item_id );
+
+				Log::write( 'item-request-item-data', $item_data );
 
 				$this->insert_id( $item_id );
 
@@ -226,12 +228,13 @@ class ItemRequest extends Access {
 	/**
 	 * Get post.
 	 *
-	 * @param $item_id
+	 * @param $item_id     int
+	 * @param $post_parent int
 	 *
 	 * @return array|\WP_Post|null
 	 */
 
-	public function get_post( $item_id ) {
+	public function get_post( $item_id, $post_parent = 0 ) {
 
 		global $wpdb;
 
@@ -250,7 +253,8 @@ class ItemRequest extends Access {
 
 		unset( $item->ID );
 		unset( $item->guid );
-		unset( $item->post_parent );
+
+		$item->post_parent = $post_parent;
 
 		if ( Settings::is_checked( 'wp_data_sync_unset_post_author' ) ) {
 			unset( $item->post_author );

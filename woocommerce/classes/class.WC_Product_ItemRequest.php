@@ -11,6 +11,8 @@
 
 namespace WP_DataSync\Woo;
 
+use WP_DataSync\App\ItemRequest;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -68,7 +70,7 @@ class WC_Product_ItemRequest {
 	 *
 	 * @param $item_data
 	 * @param $product_id
-	 * @param $item_request
+	 * @param $item_request ItemRequest
 	 *
 	 * @return mixed
 	 */
@@ -205,7 +207,7 @@ class WC_Product_ItemRequest {
 	public function product_variations() {
 
 		$variations    = [];
-		$variation_ids = $this->get_variation_ids();
+		$variation_ids = $this->product->get_children();
 		$i             = 1;
 
 		if ( empty( $variation_ids ) ) {
@@ -214,6 +216,7 @@ class WC_Product_ItemRequest {
 
 		foreach ( $variation_ids as $variation_id ) {
 
+			$variation               = [];
 			$variation['primary_id'] =  [
 				'meta_key'   => '_source_item_id',
 				'meta_value' => $variation_id,
@@ -221,7 +224,7 @@ class WC_Product_ItemRequest {
 				'post_id'    => $variation_id
 			];
 
-			$variation['post_data']  = $this->item_request->get_post( $variation_id );
+			$variation['post_data']  = $this->item_request->get_post( $variation_id, $this->product_id );
             $variation['post_meta']  = $this->item_request->post_meta( $variation_id );
             $variation['attributes'] = $this->product_attributes( $variation_id );
 
@@ -229,30 +232,13 @@ class WC_Product_ItemRequest {
 	            $variation['featured_image'] = $this->item_request->featured_image( $variation_id );
             }
 
-			$variations["variation_$i"] = $variation;
+			$variations["variation_$i"] = array_filter( $variation );
 
             $i++;
 
 		}
 
 		return $variations;
-
-	}
-
-	/**
-	 * Get product variation ids.
-	 *
-	 * @return int[]|\WP_Post[]
-	 */
-
-	public function get_variation_ids() {
-
-		return get_posts( [
-			'numberposts' => -1,
-			'post_type'   => 'product_variation',
-			'parent'      => $this->product_id,
-			'fields'      => 'ids',
-		] );
 
 	}
 
