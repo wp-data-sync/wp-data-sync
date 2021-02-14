@@ -83,6 +83,14 @@ class WC_Product_DataSync {
 			$this->variations( $product_id, $variations );
 		}
 
+		/**
+		 * @since 1.6.0 Deprecated
+		 * @use   WC+Product_DataSync::gallery_images instaed
+		 */
+		if ( $product_gallery = $this->data_sync->get_product_gallery() ) {
+			$this->product_gallery( $product_id, $product_gallery );
+		}
+
 		if ( $gallery_images = $this->data_sync->get_gallery_images() ) {
 			$this->gallery_images( $product_id, $gallery_images );
 		}
