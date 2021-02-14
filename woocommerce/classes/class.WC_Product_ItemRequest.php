@@ -86,7 +86,7 @@ class WC_Product_ItemRequest {
 			$item_data['gallery_images'] = $images;
 		}
 
-		if ( $attributes = $this->product_attributes() ) {
+		if ( $attributes = $this->product_attributes( $product_id ) ) {
 			$item_data['attributes'] = $attributes;
 		}
 
@@ -139,18 +139,22 @@ class WC_Product_ItemRequest {
 	}
 
 	/**
-	 * Product Attributes.
+	 * Get product attributes.
+	 *
+	 * @param $product_id
 	 *
 	 * @return array|bool
 	 */
 
-	public function product_attributes() {
+	public function product_attributes( $product_id ) {
 
-		if ( ! $this->product->has_attributes() ) {
+		$product = wc_get_product( $product_id );
+
+		if ( ! $product->has_attributes() ) {
 			return FALSE;
 		}
 
-		$product_attributes = get_post_meta( $this->product_id, '_product_attributes', TRUE );
+		$product_attributes = get_post_meta( $product_id, '_product_attributes', TRUE );
 		$attributes         = [];
 
 		foreach ( $product_attributes as $attribute ) {
@@ -162,7 +166,7 @@ class WC_Product_ItemRequest {
 			if ( $attribute['is_taxonomy'] ) {
 
 				$attributes[ $slug ]['name']   = wc_attribute_label( $attribute['name'] );
-				$value = $this->product->get_attribute( $attribute['name'] );
+				$value = $product->get_attribute( $attribute['name'] );
 				$attributes[ $slug ]['values'] = $this->explode( $value );
 
 			}
@@ -215,7 +219,7 @@ class WC_Product_ItemRequest {
 
 			$variation['post_data']  = $this->item_request->get_post( $variation_id );
             $variation['post_meta']  = $this->item_request->post_meta( $variation_id );
-            $variation['attributes'] = $this->get_variation_attributes( $variation_id );
+            $variation['attributes'] = $this->product_attributes( $variation_id );
 
             if ( has_post_thumbnail( $variation_id ) ) {
 	            $variation['featured_image'] = $this->item_request->featured_image( $variation_id );
