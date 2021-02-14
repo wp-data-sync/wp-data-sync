@@ -224,7 +224,7 @@ class WC_Product_ItemRequest {
 				'post_id'    => $variation_id
 			];
 
-			$variation['post_data']  = $this->item_request->get_post( $variation_id, $this->product_id );
+			$variation['post_data']  = $this->item_request->get_post( $variation_id );
             $variation['post_meta']  = $this->item_request->post_meta( $variation_id );
             $variation['attributes'] = $this->product_attributes( $variation_id );
 

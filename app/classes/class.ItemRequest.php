@@ -228,13 +228,12 @@ class ItemRequest extends Access {
 	/**
 	 * Get post.
 	 *
-	 * @param $item_id     int
-	 * @param $post_parent int
+	 * @param $item_id int
 	 *
 	 * @return array|\WP_Post|null
 	 */
 
-	public function get_post( $item_id, $post_parent = 0 ) {
+	public function get_post( $item_id ) {
 
 		global $wpdb;
 
@@ -253,8 +252,7 @@ class ItemRequest extends Access {
 
 		unset( $item->ID );
 		unset( $item->guid );
-
-		$item->post_parent = $post_parent;
+		unset( $item->post_parent );
 
 		if ( Settings::is_checked( 'wp_data_sync_unset_post_author' ) ) {
 			unset( $item->post_author );
