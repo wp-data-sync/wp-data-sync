@@ -306,123 +306,15 @@ class WC_Product_DataSync {
 
 		if ( is_array( $variations ) ) {
 
+			$data_sync = DataSync::instance();
+
 			foreach ( $variations as $variation ) {
 
-				extract( $variation );
+				// Se the parent ID for the variation.
+				$variation['post_data']['parent'] = $product_id;
 
-				$_variation = new WC_Product_Variation();
-
-				$_variation->set_parent_id( $product_id );
-
-				if ( ! empty( $post_thumbnail ) ) {
-					$attach_id = $this->data_sync->attachment( 0, $post_thumbnail );
-					$_variation->set_image_id( $attach_id );
-				}
-
-				// Extract the Post Object
-				extract( $post_data );
-
-				// Check to see if we already have this variation
-				if ( $exists = get_page_by_title( $post_title, 'OBJECT', 'product_variation' ) ) {
-					$_variation->set_id( $exists->ID );
-				}
-
-				if ( ! empty( $post_title ) ) {
-					$_variation->set_name( $post_title );
-				}
-
-				if ( ! empty( $post_name ) ) {
-					$_variation->set_slug( $post_name );
-				}
-
-				if ( ! empty( $post_excerpt ) ) {
-					$_variation->set_short_description( $post_excerpt );
-				}
-				if ( ! empty( $post_status ) ) {
-					$_variation->set_status( $post_status );
-				}
-
-				if ( ! empty( $post_date ) ) {
-					$_variation->set_date_created( $post_date );
-				}
-
-				if ( ! empty( $menu_order ) ) {
-					$_variation->set_menu_order( $menu_order );
-				}
-
-				extract( $post_meta );
-
-				if ( ! empty( $_sku ) ) {
-					$_variation->set_sku( $_sku );
-				}
-
-				if ( ! empty( $_price ) ) {
-					$_variation->set_price( $_price );
-				}
-
-				if ( ! empty( $_regular_price ) ) {
-					$_variation->set_regular_price( $_regular_price );
-				}
-
-				if ( ! empty( $_sale_price ) ) {
-					$_variation->set_sale_price( $_sale_price );
-				}
-
-				if ( ! empty( $_variation_description ) ) {
-					$_variation->set_description( $_variation_description );
-				}
-
-				if ( ! empty( $_manage_stock ) ) {
-					$_variation->set_manage_stock( $_manage_stock );
-				}
-
-				if ( ! empty( $_back_orders ) ) {
-					$_variation->set_backorders( $_back_orders );
-				}
-
-				if ( ! empty( $_sold_individually ) ) {
-					$_variation->set_sold_individually( $_sold_individually );
-				}
-
-				if ( ! empty( $_virtual ) ) {
-					$_variation->set_virtual( $_virtual );
-				}
-
-				if ( ! empty( $_downloadable ) ) {
-					$_variation->set_downloadable( $_downloadable );
-				}
-
-				if ( ! empty( $_stock ) ) {
-					$_variation->set_stock( $_stock );
-				}
-
-				if ( ! empty( $_stock_status ) ) {
-					$_variation->set_stock_status( $_stock_status );
-				}
-
-				if ( ! empty( $_length ) ) {
-					$_variation->set_length( $_length );
-				}
-
-				if ( ! empty( $_width ) ) {
-					$_variation->set_width( $_width );
-				}
-
-				if ( ! empty( $_height ) ) {
-					$_variation->set_height( $_height );
-				}
-
-				if ( ! empty( $_weight ) ) {
-					$_variation->set_weight( $_weight );
-				}
-
-				// Attributes
-				if ( ! empty( $attributes ) ) {
-					$_variation->set_default_attributes( $attributes );
-					$_variation->set_attributes( $attributes );
-				}
-
-				$_variation->save();
+				$data_sync->set_properties( $variation );
+				$data_sync->process();
 
 			}
 

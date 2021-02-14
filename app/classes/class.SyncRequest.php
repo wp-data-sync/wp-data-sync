@@ -234,7 +234,7 @@ class SyncRequest extends Access {
 			$sanitize_callback = 'html';
 		}
 
-		if ( 'post_thumbnail' === $key || 'gallery_image_' === substr( $key, 0, 14 ) ) {
+		if ( 'gallery_image_' === substr( $key, 0, 14 ) ) {
 			$sanitize_callback = 'url';
 		}
 

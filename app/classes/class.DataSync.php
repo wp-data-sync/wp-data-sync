@@ -54,15 +54,6 @@ class DataSync {
 	private $taxonomies = FALSE;
 
 	/**
-	 * @since 1.6.0 Deprecated
-	 * @use   DataSync::featured_image instaed
-	 *
-	 * @var bool|string
-	 */
-
-	private $post_thumbnail = FALSE;
-
-	/**
 	 * @var bool|array
 	 */
 
@@ -188,14 +179,6 @@ class DataSync {
 
 		if ( $this->taxonomies ) {
 			$this->taxonomy( $this->post_id, $this->taxonomies );
-		}
-
-		/**
-		 * @since 1.6.0 Deprecated
-		 * @use   DataSync::set_featured_image instaed
-		 */
-		if ( $this->post_thumbnail ) {
-			$this->post_thumbnail( $this->post_id, $this->post_thumbnail );
 		}
 
 		if ( $this->featured_image ) {
@@ -684,28 +667,6 @@ class DataSync {
 	}
 
 	/**
-	 * Set the post thumbnail.
-	 *
-	 * @since 1.6.0 Deprecated
-	 * @use   DataSync::set_featured_image instaed
-	 *
-	 * @param $post_id
-	 * @param $post_thumbnail
-	 */
-
-	public function post_thumbnail( $post_id, $post_thumbnail ) {
-
-		if ( $attach_id = $this->attachment( $post_id, $post_thumbnail ) ) {
-
-			set_post_thumbnail( $post_id, $attach_id );
-
-			do_action( 'wp_data_sync_post_thumbnail', $post_id, $post_thumbnail );
-
-		}
-
-	}
-
-	/**
 	 * Set the featured image.
 	 *
 	 * @since 1.6.0
@@ -1189,19 +1150,6 @@ class DataSync {
 
 	public function get_taxonomies() {
 		return $this->taxonomies;
-	}
-
-	/**
-	 * Get the post thumbnail.
-	 *
-	 * @since 1.6.0 Deprecated
-	 * @use   DataSync::get_featured_image instaed
-	 *
-	 * @return string|bool
-	 */
-
-	public function get_post_thumbnail() {
-		return $this->post_thumbnail;
 	}
 
 	/**
