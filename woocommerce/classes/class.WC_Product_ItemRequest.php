@@ -217,6 +217,13 @@ class WC_Product_ItemRequest {
 
 		foreach ( $variation_ids as $variation_id ) {
 
+			$variation['primary_id'] =  [
+				'meta_key'   => '_source_item_id',
+				'meta_value' => $variation_id,
+				'search_in'  => 'post_meta',
+				'post_id'    => $variation_id
+			];
+
 			$variation['post_data']  = $this->item_request->get_post( $variation_id );
             $variation['post_meta']  = $this->item_request->post_meta( $variation_id );
             $variation['attributes'] = $this->product_attributes( $variation_id );
