@@ -125,7 +125,7 @@ class WC_Product_DataSync {
 
 			$product_attributes[ $is_taxonomy ? $taxonomy : $name ] = [
 				'name'         => $is_taxonomy ? $taxonomy : $name,
-				'value'        => $is_taxonomy ? $values : join( ',', $values ),
+				'value'        => $is_taxonomy ? $values : join( '|', $values ),
 				'position'     => $position,
 				'is_visible'   => (int) $is_visible,
 				'is_variation' => (int) $is_variation,
@@ -237,11 +237,15 @@ class WC_Product_DataSync {
 
 			foreach ( $variations as $variation ) {
 
-				// Se the parent ID for the variation.
-				$variation['post_data']['parent'] = $product_id;
+				// Set the parent ID for the variation.
+				$variation['post_data']['post_parent'] = $product_id;
+
+				Log::write( 'variation', $variation );
 
 				$data_sync->set_properties( $variation );
-				$data_sync->process();
+				$result = $data_sync->process();
+
+				Log::write( 'variation', 'Variation ID: ' . $result['post_id'] );
 
 			}
 
@@ -321,8 +325,6 @@ class WC_Product_DataSync {
 	 */
 
 	public function product_visibility( $taxonomies ) {
-
-		Log::write( 'product-visibility', $taxonomies );
 
 		if ( is_array( $taxonomies ) && array_key_exists( 'product_visibility', $taxonomies ) ) {
 
