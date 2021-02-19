@@ -75,6 +75,10 @@ class WC_Product_DataSync {
 		$this->data_sync = $data_sync;
 		$this->product   = wc_get_product( $product_id );
 
+		if ( $post_meta = $this->data_sync->get_post_meta() ) {
+			$this->price( $product_id, $post_meta );
+		}
+
 		if ( $attributes = $this->data_sync->get_attributes() ) {
 			$this->attributes( $product_id, $attributes );
 		}
@@ -97,6 +101,57 @@ class WC_Product_DataSync {
 
 		if ( $taxonomies = $this->data_sync->get_taxonomies() ) {
 			$this->product_visibility( $taxonomies );
+		}
+
+	}
+
+	/**
+	 * Price.
+	 *
+	 * @param $product_id
+	 * @param $post_meta
+	 */
+
+	public function price( $product_id, $post_meta ) {
+
+		if ( isset( $post_meta['_regular_price'] ) ) {
+
+			$regular_price = wc_format_decimal( $post_meta['_regular_price'] );
+
+			LOg::write( 'product-price', "Product ID: $product_id Regular Price: $regular_price" );
+
+			update_post_meta( $product_id, '_regular_price', $regular_price );
+
+			if ( ! empty( $regular_price ) ) {
+				update_post_meta( $product_id, '_price', $regular_price );
+			}
+
+		}
+
+		if ( isset( $post_meta['_sale_price'] ) ) {
+
+			$sale_price = wc_format_decimal( $post_meta['_sale_price'] );
+
+			LOg::write( 'product-price', "Product ID: $product_id Sale Price: $sale_price" );
+
+			update_post_meta( $product_id, '_sale_price', $sale_price );
+
+			if ( ! empty( $sale_price ) ) {
+				update_post_meta( $product_id, '_price', $sale_price );
+			}
+
+		}
+
+		if ( isset( $post_meta['_price'] ) ) {
+
+			$price = wc_format_decimal( $post_meta['_price'] );
+
+			LOg::write( 'product-price', "Product ID: $product_id Price: $price" );
+
+			if ( ! empty( $price ) ) {
+				update_post_meta( $product_id, '_price', $price );
+			}
+
 		}
 
 	}
