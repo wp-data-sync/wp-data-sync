@@ -241,8 +241,15 @@ class Settings {
 
 	public function value( $args ) {
 
-		return isset( $args['value'] ) ? $args['value'] :
-			isset ( $args['key'] ) ? get_option( $args['key'], '' ) : '';
+		if ( isset( $args['value'] ) ) {
+			return $args['value'];
+		}
+
+		if ( isset ( $args['key'] ) ) {
+			return get_option( $args['key'], '' );
+		}
+
+		return '';
 
 	}
 
