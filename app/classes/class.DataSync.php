@@ -433,14 +433,14 @@ class DataSync {
 
 			}
 
-			$parent_id  = 0;
-			$term_ids   = [];
-			$parent_ids = [];
-			$append     = Settings::is_true( 'wp_data_sync_append_terms' );
+			$term_ids = [];
+			$append   = Settings::is_true( 'wp_data_sync_append_terms' );
 
 			foreach ( $terms as $term ) {
 
-				if ( ! empty( $term['parents'] ) ) {
+				$parent_id = 0;
+
+				if ( ! empty( $term['parents'] ) && is_array( $term['parents']  ) ) {
 
 					foreach ( $term['parents'] as $parent ) {
 						$parent_id = $this->set_term( $parent, $taxonomy, $parent_id );
@@ -449,9 +449,6 @@ class DataSync {
 				}
 
 				$term_ids[] = $this->set_term( $term, $taxonomy, $parent_id );
-
-				// Reset parent ID.
-				$parent_id = 0;
 
 			}
 
