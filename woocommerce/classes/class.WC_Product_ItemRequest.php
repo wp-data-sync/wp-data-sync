@@ -212,16 +212,10 @@ class WC_Product_ItemRequest {
 
 		foreach ( $variation_ids as $variation_id ) {
 
-			$variation               = [];
-			$variation['primary_id'] =  [
-				'meta_key'   => '_source_item_id',
-				'meta_value' => $variation_id,
-				'search_in'  => 'post_meta',
-				'post_id'    => $variation_id
-			];
-
-			$variation['post_data']  = $this->item_request->get_post( $variation_id );
-            $variation['post_meta']  = $this->item_request->post_meta( $variation_id );
+			$variation                   = [];
+			$variation['source_item_id'] = $variation_id;
+			$variation['post_data']      = $this->item_request->get_post( $variation_id );
+            $variation['post_meta']      = $this->item_request->post_meta( $variation_id );
 
             if ( has_post_thumbnail( $variation_id ) ) {
 	            $variation['featured_image'] = $this->item_request->featured_image( $variation_id );
