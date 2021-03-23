@@ -83,6 +83,10 @@ class WC_Product_DataSync {
 			$this->attributes( $product_id, $attributes );
 		}
 
+		if ( $this->product->is_type( 'variable' ) ) {
+			$this->set_variations_inactive( $product_id );
+		}
+
 		if ( $variations = $this->data_sync->get_variations() ) {
 			$this->variations( $product_id, $variations );
 		}
@@ -282,6 +286,28 @@ class WC_Product_DataSync {
 	}
 
 	/**
+	 * Set variations inactive.
+	 *
+	 * We want to set all variations inactive.
+	 * Later when variations are updated,
+	 * we will set only current variations active.
+	 *
+	 * @param $product_id
+	 */
+
+	public function set_variations_inactive( $product_id ) {
+
+		global $wpdb;
+
+		$wpdb->update(
+			$wpdb->posts,
+			[ 'post_status' => 'private' ],
+			[ 'post_parent' => $product_id ]
+		);
+
+	}
+
+	/**
 	 * Variations.
 	 *
 	 * @link https://woocommerce.github.io/code-reference/classes/WC-Product-Variation.html
@@ -302,6 +328,10 @@ class WC_Product_DataSync {
 
 				// Set the parent ID for the variation.
 				$variation['post_data']['post_parent'] = $product_id;
+
+				if ( ! isset( $variation['post_data']['post_status'] ) ) {
+					$variation['post_data']['post_status'] = 'publish';
+				}
 
 				Log::write( 'variation', $variation );
 
