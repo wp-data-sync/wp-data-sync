@@ -29,19 +29,8 @@ function wc_update() {
 		WC_Product_Sells::create_table();
 		WC_Order_StageOrder::create_table();
 
-		reset_product_visibilty_defualt();
-
 		update_option( 'WC_DATA_SYNC_VERSION', WC_DATA_SYNC_VERSION );
 
-	}
-
-}
-
-// TODO: Temporary function
-function reset_product_visibilty_defualt() {
-
-	if ( 'null' === get_option( 'wp_data_sync_product_visibility', 'visible' ) ) {
-		update_option( 'wp_data_sync_product_visibility', 'visible' );
 	}
 
 }

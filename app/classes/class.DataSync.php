@@ -722,7 +722,7 @@ class DataSync {
 			'post_excerpt' => $caption
 		];
 
-		if ( $attachment['ID'] = $this->attachment_exists( $image_url, $attachment['post_title'] ) ) {
+		if ( $attachment['ID'] = $this->attachment_exists( $image_url ) ) {
 
 			Log::write( 'attachment', "Exists: {$attachment['ID']} - {$attachment['post_title']}" );
 
@@ -919,15 +919,15 @@ class DataSync {
 	/**
 	 * Check to see if attachment exists.
 	 *
-	 * @since 1.6.0 Query _source_url
+	 * @since 1.6.0  Query _source_url
+	 * @since 1.6.17 Remove query by attachment ame
 	 *
 	 * @param $image_url
-	 * @param $post_title
 	 *
 	 * @return bool|int
 	 */
 
-	public function attachment_exists( $image_url, $post_title ) {
+	public function attachment_exists( $image_url ) {
 
 		global $wpdb;
 
@@ -939,24 +939,6 @@ class DataSync {
 			AND meta_value = %s
 			",
 			$image_url
-		) );
-
-		if ( null !== $attach_id && 0 < $attach_id && ! is_wp_error( $attach_id ) ) {
-			return (int) $attach_id;
-		}
-
-		/**
-		 * TODO: remove the query below once all images have a saved _source_url
-		 */
-
-		$attach_id = $wpdb->get_var( $wpdb->prepare(
-			"
-			SELECT ID
-			FROM $wpdb->posts
-			WHERE post_title = %s
-			AND post_type = 'attachment'
-			",
-			$post_title
 		) );
 
 		if ( null === $attach_id || is_wp_error( $attach_id ) ) {
