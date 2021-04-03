@@ -60,6 +60,7 @@ class WC_Order_Data {
 		if ( $order = wc_get_order( $order_id ) ) {
 
 			$_order          = $order->get_data();
+			$_order['meta']  = $order->get_meta();
 			$_order['items'] = $this->get_items( $order );
 
 		}
@@ -77,19 +78,17 @@ class WC_Order_Data {
 
 		$order_items = [];
 
-		foreach ( $order->get_items() as $item ) {
+		foreach ( $order->get_items() as $i => $item ) {
 
-			$order_items[]             = $item->get_data();
-			$order_items[]['itemmeta'] = $item->get_meta_data();
+			$order_items[ $i ]             = $item->get_data();
+			$order_items[ $i ]['itemmeta'] = $item->get_meta_data();
 
 			if ( $product = wc_get_product( $item->get_product_id() ) ) {
-				$order_items[]['sku'] = $product->get_sku();
+				$order_items[ $i ]['sku'] = $product->get_sku();
 			}
 			else {
-				$order_items[]['sku'] = 'NA';
+				$order_items[ $i ]['sku'] = 'NA';
 			}
-
-			$i++;
 
 		}
 
