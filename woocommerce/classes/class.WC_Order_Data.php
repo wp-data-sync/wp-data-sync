@@ -59,15 +59,16 @@ class WC_Order_Data {
 
 		if ( $order = wc_get_order( $order_id ) ) {
 
-			$_order          = $order->get_data();
-			$_order['meta']  = $order->get_meta();
-			$_order['items'] = $this->get_items( $order );
+			$_order              = $order->get_data();
+			$_order['meta_data'] = $this->format_meta( $order );
+			$_order['items']     = $this->get_items( $order );
 
 		}
 
 		return $_order;
 
 	}
+
 	/**
 	 * @param $order \WC_Order
 	 *
@@ -80,8 +81,8 @@ class WC_Order_Data {
 
 		foreach ( $order->get_items() as $i => $item ) {
 
-			$order_items[ $i ]             = $item->get_data();
-			$order_items[ $i ]['itemmeta'] = $item->get_meta_data();
+			$order_items[ $i ]              = $item->get_data();
+			$order_items[ $i ]['meta_data'] = $this->format_meta( $item );
 
 			if ( $product = wc_get_product( $item->get_product_id() ) ) {
 				$order_items[ $i ]['sku'] = $product->get_sku();
@@ -93,6 +94,32 @@ class WC_Order_Data {
 		}
 
 		return apply_filters( 'wp_data_sync_order_items', $order_items, $order );
+
+	}
+
+	/**
+	 * Foemat meta.
+	 *
+	 * @param $object \WC_Order|\WC_Order_Item
+	 *
+	 * @return array
+	 */
+
+	public function format_meta( $object ) {
+
+		$meta_data = $object->get_meta_data();
+
+		if ( ! is_array( $meta_data ) ) {
+			return $meta_data;
+		}
+
+		$_meta_data = [];
+
+		foreach ( $meta_data as $meta ) {
+			$_meta_data[ $meta['key'] ] = $meta['value'];
+		}
+
+		return $_meta_data;
 
 	}
 
