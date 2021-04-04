@@ -65,6 +65,8 @@ class WC_Order_Data {
 
 		}
 
+		Log::write( 'order', $_order );
+
 		return $_order;
 
 	}
@@ -107,7 +109,7 @@ class WC_Order_Data {
 
 	public function format_meta( $object ) {
 
-		$meta_data = $object->get_meta_data();
+		$meta_data =  $object->get_meta_data();
 
 		if ( ! is_array( $meta_data ) ) {
 			return $meta_data;
@@ -116,7 +118,11 @@ class WC_Order_Data {
 		$_meta_data = [];
 
 		foreach ( $meta_data as $meta ) {
-			$_meta_data[ $meta['key'] ] = $meta['value'];
+
+			$data = $meta->get_data();
+
+			$_meta_data[ $data['key'] ] = $data['value'];
+
 		}
 
 		return $_meta_data;
