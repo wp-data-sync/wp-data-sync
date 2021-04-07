@@ -29,16 +29,3 @@ add_action( 'set_object_terms', 'WP_DataSync\App\item_updated', 20, 1 );
 function item_updated( $item_id ) {
 	ItemRequest::delete_id( $item_id );
 }
-
-add_action( 'updated_postmeta', 'WP_DataSync\App\meta_updated', 20, 2 );
-
-/**
- * Delete item ID from DB.
- *
- * @param $meta_id
- * @param $item_id
- */
-
-function meta_updated( $meta_id, $item_id ) {
-	ItemRequest::delete_id( $item_id );
-}

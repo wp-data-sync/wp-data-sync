@@ -1,0 +1,20 @@
+.misc-pub-section.wpds-synced {
+	padding: 10px 16px;
+}
+
+.misc-pub-section.wpds-synced div {
+	width: 100%;
+	padding-top: 6px;
+	padding-bottom: 6px;
+	background-color: #592c85;
+	border-radius: 6px;
+	color: #FFFFFF;
+	text-align: center;
+}
+
+.misc-pub-section.wpds-synced svg {
+	fill: #FFFFFF;
+	height: 10px;
+	width: 10px;
+	margin-right: 3px;
+}

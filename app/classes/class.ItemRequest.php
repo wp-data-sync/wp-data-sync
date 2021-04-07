@@ -576,6 +576,35 @@ class ItemRequest extends Access {
 	}
 
 	/**
+	 * Has synced.
+	 *
+	 * @return bool
+	 */
+
+	public static function has_synced() {
+
+		global $wpdb;
+
+		$table = self::table();
+
+		$has_synced = $wpdb->get_var( $wpdb->prepare(
+			"
+			SELECT id 
+			FROM $table
+			WHERE item_id = %d
+			",
+			get_the_id()
+		) );
+
+		if ( null === $has_synced || is_wp_error( $has_synced ) ) {
+			return FALSE;
+		}
+
+		return TRUE;
+
+	}
+
+	/**
 	 * Truncate Item Request table.
 	 */
 

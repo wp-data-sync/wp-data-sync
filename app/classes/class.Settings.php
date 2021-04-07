@@ -96,7 +96,8 @@ class Settings {
 	 */
 
 	public function scripts() {
-		wp_register_style( 'jquery-ui-min', WP_DATA_SYNC_ASSETS . 'css/jquery-ui.min.css' );
+		wp_register_style( 'jquery-ui-min', WP_DATA_SYNC_ASSETS . 'css/jquery-ui.min.css', [], WP_DATA_SYNC_VERSION );
+		wp_enqueue_style( 'wpds_admin', WP_DATA_SYNC_ASSETS . 'css/admin.css', [], WP_DATA_SYNC_VERSION );
 	}
 
 	/**
