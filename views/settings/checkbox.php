@@ -18,9 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 <input
 	type="checkbox"
 	value="checked"
-	name="<?php esc_attr_e( $args['key'] ); ?>"
-	id="<?php esc_attr_e( $args['key'] ); ?>"
-	class="<?php esc_attr_e( $args['class'] ); ?>"
+	name="<?php esc_attr_e( $key ); ?>"
+	id="<?php esc_attr_e( $key ); ?>"
+	class="<?php esc_attr_e( $class ); ?>"
 	<?php esc_attr_e( $value ); ?>
 >
 

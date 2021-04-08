@@ -13,9 +13,7 @@ namespace WP_DataSync\App;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	return;
-}
-
-extract( $args ); ?>
+} ?>
 
 <?php foreach ( $options as $option ) { ?>
 

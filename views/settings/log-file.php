@@ -15,8 +15,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	return;
 }
 
-extract( $args );
-
 if ( ! $files ) {
 
 	printf( '%s', esc_html( __( 'You must allow logging so a log file can be created.', 'wp-data-sync' ) ) );

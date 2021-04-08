@@ -16,12 +16,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 } ?>
 
 <input
-	type="<?php esc_attr_e( $args['type'] ); ?>"
-	name="<?php esc_attr_e( $args['key'] ); ?>"
-	id="<?php esc_attr_e( $args['key'] ); ?>"
+	type="<?php esc_attr_e( $type ); ?>"
+	name="<?php esc_attr_e( $key ); ?>"
+	id="<?php esc_attr_e( $key ); ?>"
 	value="<?php esc_attr_e( $value ); ?>"
-	class="<?php esc_attr_e( $args['class'] ); ?>"
-	placeholder="<?php esc_attr_e( $args['placeholder'] ); ?>"
+	class="<?php esc_attr_e( $class ); ?>"
+	placeholder="<?php esc_attr_e( $placeholder ); ?>"
 >
 
 <?php toottip( $args ); ?>

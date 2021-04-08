@@ -18,3 +18,18 @@
 	width: 10px;
 	margin-right: 3px;
 }
+
+.wpds-tooltip {
+	color: #222;cursor: pointer;
+}
+
+.wpds-message {
+	padding-left: 10px;
+}
+
+.wpds-help-buttons {
+	padding: 20px 0;
+}
+.wpds-help-buttons .button-primary {
+	margin-bottom: 10px;
+}

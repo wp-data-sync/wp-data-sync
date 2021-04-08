@@ -35,6 +35,8 @@ __Data Source Types__
 &#x2611; JSON
 &#x2611; XML
 &#x2611; CSV
+&#x2611; FTP
+&#x2611; Webhook
 &#x2611; Google Sheets
 &#x2611; WordPress Website
 &#x2611; WooCommerce Website

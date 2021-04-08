@@ -15,11 +15,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	return;
 } ?>
 
-<style>
-	.wpds-tooltip {color: #222;cursor: pointer;}
-	.wpds-message {padding-left: 10px;}
-</style>
-
 <script>
 	jQuery(document).ready(function($) {
 		$( '.wpds-tooltip' ).tooltip({
@@ -37,18 +32,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<?php do_action( 'wp_data_sync_help_buttons' ); ?>
 
-	<form method="post" action="options.php?<?php esc_attr_e( $this->active_tab ); ?>=<?php esc_attr_e( $this->group ); ?>">
+	<?php view( 'settings/admin-tabs', $args ); ?>
 
-		<?php $this->admin_tabs(); ?>
+	<form method="post" action="options.php?<?php esc_attr_e( $active_tab ); ?>=<?php esc_attr_e( $group ); ?>">
 
 		<table class="form-table">
 
 			<tbody>
 
-				<?php settings_fields( $this->group ); ?>
+				<?php settings_fields( $group ); ?>
 
-				<?php do_settings_sections( $this->group ); ?>
-				<?php do_settings_fields( WP_DATA_SYNC_CAP, $this->group ); ?>
+				<?php do_settings_sections( $group ); ?>
+				<?php do_settings_fields( WP_DATA_SYNC_CAP, $group ); ?>
 
 			</tbody>
 

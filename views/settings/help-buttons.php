@@ -13,16 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	return;
 } ?>
 
-<style>
-	.wpds-help-buttons {
-		padding: 20px 0;
-	}
-	.wpds-help-buttons .button-primary {
-		margin-bottom: 10px;
-	}
-</style>
-
-<div class="wpds-help-buttons">
+<p class="wpds-help-buttons">
 
 	<a href="https://wpdatasync.com/products/?affid=admin" class="button-primary" target="_blank">
 		<?php _e( 'Products', 'wp-data-sync' ); ?>
@@ -36,4 +27,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?php _e( 'Documentation', 'wp-data-sync' ); ?>
 	</a>
 
-</div>
+</p>

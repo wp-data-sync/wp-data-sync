@@ -13,16 +13,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 	return;
 } ?>
 
-<nav class="nav-tab-wrapper">
+<p>
+	<nav class="nav-tab-wrapper">
 
-    <?php foreach ( $tabs as $tab ) { ?>
+        <?php foreach ( $tabs as $tab ) { ?>
 
-    	<?php $status = $this->tab_status( $tab ); ?>
+    	    <?php $status = $settings->tab_status( $tab ); ?>
 
-		<a href="<?php printf( '%s', esc_url( $href ) ); ?><?php esc_attr_e( $tab['id'] ); ?>" class="nav-tab <?php esc_attr_e( $status ); ?>">
-			<?php esc_html_e( $tab['label'] ); ?>
-		</a>
+			<?php printf( '
+				<a href="%s%s" class="nav-tab %s %s">%s</a>',
+		        esc_url( $href ),
+		        esc_attr( $tab['id'] ),
+		        esc_attr( $tab['id'] ),
+		        esc_attr( $status ),
+		        esc_html( $tab['label'] )
+	        ); ?>
 
-    <?php } ?>
+     <?php } ?>
 
-</nav>
+	</nav>
+</p>

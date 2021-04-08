@@ -163,48 +163,21 @@ class Settings {
 			wp_die( __( 'You do not have sufficient permissions to access this page.', 'wp-data-sync' ) );
 		}
 
+		remove_all_actions( 'admin_notices' );
+		remove_all_actions( 'all_admin_notices' );
+
 		wp_enqueue_style( 'jquery-ui-min' );
 		wp_enqueue_script( 'jquery-ui-tooltip' );
 
-		if ( $view = $this->view( 'settings/page' ) ) {
-			include $view;
-		}
+		$args = [
+			'settings'   => $this,
+			'tabs'       => $this->tabs(),
+			'active_tab' => $this->active_tab,
+			'group'      => $this->group,
+			'href'       => admin_url( "admin.php?page=" . Settings::SLUG . "&{$this->active_tab}=" )
+		];
 
-	}
-
-	/**
-	 * Get the view file.
-	 *
-	 * @param $name
-	 *
-	 * @return bool|string
-	 */
-
-	public function view( $name ) {
-
-		$view = $this->get_view( $name );
-
-		if ( file_exists( $view ) ) {
-			return $view;
-		}
-
-		return FALSE;
-
-	}
-
-	/**
-	 * Get path to view.
-	 *
-	 * @param $name
-	 *
-	 * @return mixed|void
-	 */
-
-	public function get_view( $name ) {
-
-		$view = WP_DATA_SYNC_VIEWS . "{$name}.php";
-
-		return apply_filters( 'wp_data_sync_view', $view, $name );
+		view( 'settings/page', $args );
 
 	}
 
@@ -217,18 +190,12 @@ class Settings {
 	public function input( $args ) {
 
 		if ( isset( $args['heading'] ) ) {
-
-			if ( $view = $this->view( 'settings/heading' ) ) {
-				include $view;
-			}
-
+			view( 'settings/heading', $args );
 		}
 
-		$value = $this->value( $args );
+		$args['value'] = $this->value( $args );
 
-		if ( $view = $this->view( "settings/{$args['basename']}" ) ) {
-			include $view;
-		}
+		view( 'settings/' . $args['basename'], $args );
 
 	}
 
@@ -278,26 +245,7 @@ class Settings {
 	 */
 
 	public function help_buttons() {
-
-		if ( $view = $this->view( 'settings/help-buttons' ) ) {
-			include $view;
-		}
-
-	}
-
-	/**
-	 * Admin tabs.
-	 */
-
-	public function admin_tabs() {
-
-		$href = admin_url( "admin.php?page=" . Settings::SLUG . "&{$this->active_tab}=" );
-		$tabs = $this->tabs();
-
-		if ( $view = $this->view( 'settings/admin-tabs' ) ) {
-			include $view;
-		}
-
+		view( 'settings/help-buttons' );
 	}
 
 	/**
@@ -307,9 +255,7 @@ class Settings {
 	 */
 
 	public function group() {
-
 		return isset( $_GET[ $this->active_tab ] ) ? $_GET[ $this->active_tab ] : $this->main_tab;
-
 	}
 
 	/**
