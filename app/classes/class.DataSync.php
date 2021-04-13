@@ -397,15 +397,21 @@ class DataSync {
 	/**
 	 * Post meta value.
 	 *
+	 * @since 1.6.26
+	 *        Add meta key specific filter.
+	 *
 	 * @param $meta_value
 	 * @param $meta_key
-	 * @param $post_id
 	 *
 	 * @return mixed|void
 	 */
 
 	public function post_meta_value( $meta_value, $meta_key ) {
-		return apply_filters( 'wp_data_sync_meta_value', $meta_value, $meta_key, $this->post_id, $this );
+
+		$meta_value = apply_filters( 'wp_data_sync_meta_value', $meta_value, $meta_key, $this->post_id, $this );
+
+		return apply_filters( "wp_data_sync_{$meta_key}_value", $meta_value, $this->post_id, $this );
+
 	}
 
 	/**
