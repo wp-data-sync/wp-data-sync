@@ -75,12 +75,6 @@ class DataSync {
 	 * @var bool|array
 	 */
 
-	private $product_gallery = FALSE;
-
-	/**
-	 * @var bool|array
-	 */
-
 	private $gallery_images = FALSE;
 
 	/**
@@ -1165,19 +1159,6 @@ class DataSync {
 
 	public function get_variations() {
 		return $this->variations;
-	}
-
-	/**
-	 * Get the product gallery.
-	 *
-	 * @since 1.6.0 Deprecated
-	 * @use   DataSync::get_gallery_images instaed
-	 *
-	 * @return array|bool
-	 */
-
-	public function get_product_gallery() {
-		return $this->product_gallery;
 	}
 
 	/**

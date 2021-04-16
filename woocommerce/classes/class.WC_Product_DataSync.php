@@ -91,14 +91,6 @@ class WC_Product_DataSync {
 			$this->variations( $product_id, $variations );
 		}
 
-		/**
-		 * @since 1.6.0 Deprecated
-		 * @use   WC+Product_DataSync::gallery_images instaed
-		 */
-		if ( $product_gallery = $this->data_sync->get_product_gallery() ) {
-			$this->product_gallery( $product_id, $product_gallery );
-		}
-
 		if ( $gallery_images = $this->data_sync->get_gallery_images() ) {
 			$this->gallery_images( $product_id, $gallery_images );
 		}
@@ -347,39 +339,6 @@ class WC_Product_DataSync {
 	}
 
 	/**
-	 * Create a WooCommerce image gallery.
-	 *
-	 * @since 1.6.0 Deprecated
-	 * @use   WC+Product_DataSync::gallery_images instaed
-	 *
-	 * @param $product_id
-	 * @param $product_gallery
-	 */
-
-	public function product_gallery( $product_id, $product_gallery ) {
-
-		$attach_ids = [];
-
-		foreach ( $product_gallery as $image_url ) {
-
-			$image_url = apply_filters( 'wp_data_sync_product_gallery_image_url', $image_url );
-
-			if ( $attach_id = $this->data_sync->attachment( $product_id, $image_url ) ) {
-				$attach_ids[] = $attach_id;
-			}
-
-		}
-
-		$product_gallery_ids = apply_filters( 'wp_data_sync_product_gallery_ids', join( ',', $attach_ids ) );
-		$product_gallery_key = apply_filters( 'wp_data_sync_product_gallery_meta_key', '_product_image_gallery' );
-
-		update_post_meta( $product_id, $product_gallery_key, $product_gallery_ids );
-
-		do_action( 'wp_data_sync_product_gallery', $product_id, $product_gallery );
-
-	}
-
-	/**
 	 * Gallery images.
 	 *
 	 * @since 1.6.0
@@ -402,12 +361,12 @@ class WC_Product_DataSync {
 
 		}
 
-		$product_gallery_ids = apply_filters( 'wp_data_sync_product_gallery_images__ids', join( ',', $attach_ids ), $product_id );
-		$product_gallery_key = apply_filters( 'wp_data_sync_product_gallery_images_meta_key', '_product_image_gallery', $product_id );
+		$gallery_ids = apply_filters( 'wp_data_sync_gallery_image_ids', $attach_ids, $product_id );
+		$gallery_key = apply_filters( 'wp_data_sync_gallery_image_meta_key', '_product_image_gallery', $product_id );
 
-		update_post_meta( $product_id, $product_gallery_key, $product_gallery_ids );
+		update_post_meta( $product_id, $gallery_key, join( ',', $gallery_ids ) );
 
-		do_action( 'wp_data_sync_product_gallery_images', $product_id, $gallery_images );
+		do_action( 'wp_data_sync_gallery_images', $product_id, $gallery_images );
 
 	}
 
