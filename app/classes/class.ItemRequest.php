@@ -40,6 +40,12 @@ class ItemRequest extends Access {
 	private $post_type;
 
 	/**
+	 * @var string
+	 */
+
+	private $api_id;
+
+	/**
 	 * @var integer
 	 */
 
@@ -85,7 +91,7 @@ class ItemRequest extends Access {
 
 		register_rest_route(
 			'wp-data-sync/' . WP_DATA_SYNC_EP_VERSION,
-			'/get-item/(?P<access_token>\S+)/(?P<post_type>\S+)/(?P<limit>\d+)/(?P<cache_buster>\S+)/',
+			'/get-item/(?P<access_token>\S+)/(?P<post_type>\S+)/(?P<limit>\d+)/(?P<api_id>\S+)/',
 			[
 				'methods' => WP_REST_Server::READABLE,
 				'args'    => [
@@ -101,10 +107,9 @@ class ItemRequest extends Access {
 						'sanitize_callback' => 'intval',
 						'validate_callback' => [ $this, 'limit' ]
 					],
-					'cache_buster' => [
-						'validate_callback' => function( $param ) {
-							return is_string( $param );
-						}
+					'api_id' => [
+						'sanitize_callback' => 'sanitize_text_field',
+						'validate_callback' => [ $this, 'api_id' ]
 					]
 				],
 				'permission_callback' => [ $this, 'access' ],
@@ -123,14 +128,6 @@ class ItemRequest extends Access {
 	 */
 
 	public function request() {
-
-		if ( 'refresh' === $this->post_type ) {
-
-			$this->truncate_table();
-
-			return rest_ensure_response( FALSE );
-
-		}
 
 		$response = $this->get_items();
 
@@ -151,6 +148,24 @@ class ItemRequest extends Access {
 	public function post_type( $post_type ) {
 
 		$this->post_type = sanitize_text_field( $post_type );
+
+		return TRUE;
+
+	}
+
+	/**
+	 * Set API ID.
+	 *
+	 * @param $api_id
+	 *
+	 * @return bool
+	 */
+
+	public function api_id( $api_id ) {
+
+		$api_id = sanitize_text_field( $api_id );
+
+		$this->api_id = strstr( $api_id, '~', TRUE );
 
 		return TRUE;
 
@@ -276,15 +291,15 @@ class ItemRequest extends Access {
 		$status       = get_option( 'wp_data_sync_item_request_status', [ 'publish' ] );
 		$count        = count( $status );
 		$placeholders = join( ', ', array_fill( 0, $count, '%s' ) );
-		$args         = array_merge( [ $this->post_type ], $status, [ $this->limit ] );
+		$args         = array_merge( [ $this->api_id, $this->post_type ], $status, [ $this->limit ] );
 
 		$sql = $wpdb->prepare(
 			"
 			SELECT SQL_NO_CACHE SQL_CALC_FOUND_ROWS  p.ID 
 			FROM {$wpdb->prefix}posts p
 			LEFT JOIN $table i
-			ON (p.ID = i.item_id) 
-			WHERE (i.item_id IS NULL) 
+			ON (p.ID = i.item_id AND i.api_id = %s) 
+			WHERE i.item_id IS NULL 
 			AND p.post_type = %s 
 			AND p.post_status IN ( $placeholders )
 			GROUP BY p.ID 
@@ -539,7 +554,10 @@ class ItemRequest extends Access {
 
 		$wpdb->insert(
 			self::table(),
-			[ 'item_id' => $item_id ]
+			[
+				'item_id' => $item_id,
+				'api_id'  => $this->api_id
+			]
 		);
 
 	}
@@ -605,20 +623,6 @@ class ItemRequest extends Access {
 	}
 
 	/**
-	 * Truncate Item Request table.
-	 */
-
-	private function truncate_table() {
-
-		global $wpdb;
-
-		$table = self::table();
-
-		$wpdb->query( "TRUNCATE TABLE $table" );
-
-	}
-
-	/**
 	 * Create the item request table.
 	 */
 
@@ -631,10 +635,13 @@ class ItemRequest extends Access {
 		$charset_collate = $wpdb->get_charset_collate();
         $table           = self::table();
 
+        $wpdb->query( "DROP TABLE IF EXISTS $table" );
+
 		$sql = "
 			CREATE TABLE IF NOT EXISTS $table (
   			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   			item_id bigint(20) NOT NULL,
+  			api_id varchar(100) NOT NULL,
   			PRIMARY KEY (id),
 			KEY item_id (item_id)
 			) $charset_collate;
