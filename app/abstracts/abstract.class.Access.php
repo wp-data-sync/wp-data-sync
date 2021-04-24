@@ -29,18 +29,8 @@ abstract class Access {
 
 			if ( $referer = $this->referer() ) {
 
-				Log::write( 'access-attempt', "Referer Captured: $referer" );
-
-				$api_url = get_option( 'wp_data_sync_api_url' );
-
-				if ( $referer === untrailingslashit( $api_url ) ) {
-
-					Log::write( 'access-attempt', "Referer Approved: $referer" );
-
-					if ( $this->private_key() ) {
-						return TRUE;
-					}
-
+				if ( $this->private_key() ) {
+					return TRUE;
 				}
 
 			}
@@ -128,7 +118,7 @@ abstract class Access {
 	/**
 	 * Get the HTTP referer header.
 	 *
-	 * @return bool|string
+	 * @return bool
 	 */
 
 	public function referer() {
@@ -139,9 +129,9 @@ abstract class Access {
 			return FALSE;
 		}
 
-		Log::write( 'access-attempt', "Referer Available: $referer" );
+		Log::write( 'access-attempt', "Referer: $referer" );
 
-		return untrailingslashit( $referer );
+		return TRUE;
 
 	}
 

@@ -359,19 +359,6 @@ class Settings {
 					]
 				],
 				1 => (object) [
-					'key' 		=> 'wp_data_sync_api_url',
-					'label'		=> __( 'API URL', 'wp-data-sync' ),
-					'callback'  => 'input',
-					'args'      => [
-						'sanitize_callback' => 'sanitize_text_field',
-						'basename'          => 'text-input',
-						'type'		        => 'url',
-						'class'		        => 'regular-text',
-						'placeholder'       => __( 'https://domain.com', 'wp-data-sync' ),
-						'info'              => __( 'The URL of your WP Data Sync API account.' )
-					]
-				],
-				2 => (object) [
 					'key' 		=> 'wp_data_sync_access_token',
 					'label'		=> __( 'API Access Token', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -383,7 +370,7 @@ class Settings {
 						'placeholder'       => ''
 					]
 				],
-				3 => (object) [
+				2 => (object) [
 					'key' 		=> 'wp_data_sync_private_token',
 					'label'		=> __( 'API Private Token', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -395,7 +382,7 @@ class Settings {
 						'placeholder'       => ''
 					]
 				],
-				4 => (object) [
+				3 => (object) [
 					'key' 		=> 'wp_data_sync_auto_update',
 					'label'		=> __( 'Automatically Update Plugin', 'wp-data-sync' ),
 					'callback'  => 'input',
