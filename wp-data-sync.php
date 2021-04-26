@@ -37,7 +37,7 @@ $defines = [
 	'WP_DATA_SYNC_VIEWS'      => plugin_dir_path( __FILE__ ) . 'views/',
 	'WP_DATA_SYNC_ASSETS'     => plugins_url( 'assets/', __FILE__ ),
 	'WP_DATA_SYNC_LOG_DIR'    => $uploads['basedir'] . '/wp-data-sync-logs/',
-	'WP_DATA_SYNC_EP_VERSION' => 'v1'
+	'WP_DATA_SYNC_EP_VERSION' => 'v2'
 ];
 
 foreach ( $defines as $define => $value ) {
