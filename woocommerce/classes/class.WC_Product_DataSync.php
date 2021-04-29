@@ -110,42 +110,38 @@ class WC_Product_DataSync {
 
 	public function price( $product_id, $post_meta ) {
 
-		if ( isset( $post_meta['_regular_price'] ) ) {
+		extract( $post_meta );
 
-			$regular_price = wc_format_decimal( $post_meta['_regular_price'] );
+		if ( isset( $_regular_price ) ) {
 
-			LOg::write( 'product-price', "Product ID: $product_id Regular Price: $regular_price" );
+			LOg::write( 'product-price', "Product ID: $product_id Regular Price: $_regular_price" );
 
-			update_post_meta( $product_id, '_regular_price', $regular_price );
+			$this->data_sync->post_meta( $product_id, [ '_regular_price' => $_regular_price ] );
 
-			if ( ! empty( $regular_price ) ) {
-				update_post_meta( $product_id, '_price', $regular_price );
+			if ( ! empty( $_regular_price ) ) {
+				$this->data_sync->post_meta( $product_id, [ '_price' => $_regular_price ] );
 			}
 
 		}
 
-		if ( isset( $post_meta['_sale_price'] ) ) {
+		if ( isset( $_sale_price ) ) {
 
-			$sale_price = wc_format_decimal( $post_meta['_sale_price'] );
+			LOg::write( 'product-price', "Product ID: $product_id Sale Price: $_sale_price" );
 
-			LOg::write( 'product-price', "Product ID: $product_id Sale Price: $sale_price" );
+			$this->data_sync->post_meta( $product_id, [ '_sale_price' => $_sale_price ] );
 
-			update_post_meta( $product_id, '_sale_price', $sale_price );
-
-			if ( ! empty( $sale_price ) ) {
-				update_post_meta( $product_id, '_price', $sale_price );
+			if ( ! empty( $_sale_price ) ) {
+				$this->data_sync->post_meta( $product_id, [ '_price' => $_sale_price ] );
 			}
 
 		}
 
-		if ( isset( $post_meta['_price'] ) ) {
+		if ( isset( $_price ) ) {
 
-			$price = wc_format_decimal( $post_meta['_price'] );
+			LOg::write( 'product-price', "Product ID: $product_id Price: $_price" );
 
-			LOg::write( 'product-price', "Product ID: $product_id Price: $price" );
-
-			if ( ! empty( $price ) ) {
-				update_post_meta( $product_id, '_price', $price );
+			if ( ! empty( $_price ) ) {
+				$this->data_sync->post_meta( $product_id, [ '_price' => $_price ] );
 			}
 
 		}
