@@ -31,7 +31,7 @@ foreach ( glob( plugin_dir_path( __FILE__ ) . '**/*.php' ) as $file ) {
 
 add_action( 'rest_api_init', function() {
 
-	if ( Settings::is_checked( 'wp_data_sync_orders' ) ) {
+	if ( Settings::is_checked( 'wp_data_sync_order_sync_active' ) ) {
 		WC_Order_DataRequest::instance()->register_route();
 	}
 

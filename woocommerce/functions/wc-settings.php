@@ -62,25 +62,24 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 					'placeholder'       => '',
 					'info'              => __( 'This relates the IDs from your data source with the IDs from your website. Please note, if the related product does not exist, this system will relate the product when it is created in the data sync.' )
 				]
-			],
-			4 => (object) [
-				'key' 		=> 'wp_data_sync_orders',
-				'label'		=> __( 'Sync Orders', 'wp-data-sync' ),
+			]
+		],
+		'orders' => [
+			0 => (object) [
+				'key' 		=> 'wp_data_sync_order_sync_active',
+				'label'		=> __( 'Activate Order Sync', 'wp-data-sync' ),
 				'callback'  => 'input',
 				'args'      => [
 					'sanitize_callback' => 'sanitize_text_field',
 					'basename'          => 'checkbox',
-					'selected'          => get_option( 'wp_data_sync_orders' ),
-					'name'              => 'wp_data_sync_orders',
+					'tyoe'              => '',
 					'class'             => 'sync-orders',
-					'value'             => 'checked',
+					'placeholder'       => '',
 					'info'              => __( 'Sync order details using the WP Data Sync API.')
 				]
-			]
-		],
-		'sync_orders' => [
-			0 => (object) [
-				'key'      => 'wp_data_sync_orders_webhook_url',
+			],
+			1 => (object) [
+				'key'      => 'wp_data_sync_order_webhook_url',
 				'label'    => __( 'Orders Webhook URL', 'wp-data-sync' ),
 				'callback' => 'input',
 				'args'      => [
@@ -89,20 +88,6 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 					'type'		        => 'text',
 					'class'		        => 'regular-text',
 					'placeholder'       => ''
-				]
-			],
-			1 => (object) [
-				'key'      => 'wp_data_sync_existingl_orders',
-				'label'    => __( 'Sync all existing orders', 'wp-data-sync' ),
-				'callback' => 'input',
-				'args'      => [
-					'sanitize_callback' => 'sanitize_text_field',
-					'basename'          => 'checkbox',
-					'type'		        => '',
-					'class'		        => '',
-					'placeholder'       => '',
-					'msg'               => WC_Order_StageOrder::count_msg(),
-					'info'              => __( 'Schedule a task to sync existing orders in small batches. This setting will reset itself when all orders have been processed.', 'wp-data-sync' )
 				]
 			],
 			2 => (object) [
@@ -125,13 +110,23 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 						'refunded'   => __( 'Refunded', 'woocommerce' )
 					]
 				]
+			],
+			3 => (object) [
+				'key'      => 'wp_data_sync_order_sync_existing',
+				'label'    => __( 'Sync all existing orders now', 'wp-data-sync' ),
+				'callback' => 'input',
+				'args'      => [
+					'sanitize_callback' => 'sanitize_text_field',
+					'basename'          => 'checkbox',
+					'type'		        => '',
+					'class'		        => '',
+					'placeholder'       => '',
+					'msg'               => WC_Order_StageOrder::count_msg(),
+					'info'              => __( 'Schedule a task to sync existing orders in small batches. This setting will reset itself when all orders have been processed.', 'wp-data-sync' )
+				]
 			]
 		]
 	] );
-
-	if ( 'checked' !== get_option( 'wp_data_sync_orders' ) ) {
-		unset( $settings['sync_orders'] );
-	}
 
 	return $settings;
 

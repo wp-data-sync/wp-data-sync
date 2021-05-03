@@ -11,9 +11,11 @@
 
 namespace WP_DataSync\Woo;
 
+use WP_DataSync\App\Settings;
+
 add_action( 'woocommerce_order_status_changed', function( $order_id, $status_from, $status_to ) {
 
-	if ( 'checked' !== get_option( 'wp_data_sync_orders' ) ) {
+	if ( ! Settings::is_checked( 'wp_data_sync_order_sync_active' ) ) {
 		return;
 	}
 

@@ -11,7 +11,7 @@
 
 namespace WP_DataSync\Woo;
 
-add_action( 'update_option_wp_data_sync_existingl_orders', function( $old_value, $value, $option ) {
+add_action( 'update_option_wp_data_sync_order_sync_existing', function( $old_value, $value, $option ) {
 
 	$stage_order = WC_Order_StageOrder::instance();
 

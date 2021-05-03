@@ -13,7 +13,7 @@ namespace WP_DataSync\Woo;
 
 add_action( 'wp_data_sync_stage_order_event', function() {
 
-	if ( 'checked' !== get_option( 'wp_data_sync_orders' ) ) {
+	if ( ! Settings::is_checked( 'wp_data_sync_order_sync_active' ) ) {
 		return;
 	}
 
@@ -30,7 +30,7 @@ add_action( 'wp_data_sync_stage_order_event', function() {
 		// If no more orders to stage.
 		// Unset stage existing orders.
 		// This will trigger truncate table and delete cron event.
-		update_option( 'wp_data_sync_existingl_orders', '' );
+		update_option( 'wp_data_sync_order_sync_existing', '' );
 	}
 
 } );
