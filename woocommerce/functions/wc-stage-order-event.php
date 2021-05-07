@@ -11,6 +11,8 @@
 
 namespace WP_DataSync\Woo;
 
+use WP_DataSync\App\Settings;
+
 add_action( 'wp_data_sync_stage_order_event', function() {
 
 	if ( ! Settings::is_checked( 'wp_data_sync_order_sync_active' ) ) {
