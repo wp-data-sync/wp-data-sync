@@ -102,7 +102,7 @@ class WC_Order_StageOrder {
 	protected function endpoint() {
 
 		if ( $webhook_url = get_option( 'wp_data_sync_order_webhook_url' ) ) {
-			return trailingslashit( trailingslashit( $webhook_url ) . $this->order_id );
+			return sprintf( $webhook_url, WP_DATA_SYNC_EP_VERSION, $this->order_id );
 		}
 
 		return FALSE;

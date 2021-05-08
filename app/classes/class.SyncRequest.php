@@ -107,8 +107,8 @@ class SyncRequest extends Access {
 		$start_request = microtime();
 		$response      = [];
 		$data_sync     = DataSync::instance();
-		$raw_data      = $request->get_params();
-		$data          = $this->request_data( $raw_data );
+		$json          = $request->get_body();
+		$data          = $this->request_data( $json );
 
 		if ( isset( $data['items'] ) && is_array( $data['items'] ) ) {
 
@@ -139,18 +139,25 @@ class SyncRequest extends Access {
 	/**
 	 * Request data.
 	 *
-	 * @param $raw_data
+	 * @param $json
 	 *
 	 * @return mixed|void
 	 */
 
-	public function request_data( $raw_data ) {
+	public function request_data( $json ) {
 
-		Log::write( 'request-raw-data', $raw_data );
+		Log::write( 'sync-request-data', 'Sync Request JSON' );
+		Log::write( 'sync-request-data', $json );
 
-		$data = $this->sanitize_request( $raw_data );
+		$raw_data = json_decode( $json, TRUE );
 
-		Log::write( 'request-data', $data );
+		Log::write( 'sync-request-data', 'Sync Request Raw Data' );
+		Log::write( 'sync-request-data', $raw_data );
+
+		$data     = $this->sanitize_request( $raw_data );
+
+		Log::write( 'sync-request-data', 'Sync Request Sanitized Data' );
+		Log::write( 'sync-request-data', $data );
 
 		return apply_filters( 'wp_data_sync_data', $data );
 
