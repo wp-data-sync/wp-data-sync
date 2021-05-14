@@ -302,7 +302,7 @@ class DataSync {
 
 		if ( 0 < $this->post_id && 'trash' === $this->post_data['post_status'] ) {
 
-			if ( Settings::is_true( 'wp_data_sync_force_delete' ) ) {
+			if ( Settings::is_checked( 'wp_data_sync_force_delete' ) ) {
 
 				if ( wp_delete_post( $this->post_id, TRUE ) ) {
 					return TRUE;
