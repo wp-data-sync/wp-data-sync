@@ -21,25 +21,13 @@ class Settings {
 	 * @var Settings
 	 */
 
-	public static $instance;
-
-	/**
-	 * @var array
-	 */
-
-	public $group;
+	private static $instance;
 
 	/**
 	 * @var string
 	 */
 
-	private $main_tab = 'dashboard';
-
-	/**
-	 * @var string
-	 */
-
-	private $active_tab = 'active_tab';
+	private $active_tab = 'dashboard';
 
 	/**
 	 * Settings page slug.
@@ -52,11 +40,7 @@ class Settings {
 	 */
 
 	public function __construct() {
-
-		$this->group   = $this->group();
-
 		self::$instance = $this;
-
 	}
 
 	/**
@@ -81,6 +65,7 @@ class Settings {
 
 	public function actions() {
 
+		add_action( 'admin_init', [ $this, 'set_active_tab' ], 1 );
 		add_action( 'admin_init', [ $this, 'register_settings' ], 2 );
 		add_action( 'admin_menu', [ $this, 'add_pages' ], 5 );
 		add_action( 'wp_data_sync_help_buttons', [ $this, 'help_buttons' ] );
@@ -88,6 +73,18 @@ class Settings {
 
 		// Delete log files on setting change.
 		add_action( 'update_option_wp_data_sync_allow_logging', [ $this, 'delete_log_files' ], 10, 2 );
+
+	}
+
+	/**
+	 * Set active tab.
+	 */
+
+	public function set_active_tab() {
+
+		if ( isset( $_GET['active_tab'] ) ) {
+			$this->active_tab = sanitize_text_field( $_GET['active_tab'] );
+		}
 
 	}
 
@@ -109,31 +106,29 @@ class Settings {
 	public function tabs() {
 
 		$tabs = [
-			$this->main_tab => [
+			'dashboard' => [
 				'label' => __( 'Dashboard', 'wp-data-sync' ),
-				'id'    => $this->main_tab
 			],
 			'sync_settings' => [
 				'label' => __( 'Sync Settings', 'wp-data-sync' ),
-				'id'    => 'sync_settings'
 			],
 			'item_request' => [
 				'label' => __( 'Item Request', 'wp-data-sync' ),
-				'id'    => 'item_request'
 			]
 		];
 
 		$tabs = apply_filters( 'wp_data_sync_admin_tabs', $tabs, $this );
 
 		// Include logs as last tab.
-		$logs_tab = [
-			'logs' => [
-				'label' => __( 'Logs', 'wp-data-sync' ),
-				'id'    => 'logs'
-			]
+		$tabs['logs'] = [
+			'label' => __( 'Logs', 'wp-data-sync' ),
 		];
 
-		return array_merge( $tabs, $logs_tab );
+		foreach ( $tabs as $key => $tab ) {
+			$tabs[ $key ]['status'] = $this->tab_status( $key );
+		}
+
+		return $tabs;
 
 	}
 
@@ -170,11 +165,9 @@ class Settings {
 		wp_enqueue_script( 'jquery-ui-tooltip' );
 
 		$args = [
-			'settings'   => $this,
-			'tabs'       => $this->tabs(),
-			'active_tab' => $this->active_tab,
-			'group'      => $this->group,
-			'href'       => admin_url( "admin.php?page=" . Settings::SLUG . "&{$this->active_tab}=" )
+			'tabs'  => $this->tabs(),
+			'group' => $this->active_tab,
+			'href'  => admin_url( "admin.php?page=" . Settings::SLUG . "&active_tab=" )
 		];
 
 		view( 'settings/page', $args );
@@ -249,30 +242,16 @@ class Settings {
 	}
 
 	/**
-	 * Group.
-	 *
-	 * @return string
-	 */
-
-	public function group() {
-		return isset( $_GET[ $this->active_tab ] ) ? $_GET[ $this->active_tab ] : $this->main_tab;
-	}
-
-	/**
 	 * Tab status.
 	 *
-	 * @param $tab
+	 * @param $key
 	 *
 	 * @return string
 	 */
 
-	public function tab_status( $tab ) {
+	public function tab_status( $key ) {
 
-		if ( ! isset( $_GET[ $this->active_tab ] ) && $this->main_tab === $tab['id'] ) {
-			return 'nav-tab-active';
-		}
-
-		if ( isset( $_GET[ $this->active_tab ] ) && $_GET[ $this->active_tab ] === $tab['id'] ) {
+		if ( $this->active_tab === $key ) {
 			return 'nav-tab-active';
 		}
 
@@ -291,48 +270,20 @@ class Settings {
 		foreach ( $options as $option ) {
 
 			// Add the key into the args array
-			$option->args['key'] = $option->key;
+			$option['args']['key'] = $option['key'];
 
-			register_setting( $this->group, $option->key, $option->args );
+			register_setting( $this->active_tab, $option['key'], $option['args'] );
 
-			if ( 'section' === $option->callback ) {
-
-				add_settings_section(
-					$option->key,
-					$option->label,
-					[ $this, $option->callback ],
-					$this->group
-				);
-
-			}
-			else {
-
-				add_settings_field(
-					$option->key,
-					$option->label,
-					[ $this, $option->callback ],
-					WP_DATA_SYNC_CAP,
-					$this->group,
-					$option->args
-				);
-
-			}
+			add_settings_field(
+				$option['key'],
+				$option['label'],
+				[ $this, $option['callback'] ],
+				WP_DATA_SYNC_CAP,
+				$this->active_tab,
+				$option['args']
+			);
 
 		}
-
-	}
-
-	/**
-	 * Get the plugin options.
-	 *
-	 * @return array|mixed
-	 */
-
-	public function get_options() {
-
-		$options = $this->options();
-
-		return isset( $options[ $this->group ] ) ? $options[ $this->group ] : [];
 
 	}
 
@@ -342,11 +293,11 @@ class Settings {
 	 * @return array
 	 */
 
-	public function options() {
+	private function get_options() {
 
-		$options = [
+		$options = apply_filters( 'wp_data_sync_settings', [
 			'dashboard' => [
-				0 => (object) [
+				0 => [
 					'key' 		=> 'wp_data_sync_allowed',
 					'label'		=> __( 'Allow Data Sync API Access', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -358,7 +309,7 @@ class Settings {
 						'placeholder'       => ''
 					]
 				],
-				1 => (object) [
+				1 => [
 					'key' 		=> 'wp_data_sync_access_token',
 					'label'		=> __( 'API Access Token', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -370,7 +321,7 @@ class Settings {
 						'placeholder'       => ''
 					]
 				],
-				2 => (object) [
+				2 => [
 					'key' 		=> 'wp_data_sync_private_token',
 					'label'		=> __( 'API Private Token', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -382,7 +333,7 @@ class Settings {
 						'placeholder'       => ''
 					]
 				],
-				3 => (object) [
+				3 => [
 					'key' 		=> 'wp_data_sync_auto_update',
 					'label'		=> __( 'Automatically Update Plugin', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -397,7 +348,7 @@ class Settings {
 				]
 			],
 			'sync_settings' => [
-				0 => (object) [
+				0 => [
 					'key' 		=> 'wp_data_sync_post_title',
 					'label'		=> __( 'Default Title', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -409,7 +360,7 @@ class Settings {
 						'placeholder'       => ''
 					]
 				],
-				1 => (object) [
+				1 => [
 					'key' 		=> 'wp_data_sync_post_author',
 					'label'		=> __( 'Default Author', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -422,7 +373,7 @@ class Settings {
 						'class'             => 'default-author widefat'
 					]
 				],
-				2 => (object) [
+				2 => [
 					'key' 		=> 'wp_data_sync_post_status',
 					'label'		=> __( 'Default Status', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -442,7 +393,7 @@ class Settings {
 						]
 					]
 				],
-				3 => (object) [
+				3 => [
 					'key' 		=> 'wp_data_sync_post_type',
 					'label'		=> __( 'Default Type', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -455,7 +406,7 @@ class Settings {
 						'values'            => get_post_types()
 					]
 				],
-				4 => (object) [
+				4 => [
 					'key' 		=> 'wp_data_sync_append_terms',
 					'label'		=> __( 'Append Terms', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -471,7 +422,7 @@ class Settings {
 						]
 					]
 				],
-				5 => (object) [
+				5 => [
 					'key' 		=> 'wp_data_sync_sync_term_desc',
 					'label'		=> __( 'Sync Term Description', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -487,7 +438,7 @@ class Settings {
 						]
 					]
 				],
-				6 => (object) [
+				6 => [
 					'key' 		=> 'wp_data_sync_sync_term_thumb',
 					'label'		=> __( 'Sync Term Thumbnail', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -503,7 +454,7 @@ class Settings {
 						]
 					]
 				],
-				7 => (object) [
+				7 => [
 					'key' 		=> 'wp_data_sync_sync_term_meta',
 					'label'		=> __( 'Sync Term Meta', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -519,7 +470,7 @@ class Settings {
 						]
 					]
 				],
-				8 => (object) [
+				8 => [
 					'key' 		=> 'wp_data_sync_force_delete',
 					'label'		=> __( 'Force Delete', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -532,7 +483,7 @@ class Settings {
 						'info'              => __( 'When synced items have the trash status permanently delete the items and all related data.' )
 					]
 				],
-				9 => (object) [
+				9 => [
 					'key' 		=> 'wp_data_sync_allow_unsecure_images',
 					'label'		=> __( 'Allow Unsecure Images', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -545,7 +496,7 @@ class Settings {
 						'info'              => __( 'Allow images without valid SSL certificates to be imported.' )
 					]
 				],
-				10 => (object) [
+				10 => [
 					'key' 		=> 'wp_data_sync_replace_post_content_images',
 					'label'		=> __( 'Replace Images in Content', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -558,7 +509,7 @@ class Settings {
 						'info'              => __( 'Replace all valid full image URLs. This will make a copy of the images in this websites media library and replace the image URLs in the content.' )
 					]
 				],
-				11 => (object) [
+				11 => [
 					'key' 		=> 'wp_data_sync_replace_post_excerpt_images',
 					'label'		=> __( 'Replace Images in Excerpt', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -573,7 +524,7 @@ class Settings {
 				]
 			],
 			'item_request' => [
-				0 => (object) [
+				0 => [
 					'key' 		=> 'wp_data_sync_item_request_access_token',
 					'label'		=> __( 'Item Request Access Token', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -585,7 +536,7 @@ class Settings {
 						'placeholder'       => ''
 					]
 				],
-				1 => (object) [
+				1 => [
 					'key' 		=> 'wp_data_sync_item_request_private_token',
 					'label'		=> __( 'Item Request Private Token', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -597,7 +548,7 @@ class Settings {
 						'placeholder'       => ''
 					]
 				],
-				2 => (object) [
+				2 => [
 					'key' 		=> 'wp_data_sync_unset_post_author',
 					'label'		=> __( 'Unset Post Author', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -610,7 +561,7 @@ class Settings {
 						'info'              => __( 'Remove the post author ID from items. This will allow the default author to be assigned when syncing data.' )
 					]
 				],
-				3 => (object) [
+				3 => [
 					'key' 		=> 'wp_data_sync_item_request_status',
 					'label'		=> __( 'Include items with status', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -634,7 +585,7 @@ class Settings {
 				]
 			],
 			'logs' => [
-				0 => (object) [
+				0 => [
 					'key' 		=> 'wp_data_sync_allow_logging',
 					'label'		=> __( 'Allow Logging', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -647,7 +598,7 @@ class Settings {
 						'info'              => __( 'We reccommend keeping this off unless you are having an issue with the data sync. If you do have an issue, please activate this before contacting support. Please note when this is deactivated all log files will be deleted.' )
 					]
 				],
-				1 => (object) [
+				1 => [
 					'key' 		=> 'wp_data_sync_log_file',
 					'label'		=> __( 'Log File', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -659,9 +610,13 @@ class Settings {
 					]
 				]
 			]
-		];
+		], $this );
 
-		return apply_filters( 'wp_data_sync_settings', $options, $this );
+		if ( isset( $options[ $this->active_tab ] ) ) {
+			return $options[ $this->active_tab ];
+		}
+
+		return [];
 
 	}
 
@@ -686,12 +641,12 @@ class Settings {
 	}
 
 	/**
-	 * Settings section.
+	 * Settings Heading.
 	 *
-	 * @param $args
+	 * @param array $args
 	 */
 
-	public function section( $args ) {
+	public function heading( $args ) {
 		return;
 	}
 

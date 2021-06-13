@@ -16,16 +16,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 <p>
 	<nav class="nav-tab-wrapper">
 
-        <?php foreach ( $tabs as $tab ) { ?>
-
-    	    <?php $status = $settings->tab_status( $tab ); ?>
+        <?php foreach ( $tabs as $id => $tab ) { ?>
 
 			<?php printf( '
 				<a href="%s%s" class="nav-tab %s %s">%s</a>',
 		        esc_url( $href ),
-		        esc_attr( $tab['id'] ),
-		        esc_attr( $tab['id'] ),
-		        esc_attr( $status ),
+		        esc_attr( $id ),
+		        esc_attr( $id ),
+		        esc_attr( $tab['status'] ),
 		        esc_html( $tab['label'] )
 	        ); ?>
 

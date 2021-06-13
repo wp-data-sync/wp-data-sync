@@ -19,7 +19,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 
 	$settings = array_merge( $settings, [
 		'woocommerce' => [
-			0 => (object) [
+			0 => [
 				'key' 		=> 'wp_data_sync_product_visibility',
 				'label'		=> __( 'Default Product Visibility', 'wp-data-sync' ),
 				'callback'  => 'input',
@@ -37,7 +37,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 					]
 				]
 			],
-			1 => (object) [
+			1 => [
 				'key' 		=> 'wp_data_sync_process_cross_sells',
 				'label'		=> __( 'Process Cross Sells', 'wp-data-sync' ),
 				'callback'  => 'input',
@@ -50,7 +50,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 					'info'              => __( 'This relates the IDs from your data source with the IDs from your website. Please note, if the related product does not exist, this system will relate the product when it is created in the data sync.' )
 				]
 			],
-			2 => (object) [
+			2 => [
 				'key' 		=> 'wp_data_sync_process_up_sells',
 				'label'		=> __( 'Process Up Sells', 'wp-data-sync' ),
 				'callback'  => 'input',
@@ -65,7 +65,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 			]
 		],
 		'orders' => [
-			0 => (object) [
+			0 => [
 				'key' 		=> 'wp_data_sync_order_sync_active',
 				'label'		=> __( 'Activate Order Sync', 'wp-data-sync' ),
 				'callback'  => 'input',
@@ -78,7 +78,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 					'info'              => __( 'Sync order details using the WP Data Sync API.')
 				]
 			],
-			1 => (object) [
+			1 => [
 				'key'      => 'wp_data_sync_order_webhook_url',
 				'label'    => __( 'Orders Webhook URL', 'wp-data-sync' ),
 				'callback' => 'input',
@@ -90,7 +90,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 					'placeholder'       => ''
 				]
 			],
-			2 => (object) [
+			2 => [
 				'key' 		=> 'wp_data_sync_order_sync_on_status',
 				'label'		=> __( 'Sync order when status is', 'wp-data-sync' ),
 				'callback'  => 'input',
@@ -111,7 +111,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 					]
 				]
 			],
-			3 => (object) [
+			3 => [
 				'key'      => 'wp_data_sync_order_sync_existing',
 				'label'    => __( 'Sync all existing orders now', 'wp-data-sync' ),
 				'callback' => 'input',

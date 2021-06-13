@@ -34,7 +34,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<?php view( 'settings/admin-tabs', $args ); ?>
 
-	<form method="post" action="options.php?<?php esc_attr_e( $active_tab ); ?>=<?php esc_attr_e( $group ); ?>">
+	<form method="post" action="options.php?active_tab=<?php esc_attr_e( $group ); ?>">
 
 		<table class="form-table">
 
@@ -42,7 +42,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 				<?php settings_fields( $group ); ?>
 
-				<?php do_settings_sections( $group ); ?>
 				<?php do_settings_fields( WP_DATA_SYNC_CAP, $group ); ?>
 
 			</tbody>
