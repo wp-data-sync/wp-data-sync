@@ -4,7 +4,7 @@
  *
  * @since   1.6.22
  *
- * @package WP_DataSync
+ * @package WP_Data_Sync
  */
 
 namespace WP_DataSync\App;

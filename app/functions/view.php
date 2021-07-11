@@ -6,7 +6,7 @@
  *
  * @since   1.0.0
  *
- * @package WP_DataSync_Api
+ * @package WP_Data_Sync_Api
  */
 
 namespace WP_DataSync\App;
@@ -20,7 +20,7 @@ function view( $path_file, $args = [] ) {
 		extract( $args );
 	}
 
-	$view = WP_DATA_SYNC_VIEWS . "$path_file.php";
+	$view = WPDSYNC_VIEWS . "$path_file.php";
 
 	$view = apply_filters( 'wp_data_sync_view', $view, $path_file );
 

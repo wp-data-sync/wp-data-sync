@@ -6,7 +6,7 @@
  *
  * @since   1.0.0
  *
- * @package WP_DataSync
+ * @package WP_Data_Sync
  */
 
 namespace WP_DataSync\App;
@@ -24,11 +24,11 @@ add_action( 'admin_init', 'WP_DataSync\App\plugin_update' );
 
 function plugin_update() {
 
-	if ( WP_DATA_SYNC_VERSION !== get_option( 'WP_DATA_SYNC_VERSION' ) ) {
+	if ( WPDSYNC_VERSION !== get_option( 'WPDSYNC_VERSION' ) ) {
 
 		ItemRequest::create_table();
 
-		update_option( 'WP_DATA_SYNC_VERSION', WP_DATA_SYNC_VERSION );
+		update_option( 'WPDSYNC_VERSION', WPDSYNC_VERSION );
 
 	}
 

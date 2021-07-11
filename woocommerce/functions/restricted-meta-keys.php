@@ -7,7 +7,7 @@
  *
  * @since   1.0.0
  *
- * @package WP_DataSync
+ * @package WP_Data_Sync
  */
 
 namespace WP_DataSync\Woo;

@@ -6,7 +6,7 @@
  *
  * @since   1.2.0
  *
- * @package WP_DataSync
+ * @package WP_Data_Sync
  */
 
 namespace WP_DataSync\App;
@@ -32,6 +32,12 @@ class ItemRequest extends Access {
 	 */
 
 	protected $private_token_key = 'wp_data_sync_item_request_private_token';
+
+	/**
+	 * @var string
+	 */
+
+	protected $permissions_key = 'wp_data_sync_allowed';
 
 	/**
 	 * @var string
@@ -90,7 +96,7 @@ class ItemRequest extends Access {
 	public function register_route() {
 
 		register_rest_route(
-			'wp-data-sync/' . WP_DATA_SYNC_EP_VERSION,
+			'wp-data-sync/' . WPDSYNC_EP_VERSION,
 			'/get-item/(?P<access_token>\S+)/(?P<post_type>\S+)/(?P<limit>\d+)/(?P<api_id>\S+)/',
 			[
 				'methods' => WP_REST_Server::READABLE,

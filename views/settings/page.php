@@ -6,7 +6,7 @@
  *
  * @since   1.0.0
  *
- * @package WP_DataSync
+ * @package WP_Data_Sync
  */
 
 namespace WP_DataSync\App;
@@ -42,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 				<?php settings_fields( $group ); ?>
 
-				<?php do_settings_fields( WP_DATA_SYNC_CAP, $group ); ?>
+				<?php do_settings_fields( WPDSYNC_CAP, $group ); ?>
 
 			</tbody>
 

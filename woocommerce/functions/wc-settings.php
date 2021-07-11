@@ -6,7 +6,7 @@
  *
  * @since   1.0.0
  *
- * @package WP_DataSync
+ * @package WP_Data_Sync
  */
 
 namespace WP_DataSync\Woo;
@@ -66,8 +66,8 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 		],
 		'orders' => [
 			0 => [
-				'key' 		=> 'wp_data_sync_order_sync_active',
-				'label'		=> __( 'Activate Order Sync', 'wp-data-sync' ),
+				'key' 		=> 'wp_data_sync_order_sync_allowed',
+				'label'		=> __( 'Allow Order Sync', 'wp-data-sync' ),
 				'callback'  => 'input',
 				'args'      => [
 					'sanitize_callback' => 'sanitize_text_field',
@@ -75,56 +75,43 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 					'tyoe'              => '',
 					'class'             => 'sync-orders',
 					'placeholder'       => '',
-					'info'              => __( 'Sync order details using the WP Data Sync API.')
+					'info'              => __( 'Allow order details to sync with the WP Data Sync API.')
 				]
 			],
 			1 => [
-				'key'      => 'wp_data_sync_order_webhook_url',
-				'label'    => __( 'Orders Webhook URL', 'wp-data-sync' ),
-				'callback' => 'input',
-				'args'      => [
-					'sanitize_callback' => 'sanitize_text_field',
-					'basename'          => 'text-input',
-					'type'		        => 'text',
-					'class'		        => 'regular-text',
-					'placeholder'       => ''
-				]
-			],
-			2 => [
-				'key' 		=> 'wp_data_sync_order_sync_on_status',
-				'label'		=> __( 'Sync order when status is', 'wp-data-sync' ),
+				'key' 		=> 'wp_data_sync_allowed_order_status',
+				'label'		=> __( 'Allowed Order Status', 'wp-data-sync' ),
 				'callback'  => 'input',
 				'args'      => [
 					'sanitize_callback' => [ $_settings, 'sanitize_array' ],
 					'basename'          => 'select-multiple',
-					'name'              => 'wp_data_sync_order_sync_on_status',
+					'name'              => 'wp_data_sync_allowed_order_status',
 					'type'		        => '',
 					'class'		        => 'wc-enhanced-select regular-text',
 					'placeholder'       => '',
-					'selected'          => get_option( 'wp_data_sync_order_sync_on_status', [] ),
-					'options'            => [
-						'pending'    => __( 'Pending', 'woocommerce' ),
-						'processing' => __( 'Processing', 'woocommerce' ),
-						'on-hold'    => __( 'On Hold', 'woocommerce' ),
-						'completed'  => __( 'Completed', 'woocommerce' ),
-						'refunded'   => __( 'Refunded', 'woocommerce' )
-					]
+					'selected'          => get_option( 'wp_data_sync_allowed_order_status', [] ),
+					'options'           => apply_filters( 'wp_data_sync_allowed_order_status', [
+						'wc-pending'    => __( 'Pending', 'woocommerce' ),
+						'wc-processing' => __( 'Processing', 'woocommerce' ),
+						'wc-on-hold'    => __( 'On Hold', 'woocommerce' ),
+						'wc-completed'  => __( 'Completed', 'woocommerce' ),
+						'wc-refunded'   => __( 'Refunded', 'woocommerce' )
+					] )
 				]
 			],
-			3 => [
-				'key'      => 'wp_data_sync_order_sync_existing',
-				'label'    => __( 'Sync all existing orders now', 'wp-data-sync' ),
-				'callback' => 'input',
+			2 => [
+				'key' 		=> 'wp_data_sync_show_order_sync_status_admin_column',
+				'label'		=> __( 'Show Order Sync Status Admin Column', 'wp-data-sync' ),
+				'callback'  => 'input',
 				'args'      => [
 					'sanitize_callback' => 'sanitize_text_field',
 					'basename'          => 'checkbox',
-					'type'		        => '',
-					'class'		        => '',
+					'tyoe'              => '',
+					'class'             => 'show-admin-column',
 					'placeholder'       => '',
-					'msg'               => WC_Order_StageOrder::count_msg(),
-					'info'              => __( 'Schedule a task to sync existing orders in small batches. This setting will reset itself when all orders have been processed.', 'wp-data-sync' )
+					'info'              => __( 'Show admin column for order export status on Orders list.')
 				]
-			]
+			],
 		]
 	] );
 

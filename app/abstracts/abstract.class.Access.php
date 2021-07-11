@@ -6,7 +6,7 @@
  *
  * @since   1.0.0
  *
- * @package WP_DataSync
+ * @package WP_Data_Sync
  */
 
 namespace WP_DataSync\App;
@@ -25,16 +25,8 @@ abstract class Access {
 
 	public function access() {
 
-		if ( $this->allowed() ) {
-
-			if ( $referer = $this->referer() ) {
-
-				if ( $this->private_key() ) {
-					return TRUE;
-				}
-
-			}
-
+		if ( $this->allowed() && $this->referer() ) {
+			return $this->private_key();
 		}
 
 		return FALSE;
@@ -48,7 +40,7 @@ abstract class Access {
 	 */
 
 	public function allowed() {
-		return Settings::is_checked( 'wp_data_sync_allowed' );
+		return Settings::is_checked( $this->permissions_key );
 	}
 
 	/**

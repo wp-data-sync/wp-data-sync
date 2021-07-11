@@ -6,7 +6,7 @@
  *
  * @since   1.0.0
  *
- * @package WP_DataSync
+ * @package WP_Data_Sync
  */
 
 namespace WP_DataSync\App;
@@ -32,6 +32,12 @@ class SyncRequest extends Access {
 	 */
 
 	protected $private_token_key = 'wp_data_sync_private_token';
+
+	/**
+	 * @var string
+	 */
+
+	protected $permissions_key = 'wp_data_sync_allowed';
 
 	/**
 	 * @var SyncRequest
@@ -72,7 +78,7 @@ class SyncRequest extends Access {
 	public function register_route() {
 
 		register_rest_route(
-			'wp-data-sync/' . WP_DATA_SYNC_EP_VERSION,
+			'wp-data-sync/' . WPDSYNC_EP_VERSION,
 			'/sync/(?P<access_token>\S+)/(?P<cache_buster>\S+)/',
 			[
 				'methods' => WP_REST_Server::CREATABLE,

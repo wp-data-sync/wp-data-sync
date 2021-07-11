@@ -6,7 +6,7 @@
  *
  * @since   1.0.0
  *
- * @package WP_DataSync
+ * @package WP_Data_Sync
  */
 
 namespace WP_DataSync\App;
@@ -30,11 +30,11 @@ class Log {
 
 			$msg        = self::message( $data );
 			$date       = date( 'Y-m-d' );
-			$error_file = WP_DATA_SYNC_LOG_DIR . "{$key}-{$date}.log";
+			$error_file = WPDSYNC_LOG_DIR . "{$key}-{$date}.log";
 
 			// Create the log file dir if we do not already have one.
-			if ( ! file_exists( WP_DATA_SYNC_LOG_DIR ) ) {
-				mkdir( WP_DATA_SYNC_LOG_DIR, 0755, TRUE );
+			if ( ! file_exists( WPDSYNC_LOG_DIR ) ) {
+				mkdir( WPDSYNC_LOG_DIR, 0755, TRUE );
 			}
 
 			if ( ! file_exists( $error_file ) ) {
@@ -97,7 +97,7 @@ class Log {
 
 		if ( $file_name = get_option('wp_data_sync_log_file') ) {
 
-			$file = WP_DATA_SYNC_LOG_DIR . $file_name;
+			$file = WPDSYNC_LOG_DIR . $file_name;
 
 			if ( file_exists( $file ) ) {
 				return file_get_contents( $file );
@@ -117,7 +117,7 @@ class Log {
 
 	public static function log_files() {
 
-		$files = glob( WP_DATA_SYNC_LOG_DIR . '*.log' );
+		$files = glob( WPDSYNC_LOG_DIR . '*.log' );
 
 		if ( is_array( $files ) && ! empty( $files ) ) {
 			return array_map( 'basename', $files );

@@ -6,7 +6,7 @@
  *
  * @since   1.0.0
  *
- * @package WP_DataSync
+ * @package WP_Data_Sync
  */
 
 namespace WP_DataSync\App;
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! $files ) {
 
-	printf( '%s', esc_html( __( 'You must allow logging so a log file can be created.', 'wp-data-sync' ) ) );
+	printf( '%s', esc_html( __( 'Allow logging for log files to be created.', 'wp-data-sync' ) ) );
 
 	return;
 

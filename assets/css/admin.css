@@ -33,3 +33,19 @@
 .wpds-help-buttons .button-primary {
 	margin-bottom: 10px;
 }
+
+.wpds-order-export {
+	color: #fff;
+	background-color: red;
+	padding: 3px 12px;
+	border-radius: 4px;
+}
+
+.wpds-order-export.synced {
+	background-color: green;
+}
+
+.manage-column.column-wpds_sync_status,
+.column-wpds_sync_status {
+	text-align: center;
+}

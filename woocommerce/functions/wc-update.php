@@ -6,7 +6,7 @@
  *
  * @since   1.0.0
  *
- * @package WP_DataSync
+ * @package WP_Data_Sync
  */
 
 namespace WP_DataSync\Woo;
@@ -24,12 +24,11 @@ add_action( 'admin_init', 'WP_DataSync\Woo\wc_update' );
 
 function wc_update() {
 
-	if ( WC_DATA_SYNC_VERSION !== get_option( 'WC_DATA_SYNC_VERSION' ) ) {
+	if ( WCDSYNC_VERSION !== get_option( 'WCDSYNC_VERSION' ) ) {
 
 		WC_Product_Sells::create_table();
-		WC_Order_StageOrder::create_table();
 
-		update_option( 'WC_DATA_SYNC_VERSION', WC_DATA_SYNC_VERSION );
+		update_option( 'WCDSYNC_VERSION', WCDSYNC_VERSION );
 
 	}
 

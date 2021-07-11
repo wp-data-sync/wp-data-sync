@@ -6,7 +6,7 @@
  *
  * @since   1.0.2
  *
- * @package WP_DataSync
+ * @package WP_Data_Sync
  */
 
 namespace WP_DataSync\App;
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 add_filter( 'plugin_action_links', function( $links, $file ) {
 
-	if ( $file === WP_DATA_SYNC_PLUGIN ) {
+	if ( $file === WPDSYNC_PLUGIN ) {
 
 		$links[] = '<a href="options-general.php?page=wp-data-sync">' . __( 'Settings' ) . '</a>';
 

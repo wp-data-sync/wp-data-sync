@@ -6,7 +6,7 @@
  *
  * @since   1.0.0
  *
- * @package WP_DataSync
+ * @package WP_Data_Sync
  */
 
 namespace WP_DataSync\Woo;
@@ -48,22 +48,19 @@ class WC_Order_Data {
 	}
 
 	/**
-	 * Get Order Data.
+	 * Get order array.
 	 *
-	 * @return array
+	 * @param \WC_Order $order
+	 *
+	 * @return mixed
 	 */
 
-	public function get( $order_id ) {
+	public function get( $order ) {
 
-		$_order = [];
-
-		if ( $order = wc_get_order( $order_id ) ) {
-
-			$_order              = $order->get_data();
-			$_order['meta_data'] = $this->format_meta( $order );
-			$_order['items']     = $this->get_items( $order );
-
-		}
+		$_order                  = $order->get_data();
+		$_order['meta_data']     = $this->format_meta( $order );
+		$_order['items']         = $this->get_items( $order );
+		$_order['shipping_data'] = $this->get_shipping_data( $order );
 
 		Log::write( 'order', $_order );
 
@@ -126,6 +123,22 @@ class WC_Order_Data {
 		}
 
 		return $_meta_data;
+
+	}
+
+	/**
+	 * Get shipping data.
+	 *
+	 * @param $order
+	 *
+	 * @return mixed
+	 */
+
+	public function get_shipping_data( $order ) {
+
+		foreach( $order->get_items( 'shipping' ) as $shipping_item_obj ){
+			return $shipping_item_obj->get_data();
+		}
 
 	}
 

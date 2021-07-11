@@ -6,7 +6,7 @@
  *
  * @since   1.0.0
  *
- * @package WP_DataSync
+ * @package WP_Data_Sync
  */
 
 namespace WP_DataSync\Woo;
@@ -14,6 +14,7 @@ namespace WP_DataSync\Woo;
 use WP_DataSync\App\Access;
 use WP_DataSync\App\Log;
 use WP_REST_Server;
+use WP_REST_Request;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -34,16 +35,16 @@ class WC_Order_DataRequest extends Access {
 	protected $private_token_key = 'wp_data_sync_private_token';
 
 	/**
+	 * @var string
+	 */
+
+	protected $permissions_key = 'wp_data_sync_order_sync_allowed';
+
+	/**
 	 * @var WC_Order_DataRequest
 	 */
 
 	public static $instance;
-
-	/**
-	 * @var integer
-	 */
-
-	protected $order_id;
 
 	/**
 	 * WC_Order_DataRequest constructor.
@@ -76,8 +77,8 @@ class WC_Order_DataRequest extends Access {
 	public function register_route() {
 
 		register_rest_route(
-			'wp-data-sync/' . WP_DATA_SYNC_EP_VERSION,
-			'/order-request/(?P<access_token>\S+)/(?P<order_id>\d+)/',
+			'wp-data-sync/' . WPDSYNC_EP_VERSION,
+			'/order-request/(?P<access_token>\S+)/(?P<min_date>\S+)/(?P<limit>\d+)/(?P<cache_buster>\S+)',
 			[
 				'methods' => WP_REST_Server::READABLE,
 				'args'    => [
@@ -85,9 +86,23 @@ class WC_Order_DataRequest extends Access {
 						'sanitize_callback' => 'sanitize_text_field',
 						'validate_callback' => [ $this, 'access_token' ]
 					],
-					'order_id' => [
-						'sanitize_callback' => 'intval',
-						'validate_callback' => [ $this, 'order_id' ],
+					'min_date' => [
+						'sanitize_callback' => 'sanitize_text_field',
+						'validate_callback' => function ( $param ) {
+							return is_string( $param );
+						}
+					],
+					'limit' => [
+						'sanitize_callback' => 'absint',
+						'validate_callback' => function( $param ) {
+							return is_numeric( $param );
+						}
+					],
+					'cache_buster' => [
+						'sanitize_callback' => 'sanitize_text_field',
+						'validate_callback' => function( $param ) {
+							return is_string( $param );
+						}
 					]
 				],
 				'permission_callback' => [ $this, 'access' ],
@@ -98,39 +113,105 @@ class WC_Order_DataRequest extends Access {
 	}
 
 	/**
-	 * Order ID.
+	 * Request.
 	 *
-	 * @param $order_id
+	 * @param WP_REST_Request $request
 	 *
-	 * @return bool
+	 * @return \WP_Error|\WP_HTTP_Response|\WP_REST_Response
 	 */
 
-	public function order_id( $order_id ) {
-
-		$order_id = intval( $order_id );
-
-		if ( is_int( $order_id ) && 0 < $order_id ) {
-			$this->order_id = $order_id;
-			return TRUE;
-		}
-
-		return FALSE;
-
-	}
-
-	/**
-	 * Process Request.
-	 */
-
-	public function request() {
+	public function request( WP_REST_Request $request ) {
 
 		$order_data = WC_Order_Data::instance();
 
-		$responce = $order_data->get( $this->order_id );
+		$min_date = $request->get_param( 'min_date' );
+		$limit    = $request->get_param( 'limit' );
+		$response = [];
+
+		if ( $order_ids = $this->fetch_order_ids( $min_date, $limit ) ) {
+
+			foreach ( $order_ids as $order_id ) {
+
+				if ( $order = wc_get_order( $order_id ) ) {
+
+					$response[ $order_id ] = $order_data->get( $order );
+
+					$order->add_order_note( __( 'Order synced to WP Data Sync API', 'wp-data-sync' ) );
+
+					update_post_meta( $order_id, WCDSYNC_ORDER_SYNC_STATUS, current_time( 'mysql' ) );
+
+				}
+
+			}
+
+		}
 
 		Log::write( 'order-request', $response );
 
 		return rest_ensure_response( $response );
+
+	}
+
+	/**
+	 * Format min date.
+	 *
+	 * @param $min_date
+	 *
+	 * @return false|string
+	 */
+
+	public function format_min_date( $min_date ) {
+		return date( 'Y-m-d H:i:s', strtotime( $post_time ) );
+	}
+
+	/**
+	 * Fetch order ids.
+	 *
+	 * @param $min_date
+	 * @param $limit
+	 *
+	 * @return array|bool
+	 */
+
+	public function fetch_order_ids( $min_date, $limit ) {
+
+		global $wpdb;
+
+		$allowed_status = get_option( 'wp_data_sync_allowed_order_status' );
+
+		if ( empty( $allowed_status ) ) {
+			return FALSE;
+		}
+
+		$placeholders = join( ', ', array_fill( 0, count( $allowed_status ), '%s' ) );
+		$values       = array_merge(
+			[ $this->format_min_date( $min_date ) ],
+			$allowed_status,
+			[ $limit ]
+		);
+
+		$order_ids = $wpdb->get_col( $wpdb->prepare(
+			"
+			SELECT p.ID
+			FROM $wpdb->posts p
+			WHERE p.post_type = 'shop_order'
+			AND p.post_date > %s
+			AND p.post_status IN ($placeholders)
+			AND NOT EXISTS (
+			    SELECT * FROM $wpdb->postmeta pm
+                WHERE pm.meta_key = WCDSYNC_ORDER_SYNC_STATUS
+                AND pm.post_id = p.ID
+			)
+			LIMIT %d
+			",
+			$values
+		) );
+
+		if ( empty( $order_ids ) || is_wp_error( $order_ids ) ) {
+			return FALSE;
+		}
+
+		return array_map( 'intval', $order_ids );
 
 	}
 

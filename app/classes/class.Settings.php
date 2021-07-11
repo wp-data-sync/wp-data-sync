@@ -6,7 +6,7 @@
  *
  * @since   1.0.0
  *
- * @package WP_DataSync
+ * @package WP_Data_Sync
  */
 
 namespace WP_DataSync\App;
@@ -93,8 +93,8 @@ class Settings {
 	 */
 
 	public function scripts() {
-		wp_register_style( 'jquery-ui-min', WP_DATA_SYNC_ASSETS . 'css/jquery-ui.min.css', [], WP_DATA_SYNC_VERSION );
-		wp_enqueue_style( 'wpds_admin', WP_DATA_SYNC_ASSETS . 'css/admin.css', [], WP_DATA_SYNC_VERSION );
+		wp_register_style( 'jquery-ui-min', WPDSYNC_ASSETS . 'css/jquery-ui.min.css', [], WPDSYNC_VERSION );
+		wp_enqueue_style( 'wpds_admin', WPDSYNC_ASSETS . 'css/admin.css', [], WPDSYNC_VERSION );
 	}
 
 	/**
@@ -141,7 +141,7 @@ class Settings {
 		add_options_page(
 			__( 'WP Data Sync' ),
 			__( 'WP Data Sync' ),
-			WP_DATA_SYNC_CAP,
+			WPDSYNC_CAP,
 			Settings::SLUG,
 			[ $this, 'settings_page' ]
 		);
@@ -154,7 +154,7 @@ class Settings {
 
 	public function settings_page() {
 
-		if ( ! current_user_can( WP_DATA_SYNC_CAP ) ) {
+		if ( ! current_user_can( WPDSYNC_CAP ) ) {
 			wp_die( __( 'You do not have sufficient permissions to access this page.', 'wp-data-sync' ) );
 		}
 
@@ -225,7 +225,7 @@ class Settings {
 
 		if ( 'checked' !== $value ) {
 
-			foreach ( glob( WP_DATA_SYNC_LOG_DIR . '*.log' ) as $file ) {
+			foreach ( glob( WPDSYNC_LOG_DIR . '*.log' ) as $file ) {
 				unlink( $file );
 			}
 
@@ -278,7 +278,7 @@ class Settings {
 				$option['key'],
 				$option['label'],
 				[ $this, $option['callback'] ],
-				WP_DATA_SYNC_CAP,
+				WPDSYNC_CAP,
 				$this->active_tab,
 				$option['args']
 			);

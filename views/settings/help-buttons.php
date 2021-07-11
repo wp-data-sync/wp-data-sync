@@ -6,7 +6,7 @@
  *
  * @since   1.0.2
  *
- * @package WP_DataSync
+ * @package WP_Data_Sync
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

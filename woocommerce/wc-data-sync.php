@@ -6,7 +6,7 @@
  *
  * @since   1.0.0
  *
- * @package WP_DataSync
+ * @package WP_Data_Sync
  */
 
 namespace WP_DataSync\Woo;
@@ -18,7 +18,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Used to handle WooCommerce integration versions.
-define( 'WC_DATA_SYNC_VERSION', '1.0.7' );
+define( 'WCDSYNC_VERSION', '1.1.0' );
+define( 'WCDSYNC_ORDER_SYNC_STATUS', '_wpds_order_synced' );
 
 // Load WooCommerce scripts
 foreach ( glob( plugin_dir_path( __FILE__ ) . '**/*.php' ) as $file ) {
@@ -31,7 +32,7 @@ foreach ( glob( plugin_dir_path( __FILE__ ) . '**/*.php' ) as $file ) {
 
 add_action( 'rest_api_init', function() {
 
-	if ( Settings::is_checked( 'wp_data_sync_order_sync_active' ) ) {
+	if ( Settings::is_checked( 'wp_data_sync_order_sync_allowed' ) ) {
 		WC_Order_DataRequest::instance()->register_route();
 	}
 
