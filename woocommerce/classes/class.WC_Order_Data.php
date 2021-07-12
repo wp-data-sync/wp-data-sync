@@ -140,6 +140,8 @@ class WC_Order_Data {
 			return $shipping_item_obj->get_data();
 		}
 
+		return [];
+
 	}
 
 }

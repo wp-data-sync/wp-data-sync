@@ -146,6 +146,7 @@ class WC_Order_DataRequest extends Access {
 
 		}
 
+		Log::write( 'order-request', $request->get_url_params() );
 		Log::write( 'order-request', $response );
 
 		return rest_ensure_response( $response );
@@ -187,6 +188,7 @@ class WC_Order_DataRequest extends Access {
 		$values       = array_merge(
 			[ $this->format_min_date( $min_date ) ],
 			$allowed_status,
+			[ WCDSYNC_ORDER_SYNC_STATUS ],
 			[ $limit ]
 		);
 
@@ -199,7 +201,7 @@ class WC_Order_DataRequest extends Access {
 			AND p.post_status IN ($placeholders)
 			AND NOT EXISTS (
 			    SELECT * FROM $wpdb->postmeta pm
-                WHERE pm.meta_key = WCDSYNC_ORDER_SYNC_STATUS
+                WHERE pm.meta_key = %s
                 AND pm.post_id = p.ID
 			)
 			LIMIT %d
