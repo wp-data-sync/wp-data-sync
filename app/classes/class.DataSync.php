@@ -152,12 +152,12 @@ class DataSync {
 			return [ 'error' => 'Primary ID empty!!' ];
 		}
 
-		// Set the post ID.
-		if ( ! $this->post_id = $this->set_post_id() ) {
+		// Set the post_id.
+		$this->set_post_id();
+
+		if ( ! $this->post_id ) {
 			return [ 'error' => 'Post ID failed!!' ];
 		}
-
-		$this->post_data['ID'] = $this->post_id;
 
 		if ( $this->maybe_trash_post() ) {
 			return [ 'success' => 'Trash Post' ];
@@ -168,11 +168,12 @@ class DataSync {
 		}
 
 		if ( $this->post_meta ) {
-			$this->post_meta( $this->post_id, $this->post_meta );
+			$this->post_meta();
 		}
 
 		if ( $this->taxonomies ) {
-			$this->taxonomy( $this->post_id, $this->taxonomies );
+			$this->taxonomy();
+			$this->reset_term_taxonomy_count();
 		}
 
 		if ( $this->featured_image ) {
@@ -185,74 +186,83 @@ class DataSync {
 
 		do_action( 'wp_data_sync_after_process', $this->post_id, $this );
 
-		if ( $this->taxonomies || $this->attributes ) {
-			$this->reset_term_taxonomy_count();
-		}
-
 		return [ 'post_id' => $this->post_id ];
 
 	}
 
 	/**
-	 * Set Post ID.
+	 * Set post id.
 	 *
-	 * @return bool|int
+	 * @param bool $post_id
 	 */
 
-	private function set_post_id() {
+	public function set_post_id( $post_id = FALSE ) {
 
-		// This is only used to migrate content from cloned sites with the exact same post IDs.
-		// This will create a new post if the post types do not match.
-		if ( 'post_id' === $this->primary_id['search_in'] ) {
-
-			$post_id = (int) $this->primary_id['post_id'];
-
-			if ( get_post_status( $post_id ) && $this->post_data['post_type'] === get_post_type( $post_id ) ) {
-				return $post_id;
-			}
-
+		if ( ! $post_id ) {
+			$post_id = $this->fetch_post_id();
 		}
 
-		if ( $post_id = $this->post_id( $this->primary_id ) ) {
-			return $post_id;
-		}
-
-		return FALSE;
+		$this->post_id = $post_id;
 
 	}
 
 	/**
-	 * Post ID.
+	 * Set post data.
 	 *
-	 * @param $primary_id
+	 * @param $post_data
+	 */
+
+	public function set_post_data( $post_data ) {
+		$this->post_data = $post_data;
+	}
+
+	/**
+	 * Set post meta.
+	 *
+	 * @param $post_meta
+	 */
+
+	public function set_post_meta( $post_meta ) {
+		$this->post_meta = $post_meta;
+	}
+
+	/**
+	 * Set taxonomies.
+	 *
+	 * @param $taxonomies
+	 */
+
+	public function set_taxonomies( $taxonomies ) {
+		$this->taxonomies = $taxonomies;
+	}
+
+	/**
+	 * Fetch Post ID.
 	 *
 	 * @return bool|int
 	 */
 
-	public function post_id( $primary_id ) {
+	public function fetch_post_id() {
 
 		global $wpdb;
 
-		extract( $primary_id );
+		extract( $this->primary_id );
 
-		$post_id = $wpdb->get_var(
-			$wpdb->prepare(
-				"
-				SELECT post_id 
-    			FROM {$wpdb->postmeta} pm 
-    			JOIN {$wpdb->posts} p 
-      			ON p.ID = pm.post_id
-    			WHERE meta_key = %s 
-      			AND meta_value = %s 
-      			ORDER BY meta_id DESC
-    			LIMIT 1
-				",
-				$meta_key,
-				$meta_value
-			)
-		);
+		$post_id = $wpdb->get_var( $wpdb->prepare(
+			"
+			SELECT post_id 
+    		FROM {$wpdb->postmeta} pm 
+    		JOIN {$wpdb->posts} p 
+      		ON p.ID = pm.post_id
+    		WHERE meta_key = %s 
+      		AND meta_value = %s 
+      		ORDER BY meta_id DESC
+			",
+			$meta_key,
+			$meta_value
+		) );
 
-		if ( null === $post_id || is_wp_error( $post_id ) ) {
+		if ( empty( $post_id ) || is_wp_error( $post_id ) ) {
 
 			// Do not create a new post if accelerated sync.
 			if ( $this->is_accelerated ) {
@@ -328,15 +338,21 @@ class DataSync {
 
 	public function post_data() {
 
+		global $wpdb;
+
 		do_action( 'wp_data_sync_before_post_data', $this->post_data );
 
 		if ( $this->is_new ) {
 			$this->post_data_defaults();
 		}
 
-		$this->post_date_format();
+		$wpdb->update(
+			$wpdb->posts,
+			$this->post_data,
+			[ 'ID' => $this->post_id ]
+		);
 
-		if ( wp_update_post( $this->post_data ) ) {
+		if ( empty( $wpdb->last_error ) ) {
 			do_action( 'wp_data_sync_after_post_data', $this->post_data );
 		}
 
@@ -344,33 +360,30 @@ class DataSync {
 
 	/**
 	 * Post meta.
-	 *
-	 * @param $post_id
-	 * @param $post_meta
 	 */
 
-	public function post_meta( $post_id, $post_meta ) {
+	public function post_meta() {
 
-		if ( is_array( $post_meta ) ) {
+		if ( is_array( $this->post_meta ) ) {
 
 			$restricted_meta_keys = $this->restricted_meta_keys();
 
-			foreach( $post_meta as $meta_key => $meta_value ) {
+			foreach( $this->post_meta as $meta_key => $meta_value ) {
 
 				$meta_key   = $this->post_meta_key( $meta_key, $meta_value );
 				$meta_value = $this->post_meta_value( $meta_value, $meta_key );
 
 				if ( ! in_array( $meta_key, $restricted_meta_keys ) ) {
-					update_post_meta( $post_id, $meta_key, $meta_value );
+					update_post_meta( $this->post_id, $meta_key, $meta_value );
 				}
 
-				do_action( "wp_data_sync_post_meta_$meta_key", $post_id, $meta_value, $this );
+				do_action( "wp_data_sync_post_meta_$meta_key", $this->post_id, $meta_value, $this );
 
 			}
 
 		}
 
-		do_action( 'wp_data_sync_post_meta', $post_id, $post_meta, $this );
+		do_action( 'wp_data_sync_post_meta', $this->post_id, $this->post_meta, $this );
 
 	}
 
@@ -409,19 +422,16 @@ class DataSync {
 	}
 
 	/**
-	 * Set taxonomies.
-	 *
-	 * @param $post_id
-	 * @param $taxonomies
+	 * Taxonomies.
 	 */
 
-	public function taxonomy( $post_id, $taxonomies ) {
+	public function taxonomy() {
 
-		if ( ! is_array( $taxonomies ) ) {
+		if ( ! is_array( $this->taxonomies ) ) {
 			return;
 		}
 
-		foreach ( $taxonomies as $taxonomy => $terms ) {
+		foreach ( $this->taxonomies as $taxonomy => $terms ) {
 
 			$taxonomy = trim( wp_unslash( $taxonomy ) );
 
@@ -454,11 +464,11 @@ class DataSync {
 
 			Log::write( 'term-id', $term_ids );
 
-			wp_set_object_terms( $post_id, $term_ids, $taxonomy, $append );
+			wp_set_object_terms( $this->post_id, $term_ids, $taxonomy, $append );
 
 		}
 
-		do_action( 'wp_data_sync_taxonomies', $post_id, $taxonomies );
+		do_action( 'wp_data_sync_taxonomies', $this->post_id, $this->taxonomies );
 
 	}
 
@@ -994,23 +1004,6 @@ class DataSync {
 	}
 
 	/**
-	 * Format the post date for WordPress.
-	 */
-
-	public function post_date_format() {
-
-		if ( ! empty( $this->post_data['post_date'] ) ) {
-
-			// Convert the date to time.
-			$post_time = strtotime( $this->post_data['post_date'] );
-
-			$this->post_data['post_date'] = date( 'Y-m-d H:i:s', $post_time );
-
-		}
-
-	}
-
-	/**
 	 * Post object keys.
 	 *
 	 * @return array
@@ -1087,7 +1080,7 @@ class DataSync {
 	 * @return int|bool
 	 */
 
-	public function get_id() {
+	public function get_post_id() {
 		return $this->post_id;
 	}
 

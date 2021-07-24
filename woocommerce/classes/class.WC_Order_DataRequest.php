@@ -132,15 +132,23 @@ class WC_Order_DataRequest extends Access {
 
 			foreach ( $order_ids as $order_id ) {
 
+				$status = 'no';
+
 				if ( $order = wc_get_order( $order_id ) ) {
 
-					$response[ $order_id ] = $order_data->get( $order );
+					if ( apply_filters( 'wp_data_sync_can_sync_order', TRUE, $order_id, $order ) ) {
 
-					$order->add_order_note( __( 'Order synced to WP Data Sync API', 'wp-data-sync' ) );
+						$response[ $order_id ] = $order_data->get( $order );
 
-					update_post_meta( $order_id, WCDSYNC_ORDER_SYNC_STATUS, current_time( 'mysql' ) );
+						$order->add_order_note( __( 'Order synced to WP Data Sync API', 'wp-data-sync' ) );
+
+						$status = current_time( 'mysql' );
+
+					}
 
 				}
+
+				update_post_meta( $order_id, WCDSYNC_ORDER_SYNC_STATUS, $status );
 
 			}
 

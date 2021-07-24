@@ -13,7 +13,6 @@ namespace WP_DataSync\Woo;
 
 use WP_DataSync\App\Settings;
 use WP_DataSync\App\Log;
-use WC_Product;
 
 class WC_Product_Sells {
 
@@ -296,20 +295,22 @@ class WC_Product_Sells {
 
 		if( $product_ids = $this->get_product_ids( $row, $post_id ) ) {
 
-			$product  = new WC_Product( $post_id );
+			$key = FALSE;
 
 			switch( $row->type ) {
 
 				case 'cross_sells':
-					$product->set_cross_sell_ids( $product_ids );
+					$key = 'cross_sell_ids';
 					break;
 				case 'up_sells':
-					$product->set_upsell_ids( $product_ids );
+					$key = 'cross_sell_ids';
 					break;
 
 			}
 
-			$product->save();
+			if ( $key ) {
+				update_post_meta( $post_id, $key, $product_ids );
+			}
 
 		}
 
@@ -330,20 +331,18 @@ class WC_Product_Sells {
 
 		$table = self::table();
 
-		$product_ids = $wpdb->get_col(
-			$wpdb->prepare(
-				"
-				SELECT product_id
-				FROM $table
-				WHERE post_id = %d
-				AND type = %s
-				",
-				$post_id,
-				$row->type
-			)
-		);
+		$product_ids = $wpdb->get_col( $wpdb->prepare(
+			"
+			SELECT product_id
+			FROM $table
+			WHERE post_id = %d
+			AND type = %s
+			",
+			$post_id,
+			$row->type
+		) );
 
-		if ( null === $product_ids || is_wp_error( $product_ids ) ) {
+		if ( empty( $product_ids ) || is_wp_error( $product_ids ) ) {
 			return FALSE;
 		}
 

@@ -11,7 +11,6 @@
 
 namespace WP_DataSync\Woo;
 
-use WC_Product;
 use WP_DataSync\App\DataSync;
 use WP_DataSync\App\Log;
 
@@ -28,10 +27,46 @@ class WC_Product_DataSync {
 	private $data_sync;
 
 	/**
+	 * @var int
+	 */
+
+	private $porduct_id;
+
+	/**
 	 * @var WC_Product
 	 */
 
 	private $product;
+
+	/**
+	 * @var array|bool
+	 */
+
+	private $post_meta;
+
+	/**
+	 * @var array|bool
+	 */
+
+	private $taxonomies;
+
+	/**
+	 * @var array|bool
+	 */
+
+	private $attributes;
+
+	/**
+	 * @var array|bool
+	 */
+
+	private $variations;
+
+	/**
+	 * @var array|bool
+	 */
+
+	private $gallery_images;
 
 	/**
 	 * @var WC_Product_DataSync
@@ -66,82 +101,84 @@ class WC_Product_DataSync {
 	/**
 	 * WooCommerce process data.
 	 *
-	 * @param $product_id
 	 * @param $data_sync
 	 */
 
-	public function wc_process( $product_id, $data_sync ) {
+	public function wc_process( $data_sync ) {
 
-		$this->data_sync = $data_sync;
-		$this->product   = wc_get_product( $product_id );
+		$this->data_sync  = $data_sync;
+		$this->product_id = $this->data_sync->get_post_id();
 
-		if ( $post_meta = $this->data_sync->get_post_meta() ) {
-			$this->price( $product_id, $post_meta );
+		if ( $this->post_meta = $this->data_sync->get_post_meta() ) {
+			$this->price();
 		}
 
-		if ( $attributes = $this->data_sync->get_attributes() ) {
-			$this->attributes( $product_id, $attributes );
+		if ( $this->attributes = $this->data_sync->get_attributes() ) {
+			$this->attributes();
+			$this->data_sync->reset_term_taxonomy_count();
 		}
 
-		if ( $this->product->is_type( 'variable' ) ) {
-			$this->set_variations_inactive( $product_id );
+		if ( has_term( 'variable', 'product_type', $this->porduct_id ) ) {
+			$this->set_variations_inactive();
 		}
 
-		if ( $variations = $this->data_sync->get_variations() ) {
-			$this->variations( $product_id, $variations );
+		if ( $this->variations = $this->data_sync->get_variations() ) {
+			$this->variations();
 		}
 
-		if ( $gallery_images = $this->data_sync->get_gallery_images() ) {
-			$this->gallery_images( $product_id, $gallery_images );
+		if ( $this->gallery_images = $this->data_sync->get_gallery_images() ) {
+			$this->gallery_images();
 		}
 
-		if ( $taxonomies = $this->data_sync->get_taxonomies() ) {
-			$this->product_visibility( $taxonomies );
+		if ( $this->taxonomies = $this->data_sync->get_taxonomies() ) {
+			$this->product_visibility();
 		}
 
 	}
 
 	/**
 	 * Price.
-	 *
-	 * @param $product_id
-	 * @param $post_meta
 	 */
 
-	public function price( $product_id, $post_meta ) {
+	public function price() {
 
-		extract( $post_meta );
+		extract( $this->post_meta );
 
 		if ( isset( $_regular_price ) ) {
 
-			LOg::write( 'product-price', "Product ID: $product_id Regular Price: $_regular_price" );
+			LOg::write( 'product-price', "Product ID: $this->product_id Regular Price: $_regular_price" );
 
-			$this->data_sync->post_meta( $product_id, [ '_regular_price' => $_regular_price ] );
+			$this->data_sync->set_post_meta( [ '_regular_price' => $_regular_price ] );
+			$this->data_sync->post_meta();
 
 			if ( ! empty( $_regular_price ) ) {
-				$this->data_sync->post_meta( $product_id, [ '_price' => $_regular_price ] );
+				$this->data_sync->set_post_meta( [ '_price' => $_regular_price ] );
+				$this->data_sync->post_meta();
 			}
 
 		}
 
 		if ( isset( $_sale_price ) ) {
 
-			LOg::write( 'product-price', "Product ID: $product_id Sale Price: $_sale_price" );
+			LOg::write( 'product-price', "Product ID: $this->product_id Sale Price: $_sale_price" );
 
-			$this->data_sync->post_meta( $product_id, [ '_sale_price' => $_sale_price ] );
+			$this->data_sync->set_post_meta( [ '_sale_price' => $_sale_price ] );
+			$this->data_sync->post_meta();
 
 			if ( ! empty( $_sale_price ) ) {
-				$this->data_sync->post_meta( $product_id, [ '_price' => $_sale_price ] );
+				$this->data_sync->set_post_meta( [ '_price' => $_sale_price ] );
+				$this->data_sync->post_meta();
 			}
 
 		}
 
 		if ( isset( $_price ) ) {
 
-			LOg::write( 'product-price', "Product ID: $product_id Price: $_price" );
+			LOg::write( 'product-price', "Product ID: $this->product_id Price: $_price" );
 
 			if ( ! empty( $_price ) ) {
-				$this->data_sync->post_meta( $product_id, [ '_price' => $_price ] );
+				$this->data_sync->set_post_meta( [ '_price' => $_price ] );
+				$this->data_sync->post_meta();
 			}
 
 		}
@@ -150,20 +187,17 @@ class WC_Product_DataSync {
 
 	/**
 	 * Product attributes.
-	 *
-	 * @param $product_id
-	 * @param $attributes
 	 */
 
-	public function attributes( $product_id, $attributes ) {
+	public function attributes() {
 
-		if ( empty( $attributes ) ) {
+		if ( empty( $this->attributes ) ) {
 			return;
 		}
 
 		$product_attributes = [];
 		$position = 1;
-		$attributes = apply_filters( 'wp_data_sync_product_attributes', $attributes );
+		$attributes = apply_filters( 'wp_data_sync_product_attributes', $this->attributes );
 
 		foreach ( $attributes as $attribute ) {
 
@@ -174,7 +208,7 @@ class WC_Product_DataSync {
 				$taxonomy = $this->attribute_taxonomy( $name );
 				$term_ids = $this->attribute_term_ids( $taxonomy, $attribute );
 
-				wp_set_object_terms( $product_id, $term_ids, $taxonomy );
+				wp_set_object_terms( $this->product_id, $term_ids, $taxonomy );
 
 			}
 
@@ -189,9 +223,9 @@ class WC_Product_DataSync {
 
 		}
 
-		update_post_meta( $product_id, '_product_attributes', $product_attributes );
+		update_post_meta( $this->product_id, '_product_attributes', $product_attributes );
 
-		do_action( 'wp_data_sync_attributes', $product_id, $product_attributes );
+		do_action( 'wp_data_sync_attributes', $this->product_id, $product_attributes );
 
 	}
 
@@ -279,18 +313,16 @@ class WC_Product_DataSync {
 	 * We want to set all variations inactive.
 	 * Later when variations are updated,
 	 * we will set only current variations active.
-	 *
-	 * @param $product_id
 	 */
 
-	public function set_variations_inactive( $product_id ) {
+	public function set_variations_inactive() {
 
 		global $wpdb;
 
 		$wpdb->update(
 			$wpdb->posts,
 			[ 'post_status' => 'private' ],
-			[ 'post_parent' => $product_id ]
+			[ 'post_parent' => $this->product_id ]
 		);
 
 	}
@@ -300,22 +332,19 @@ class WC_Product_DataSync {
 	 *
 	 * @link https://woocommerce.github.io/code-reference/classes/WC-Product-Variation.html
 	 *
-	 * @param $product_id
-	 * @param $variations
-	 *
 	 * @throws \WC_Data_Exception
 	 */
 
-	public function variations( $product_id, $variations ) {
+	public function variations() {
 
-		if ( is_array( $variations ) ) {
+		if ( is_array( $this->variations ) ) {
 
 			$data_sync = DataSync::instance();
 
-			foreach ( $variations as $variation ) {
+			foreach ( $this->variations as $variation ) {
 
 				// Set the parent ID for the variation.
-				$variation['post_data']['post_parent'] = $product_id;
+				$variation['post_data']['post_parent'] = $this->product_id;
 
 				if ( ! isset( $variation['post_data']['post_status'] ) ) {
 					$variation['post_data']['post_status'] = 'publish';
@@ -338,45 +367,40 @@ class WC_Product_DataSync {
 	 * Gallery images.
 	 *
 	 * @since 1.6.0
-	 *
-	 * @param $product_id
-	 * @param $gallery_images
 	 */
 
-	public function gallery_images( $product_id, $gallery_images ) {
+	public function gallery_images() {
 
 		$attach_ids = [];
 
-		foreach ( $gallery_images as $image ) {
+		foreach ( $this->gallery_images as $image ) {
 
-			$image = apply_filters( 'wp_data_sync_product_gallery_image', $image, $product_id );
+			$image = apply_filters( 'wp_data_sync_product_gallery_image', $image, $this->product_id );
 
-			if ( $attach_id = $this->data_sync->attachment( $product_id, $image ) ) {
+			if ( $attach_id = $this->data_sync->attachment( $this->product_id, $image ) ) {
 				$attach_ids[] = $attach_id;
 			}
 
 		}
 
-		$gallery_ids = apply_filters( 'wp_data_sync_gallery_image_ids', $attach_ids, $product_id );
-		$gallery_key = apply_filters( 'wp_data_sync_gallery_image_meta_key', '_product_image_gallery', $product_id );
+		$gallery_ids = apply_filters( 'wp_data_sync_gallery_image_ids', $attach_ids, $this->product_id );
+		$gallery_key = apply_filters( 'wp_data_sync_gallery_image_meta_key', '_product_image_gallery', $this->product_id );
 
-		update_post_meta( $product_id, $gallery_key, join( ',', $gallery_ids ) );
+		update_post_meta( $this->product_id, $gallery_key, join( ',', $gallery_ids ) );
 
-		do_action( 'wp_data_sync_gallery_images', $product_id, $gallery_images );
+		do_action( 'wp_data_sync_gallery_images', $this->product_id, $this->gallery_images );
 
 	}
 
 	/**
 	 * Product visibility.
-	 *
-	 * @param $taxonomies
 	 */
 
-	public function product_visibility( $taxonomies ) {
+	public function product_visibility() {
 
-		if ( is_array( $taxonomies ) && array_key_exists( 'product_visibility', $taxonomies ) ) {
+		if ( is_array( $this->taxonomies ) && array_key_exists( 'product_visibility', $this->taxonomies ) ) {
 
-			foreach( $taxonomies['product_visibility'] as $term_array ) {
+			foreach( $this->taxonomies['product_visibility'] as $term_array ) {
 				$term = $term_array['name'];
 			}
 
@@ -392,8 +416,7 @@ class WC_Product_DataSync {
 
 		}
 
-		$this->product->set_catalog_visibility( $term );
-		$this->product->save();
+		wp_set_object_terms( $this->product_id, $term, 'product_visibility' );
 
 	}
 

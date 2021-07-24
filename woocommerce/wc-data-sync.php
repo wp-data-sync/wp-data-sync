@@ -45,7 +45,7 @@ add_action( 'rest_api_init', function() {
 add_action( 'wp_data_sync_after_process', function ( $post_id, $data_sync ) {
 
 	if ( 'product' === $data_sync->get_post_type() ) {
-		WC_Product_DataSync::instance()->wc_process( $post_id, $data_sync );
+		WC_Product_DataSync::instance()->wc_process( $data_sync );
 	}
 
 }, 10, 2 );

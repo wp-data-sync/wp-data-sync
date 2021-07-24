@@ -42,12 +42,17 @@ add_action( 'manage_shop_order_posts_custom_column', function( $column, $product
 
 	if ( 'wpds_sync_status' === $column ) {
 
-		if ( get_post_meta( $product_id, WCDSYNC_ORDER_SYNC_STATUS, TRUE ) ) {
-			printf( '<span class="wpds-order-export synced">%s</span>', esc_html( '&#10003;' ) );
+		if ( $value = get_post_meta( $product_id, WCDSYNC_ORDER_SYNC_STATUS, TRUE ) ) {
+
+			if ( 'no' !== $value ) {
+				printf( '<span class="wpds-order-export synced">%s</span>', esc_html( '&#10003;' ) );
+
+				return;
+			}
+
 		}
-		else {
-			printf( '<span class="wpds-order-export">%s</span>', esc_html( '&#10005;' ) );
-		}
+
+		printf( '<span class="wpds-order-export">%s</span>', esc_html( '&#10005;' ) );
 
 	}
 

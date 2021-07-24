@@ -64,7 +64,7 @@ class WC_Order_Data {
 
 		Log::write( 'order', $_order );
 
-		return $_order;
+		return apply_filters( 'wp_data_sync_order_data', $_order, $order );
 
 	}
 
@@ -99,14 +99,14 @@ class WC_Order_Data {
 	/**
 	 * Foemat meta.
 	 *
-	 * @param $object \WC_Order|\WC_Order_Item
+	 * @param \WC_Order|\WC_Order_Item $order
 	 *
 	 * @return array
 	 */
 
-	public function format_meta( $object ) {
+	public function format_meta( $order ) {
 
-		$meta_data =  $object->get_meta_data();
+		$meta_data =  $order->get_meta_data();
 
 		if ( ! is_array( $meta_data ) ) {
 			return $meta_data;
@@ -122,7 +122,7 @@ class WC_Order_Data {
 
 		}
 
-		return $_meta_data;
+		return apply_filters( 'wp_data_sync_order_meta', $_meta_data, $order );
 
 	}
 
@@ -131,16 +131,19 @@ class WC_Order_Data {
 	 *
 	 * @param $order
 	 *
-	 * @return mixed
+	 * @return mixed|array
 	 */
 
 	public function get_shipping_data( $order ) {
 
+		$order_shipping = [];
+
 		foreach( $order->get_items( 'shipping' ) as $shipping_item_obj ){
-			return $shipping_item_obj->get_data();
+			$order_shipping = $shipping_item_obj->get_data();
+			break;
 		}
 
-		return [];
+		return apply_filters( 'wp_data_sync_order_shipping', $order_shipping, $order );
 
 	}
 
