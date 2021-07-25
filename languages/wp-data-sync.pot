@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the WP Data Sync plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: WP Data Sync 1.7.1\n"
+"Project-Id-Version: WP Data Sync 1.9.6\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wp-data-sync\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2021-05-03T00:21:39+00:00\n"
+"POT-Creation-Date: 2021-07-25T17:12:48+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.1.0\n"
 "X-Domain: wp-data-sync\n"
@@ -31,6 +31,18 @@ msgstr ""
 msgid "https://wpdatasync.com"
 msgstr ""
 
+#: woocommerce/classes/class.WC_Order_DataRequest.php:143
+msgid "Order synced to WP Data Sync API"
+msgstr ""
+
+#: woocommerce/functions/wc-order-sync-status-order-action.php:27
+msgid "Remove order sync status"
+msgstr ""
+
+#: woocommerce/functions/wc-order-sync-status-order-action.php:42
+msgid "Manually removed order sync status."
+msgstr ""
+
 #: woocommerce/functions/wc-settings.php:24
 msgid "Default Product Visibility"
 msgstr ""
@@ -44,195 +56,191 @@ msgid "Process Up Sells"
 msgstr ""
 
 #: woocommerce/functions/wc-settings.php:70
-msgid "Activate Order Sync"
+msgid "Allow Order Sync"
 msgstr ""
 
 #: woocommerce/functions/wc-settings.php:83
-msgid "Orders Webhook URL"
+msgid "Allowed Order Status"
 msgstr ""
 
-#: woocommerce/functions/wc-settings.php:95
-msgid "Sync order when status is"
-msgstr ""
-
-#: woocommerce/functions/wc-settings.php:116
-msgid "Sync all existing orders now"
-msgstr ""
-
-#: woocommerce/functions/wc-settings.php:125
-msgid "Schedule a task to sync existing orders in small batches. This setting will reset itself when all orders have been processed."
+#: woocommerce/functions/wc-settings.php:104
+msgid "Show Order Sync Status Admin Column"
 msgstr ""
 
 #: app/classes/class.Log.php:108
 msgid "File does not exist. Please choose a different file and save changes."
 msgstr ""
 
-#: app/classes/class.Settings.php:113
+#: app/classes/class.Settings.php:110
 msgid "Dashboard"
 msgstr ""
 
-#: app/classes/class.Settings.php:117
+#: app/classes/class.Settings.php:113
 msgid "Sync Settings"
 msgstr ""
 
-#: app/classes/class.Settings.php:121
+#: app/classes/class.Settings.php:116
 msgid "Item Request"
 msgstr ""
 
-#: app/classes/class.Settings.php:131
+#: app/classes/class.Settings.php:124
 msgid "Logs"
 msgstr ""
 
-#: app/classes/class.Settings.php:163
+#: app/classes/class.Settings.php:158
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
-#: app/classes/class.Settings.php:351
+#: app/classes/class.Settings.php:302
 msgid "Allow Data Sync API Access"
 msgstr ""
 
-#: app/classes/class.Settings.php:363
+#: app/classes/class.Settings.php:314
 msgid "API Access Token"
 msgstr ""
 
-#: app/classes/class.Settings.php:375
+#: app/classes/class.Settings.php:326
 msgid "API Private Token"
 msgstr ""
 
-#: app/classes/class.Settings.php:387
+#: app/classes/class.Settings.php:338
 msgid "Automatically Update Plugin"
 msgstr ""
 
-#: app/classes/class.Settings.php:402
+#: app/classes/class.Settings.php:353
 msgid "Default Title"
 msgstr ""
 
-#: app/classes/class.Settings.php:414
+#: app/classes/class.Settings.php:365
 msgid "Default Author"
 msgstr ""
 
-#: app/classes/class.Settings.php:427
+#: app/classes/class.Settings.php:378
 msgid "Default Status"
 msgstr ""
 
-#: app/classes/class.Settings.php:436
+#: app/classes/class.Settings.php:387
 msgid "Publish"
 msgstr ""
 
-#: app/classes/class.Settings.php:437
+#: app/classes/class.Settings.php:388
 msgid "Pending"
 msgstr ""
 
-#: app/classes/class.Settings.php:438
+#: app/classes/class.Settings.php:389
 msgid "Draft"
 msgstr ""
 
-#: app/classes/class.Settings.php:439
+#: app/classes/class.Settings.php:390
 msgid "Future"
 msgstr ""
 
-#: app/classes/class.Settings.php:440
+#: app/classes/class.Settings.php:391
 msgid "Private"
 msgstr ""
 
-#: app/classes/class.Settings.php:441
+#: app/classes/class.Settings.php:392
 msgid "Trash"
 msgstr ""
 
-#: app/classes/class.Settings.php:447
+#: app/classes/class.Settings.php:398
 msgid "Default Type"
 msgstr ""
 
-#: app/classes/class.Settings.php:460
+#: app/classes/class.Settings.php:411
 msgid "Append Terms"
 msgstr ""
 
-#: app/classes/class.Settings.php:469
+#: app/classes/class.Settings.php:420
 msgid "No, I want old terms to be replaced (Recommended)"
 msgstr ""
 
-#: app/classes/class.Settings.php:470
+#: app/classes/class.Settings.php:421
 msgid "Yes, I want to keep the old terms"
 msgstr ""
 
-#: app/classes/class.Settings.php:476
+#: app/classes/class.Settings.php:427
 msgid "Sync Term Description"
 msgstr ""
 
-#: app/classes/class.Settings.php:485
+#: app/classes/class.Settings.php:436
 msgid "Yes, I want to sync term descriptions"
 msgstr ""
 
-#: app/classes/class.Settings.php:486
+#: app/classes/class.Settings.php:437
 msgid "No, I do not want to sync term descriptions"
 msgstr ""
 
-#: app/classes/class.Settings.php:492
+#: app/classes/class.Settings.php:443
 msgid "Sync Term Thumbnail"
 msgstr ""
 
-#: app/classes/class.Settings.php:501
+#: app/classes/class.Settings.php:452
 msgid "Yes, I want to sync term thumbnail"
 msgstr ""
 
-#: app/classes/class.Settings.php:502
+#: app/classes/class.Settings.php:453
 msgid "No, I do not want to sync term thumbnail"
 msgstr ""
 
-#: app/classes/class.Settings.php:508
+#: app/classes/class.Settings.php:459
 msgid "Sync Term Meta"
 msgstr ""
 
-#: app/classes/class.Settings.php:517
+#: app/classes/class.Settings.php:468
 msgid "Yes, I want to sync term meta"
 msgstr ""
 
-#: app/classes/class.Settings.php:518
+#: app/classes/class.Settings.php:469
 msgid "No, I do not want to sync term meta"
 msgstr ""
 
-#: app/classes/class.Settings.php:524
+#: app/classes/class.Settings.php:475
+msgid "Force Delete"
+msgstr ""
+
+#: app/classes/class.Settings.php:488
 msgid "Allow Unsecure Images"
 msgstr ""
 
-#: app/classes/class.Settings.php:537
+#: app/classes/class.Settings.php:501
 msgid "Replace Images in Content"
 msgstr ""
 
-#: app/classes/class.Settings.php:550
+#: app/classes/class.Settings.php:514
 msgid "Replace Images in Excerpt"
 msgstr ""
 
-#: app/classes/class.Settings.php:565
+#: app/classes/class.Settings.php:529
 msgid "Item Request Access Token"
 msgstr ""
 
-#: app/classes/class.Settings.php:577
+#: app/classes/class.Settings.php:541
 msgid "Item Request Private Token"
 msgstr ""
 
-#: app/classes/class.Settings.php:589
+#: app/classes/class.Settings.php:553
 msgid "Unset Post Author"
 msgstr ""
 
-#: app/classes/class.Settings.php:602
+#: app/classes/class.Settings.php:566
 msgid "Include items with status"
 msgstr ""
 
-#: app/classes/class.Settings.php:626
+#: app/classes/class.Settings.php:590
 msgid "Allow Logging"
 msgstr ""
 
-#: app/classes/class.Settings.php:639
+#: app/classes/class.Settings.php:603
 msgid "Log File"
 msgstr ""
 
-#: app/classes/class.DataSync.php:265
+#: app/classes/class.DataSync.php:275
 msgid "WP Data Sync Placeholder"
 msgstr ""
 
 #: views/settings/log-file.php:20
-msgid "You must allow logging so a log file can be created."
+msgid "Allow logging for log files to be created."
 msgstr ""
 
 #: views/settings/help-buttons.php:19

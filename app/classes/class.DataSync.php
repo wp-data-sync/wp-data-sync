@@ -607,7 +607,7 @@ class DataSync {
 			return;
 		}
 
-		if ( ! $attach_id = $this->attachment( $this->post_id, $thumb_url ) ) {
+		if ( ! $attach_id = $this->attachment( $thumb_url ) ) {
 			$attach_id = '';
 		}
 
@@ -681,7 +681,7 @@ class DataSync {
 
 	public function set_featured_image() {
 
-		if ( $attach_id = $this->attachment( $this->post_id, $this->featured_image ) ) {
+		if ( $attach_id = $this->attachment( $this->featured_image ) ) {
 
 			set_post_thumbnail( $this->post_id, $attach_id );
 
@@ -694,17 +694,16 @@ class DataSync {
 	/**
 	 * Attachemnt.
 	 *
-	 * @param int    $post_id
 	 * @param string $image
 	 *
 	 * @return bool|int|\WP_Post
 	 */
 
-	public function attachment( $post_id, $image ) {
+	public function attachment( $image ) {
 
 		Log::write( 'attachment', $image );
 
-		$image = $this->image( $image, $post_id );
+		$image = $this->image( $image );
 
 		extract( $image );
 
@@ -720,7 +719,7 @@ class DataSync {
 			return FALSE;
 		}
 
-		$basename    = $this->basename( $post_id, $image );
+		$basename    = $this->basename( $image );
 		$image_title = preg_replace( '/\.[^.]+$/', '', $basename );
 
 		Log::write( 'attachment', "Basename: $basename" );
@@ -768,7 +767,7 @@ class DataSync {
 				], $attachment );
 
 				// Insert image data
-				$attach_id = wp_insert_attachment( $attachment, $file_path, $post_id );
+				$attach_id = wp_insert_attachment( $attachment, $file_path, $this->post_id );
 
 				Log::write( 'attachment', "Attachment ID: $attach_id" );
 
@@ -962,17 +961,16 @@ class DataSync {
 	/**
 	 * Basename.
 	 *
-	 * @param int   $post_id
 	 * @param array $image
 	 *
 	 * @return mixed|void
 	 */
 
-	public function basename( $post_id, $image ) {
+	public function basename( $image ) {
 
 		$basename = sanitize_file_name( basename( $image['image_url'] ) );
 
-		return apply_filters( 'wp_data_sync_basename', $basename, $post_id, $image );
+		return apply_filters( 'wp_data_sync_basename', $basename, $this->post_id, $image );
 
 	}
 
@@ -980,12 +978,11 @@ class DataSync {
 	 * Image.
 	 *
 	 * @param array  $image
-	 * @param int    $post_id
 	 *
 	 * @return mixed|void
 	 */
 
-	public function image( $image, $post_id ) {
+	public function image( $image ) {
 
 		if ( ! is_array( $image ) ) {
 
@@ -999,7 +996,7 @@ class DataSync {
 
 		}
 
-		return apply_filters( 'wp_data_sync_image', $image, $post_id );
+		return apply_filters( 'wp_data_sync_image', $image, $this->post_id );
 
 	}
 

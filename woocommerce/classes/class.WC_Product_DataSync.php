@@ -30,13 +30,7 @@ class WC_Product_DataSync {
 	 * @var int
 	 */
 
-	private $porduct_id;
-
-	/**
-	 * @var WC_Product
-	 */
-
-	private $product;
+	private $product_id;
 
 	/**
 	 * @var array|bool
@@ -72,7 +66,7 @@ class WC_Product_DataSync {
 	 * @var WC_Product_DataSync
 	 */
 
-	public static $instance;
+	private static $instance;
 
 	/**
 	 * WC_Product_DataSync constructor.
@@ -377,7 +371,7 @@ class WC_Product_DataSync {
 
 			$image = apply_filters( 'wp_data_sync_product_gallery_image', $image, $this->product_id );
 
-			if ( $attach_id = $this->data_sync->attachment( $this->product_id, $image ) ) {
+			if ( $attach_id = $this->data_sync->attachment( $image ) ) {
 				$attach_ids[] = $attach_id;
 			}
 

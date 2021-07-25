@@ -39,6 +39,8 @@ function image_replace( $content, $post_id, $data_sync ) {
 
 	if ( ! empty( $content ) ) {
 
+		$data_sync->set_post_id( $post_id );
+
 		$html_dom = new DOMDocument;
 		$html_dom->loadHTML( $content );
 
@@ -48,7 +50,7 @@ function image_replace( $content, $post_id, $data_sync ) {
 
 			$image_url = $image_tag->getAttribute( 'src' );
 
-			if ( $attach_id = $data_sync->attachment( $post_id, $image_url ) ) {
+			if ( $attach_id = $data_sync->attachment( $image_url ) ) {
 
 				if ( $attach_url = wp_get_attachment_url( $attach_id ) ) {
 					$content = str_replace( $image_url, $attach_url, $content );
