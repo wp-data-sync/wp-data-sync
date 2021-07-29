@@ -239,7 +239,11 @@ class WC_Product_DataSync {
 		$term_ids   = [];
 
 		foreach ( $values as $value ) {
-			$term_ids[] = $this->data_sync->set_term( [ 'name' => $value ], $taxonomy, 0 );
+
+			if ( ! empty( $value ) ) {
+				$term_ids[] = $this->data_sync->set_term( [ 'name' => $value ], $taxonomy, 0 );
+			}
+
 		}
 
 		Log::write('test-value', $term_ids);
