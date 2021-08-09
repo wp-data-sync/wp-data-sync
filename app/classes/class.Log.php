@@ -17,6 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Log {
 
+	const FILE_KEY = 'wp_data_sync_log_file';
+	const ALLOWED_KEY = 'wp_data_sync_allow_logging';
+
 	/**
 	 * Write the log to the file.
 	 *
@@ -84,7 +87,7 @@ class Log {
 	 */
 
 	public static function is_active() {
-		return Settings::is_checked( 'wp_data_sync_allow_logging' );
+		return Settings::is_checked( Log::ALLOWED_KEY );
 	}
 
 	/**
@@ -95,7 +98,7 @@ class Log {
 
 	public static function log_file() {
 
-		if ( $file_name = get_option('wp_data_sync_log_file') ) {
+		if ( $file_name = get_option( Log::FILE_KEY ) ) {
 
 			$file = WPDSYNC_LOG_DIR . $file_name;
 
@@ -105,7 +108,7 @@ class Log {
 
 		}
 
-		return __( 'File does not exist. Please choose a different file and save changes.', 'wp-data-sync' );
+		return __( 'Please choose a file and save changes.', 'wp-data-sync' );
 
 	}
 

@@ -170,7 +170,7 @@ class WC_Order_DataRequest extends Access {
 	 */
 
 	public function format_min_date( $min_date ) {
-		return date( 'Y-m-d H:i:s', strtotime( $post_time ) );
+		return date( 'Y-m-d H:i:s', strtotime( $min_date ) );
 	}
 
 	/**
@@ -195,9 +195,9 @@ class WC_Order_DataRequest extends Access {
 		$placeholders = join( ', ', array_fill( 0, count( $allowed_status ), '%s' ) );
 		$values       = array_merge(
 			[ $this->format_min_date( $min_date ) ],
-			$allowed_status,
-			[ WCDSYNC_ORDER_SYNC_STATUS ],
-			[ $limit ]
+			array_map( 'esc_sql', $allowed_status ),
+			[ esc_sql( WCDSYNC_ORDER_SYNC_STATUS ) ],
+			[ intval( $limit ) ]
 		);
 
 		$order_ids = $wpdb->get_col( $wpdb->prepare(

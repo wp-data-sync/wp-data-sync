@@ -246,8 +246,6 @@ class WC_Product_DataSync {
 
 		}
 
-		Log::write('test-value', $term_ids);
-
 		return $term_ids;
 
 	}

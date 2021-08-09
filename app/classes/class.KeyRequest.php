@@ -213,7 +213,7 @@ class KeyRequest extends Access {
 			"
 		);
 
-		if ( null === $rows ) {
+		if ( empty( $rows ) || is_wp_error( $rows ) ) {
 			return [];
 		}
 

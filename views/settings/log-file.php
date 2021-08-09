@@ -21,12 +21,18 @@ if ( ! $files ) {
 
 	return;
 
-} ?>
+}
+
+$file_name = get_option( Log::FILE_KEY ); ?>
 
 <p>
-	<select name="wp_data_sync_log_file">
+	<select name="<?php esc_attr_e( Log::FILE_KEY );?>">
+		<?php printf( '<option value="-1">%s</option>', esc_html( 'Select One' ) ); ?>
 		<?php foreach ( $files as $file ) { ?>
-			<?php printf( '<option value="%s">%s</option>', esc_attr( $file ), esc_html( $file ) ); ?>
+
+			<?php $selected = ( $file_name === $file ) ? 'selected' : ''; ?>
+			<?php printf( '<option value="%s" %s>%s</option>', esc_attr( $file ), esc_attr( $selected ), esc_html( $file ) ); ?>
+
 		<?php } ?>
 	</select>
 </p>

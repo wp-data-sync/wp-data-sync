@@ -145,15 +145,15 @@ class WC_Product_Sells {
 				AND relational_id = %s
 				AND relational_key = %s
 				",
-				$this->type,
-				$sell_id,
-				$this->product_id,
-				$this->relational_id,
-				$this->relational_key
+				esc_sql( $this->type ),
+				esc_sql( $sell_id ),
+				intval( $this->product_id ),
+				esc_sql( $this->relational_id ),
+				esc_sql( $this->relational_key )
 			)
 		);
 
-		if ( null === $exists || is_wp_error( $exists ) ) {
+		if ( empty( $exists ) || is_wp_error( $exists ) ) {
 			return FALSE;
 		}
 
@@ -252,8 +252,8 @@ class WC_Product_Sells {
 				WHERE meta_key = %s
 				AND meta_value = %s
 				",
-				$row->relational_key,
-				$row->sell_id
+				esc_sql( $row->relational_key ),
+				esc_sql( $row->sell_id )
 			)
 		);
 
@@ -338,8 +338,8 @@ class WC_Product_Sells {
 			WHERE post_id = %d
 			AND type = %s
 			",
-			$post_id,
-			$row->type
+			intval( $post_id ),
+			esc_sql( $row->type )
 		) );
 
 		if ( empty( $product_ids ) || is_wp_error( $product_ids ) ) {

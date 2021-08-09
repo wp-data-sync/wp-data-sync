@@ -73,6 +73,7 @@ class Settings {
 
 		// Delete log files on setting change.
 		add_action( 'update_option_wp_data_sync_allow_logging', [ $this, 'delete_log_files' ], 10, 2 );
+		add_action( 'update_option_wp_data_sync_allow_logging', [ $this, 'delete_log_file_name' ], 10, 2 );
 
 	}
 
@@ -229,6 +230,14 @@ class Settings {
 				unlink( $file );
 			}
 
+		}
+
+	}
+
+	public function delete_log_file_name( $old_value, $value ) {
+
+		if ( 'checked' !== $value ) {
+			delete_option( Log::ALLOWED_KEY );
 		}
 
 	}
@@ -586,7 +595,7 @@ class Settings {
 			],
 			'logs' => [
 				0 => [
-					'key' 		=> 'wp_data_sync_allow_logging',
+					'key' 		=> Log::ALLOWED_KEY,
 					'label'		=> __( 'Allow Logging', 'wp-data-sync' ),
 					'callback'  => 'input',
 					'args'      => [
@@ -599,7 +608,7 @@ class Settings {
 					]
 				],
 				1 => [
-					'key' 		=> 'wp_data_sync_log_file',
+					'key' 		=> Log::FILE_KEY,
 					'label'		=> __( 'Log File', 'wp-data-sync' ),
 					'callback'  => 'input',
 					'args'      => [

@@ -264,10 +264,10 @@ class ItemRequest extends Access {
 			FROM $wpdb->posts
 			WHERE ID = %d
 			",
-			$item_id
+			intval( $item_id )
 		) );
 
-		if ( null === $item || is_wp_error( $item ) ) {
+		if ( empty( $item ) || is_wp_error( $item ) ) {
 			return [];
 		}
 
@@ -297,7 +297,12 @@ class ItemRequest extends Access {
 		$status       = get_option( 'wp_data_sync_item_request_status', [ 'publish' ] );
 		$count        = count( $status );
 		$placeholders = join( ', ', array_fill( 0, $count, '%s' ) );
-		$args         = array_merge( [ $this->api_id, $this->post_type ], $status, [ $this->limit ] );
+		$args         = array_merge(
+			[ esc_sql( $this->api_id ) ],
+			[ esc_sql( $this->post_type ) ],
+			array_map( 'esc_sql', $status ),
+			[ intval( $this->limit ) ]
+		);
 
 		$sql = $wpdb->prepare(
 			"
@@ -323,7 +328,7 @@ class ItemRequest extends Access {
 
 		$wpdb->flush();
 
-		if ( null === $item_ids ) {
+		if ( empty( $item_ids ) || is_wp_error( $item_ids ) ) {
 			return FALSE;
 		}
 

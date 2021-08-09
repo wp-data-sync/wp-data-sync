@@ -258,8 +258,8 @@ class DataSync {
       		AND meta_value = %s 
       		ORDER BY meta_id DESC
 			",
-			$meta_key,
-			$meta_value
+			esc_sql( $meta_key ),
+			esc_sql( $meta_value )
 		) );
 
 		if ( empty( $post_id ) || is_wp_error( $post_id ) ) {
@@ -549,9 +549,9 @@ class DataSync {
 			AND tt.taxonomy = %s
 			AND tt.parent = %d
 			",
-			$name,
-			$taxonomy,
-			$parent_id
+			esc_sql( $name ),
+			esc_sql( $taxonomy ),
+			intval( $parent_id )
 		);
 
 		Log::write( 'term-exists', $sql );
@@ -928,8 +928,7 @@ class DataSync {
 	/**
 	 * Check to see if attachment exists.
 	 *
-	 * @since 1.6.0  Query _source_url
-	 * @since 1.6.17 Remove query by attachment ame
+	 * @since 1.6.0  Query for _source_url
 	 *
 	 * @param $image_url
 	 *
@@ -947,7 +946,7 @@ class DataSync {
 			WHERE meta_key = '_source_url'
 			AND meta_value = %s
 			",
-			$image_url
+			esc_sql( $image_url )
 		) );
 
 		if ( null === $attach_id || is_wp_error( $attach_id ) ) {
