@@ -458,7 +458,9 @@ class DataSync {
 
 				}
 
-				$term_ids[] = $this->set_term( $term, $taxonomy, $parent_id );
+				if( $term_id = $this->set_term( $term, $taxonomy, $parent_id ) ) {
+					$term_ids[] = $term_id;
+				}
 
 			}
 
@@ -509,15 +511,17 @@ class DataSync {
 
 			$term = wp_insert_term( $name, $taxonomy, [ 'parent' => $parent_id ] );
 
-			$term_id = (int) $term['term_id'];
+			$term_id = is_wp_error( $term ) ? FALSE : (int) $term['term_id'];
 
 		}
 
 		Log::write( 'term-id', $term_id );
 
-		$this->term_desc( $description, $term_id, $taxonomy );
-		$this->term_thumb( $thumb_url, $term_id );
-		$this->term_meta( $term_meta, $term_id );
+		if ( $term_id ) {
+			$this->term_desc( $description, $term_id, $taxonomy );
+			$this->term_thumb( $thumb_url, $term_id );
+			$this->term_meta( $term_meta, $term_id );
+		}
 
 		return $term_id;
 

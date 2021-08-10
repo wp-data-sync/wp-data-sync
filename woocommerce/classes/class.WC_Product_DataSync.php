@@ -241,7 +241,11 @@ class WC_Product_DataSync {
 		foreach ( $values as $value ) {
 
 			if ( ! empty( $value ) ) {
-				$term_ids[] = $this->data_sync->set_term( [ 'name' => $value ], $taxonomy, 0 );
+
+				if( $term_id = $this->data_sync->set_term( [ 'name' => $value ], $taxonomy, 0 ) ) {
+					$term_ids[] = $term_id;
+				}
+
 			}
 
 		}
