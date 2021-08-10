@@ -202,7 +202,8 @@ class DataSync {
 			$post_id = $this->fetch_post_id();
 		}
 
-		$this->post_id = $post_id;
+		$this->post_id         = $post_id;
+		$this->post_data['ID'] = $post_id;
 
 	}
 
@@ -294,11 +295,64 @@ class DataSync {
 
 		foreach ( $keys as $key ) {
 
-			$value = isset( $this->post_data[ $key ] ) ? $this->post_data[ $key ] : get_option( "wp_data_sync_{$key}", '' );
+			if ( ! isset( $this->post_data[ $key ] ) ) {
+				$this->post_data[ $key ] = get_option( "wp_data_sync_$key" );
+			}
+
+		}
+
+	}
+
+	/**
+	 * Post data apply filter
+	 *
+	 * @since 1.9.10
+	 */
+
+	public function post_data_apply_filters() {
+
+		$keys = $this->post_data_keys();
+
+		foreach ( $keys as $key ) {
+
+			$value = FALSE;
+
+			if ( isset( $this->post_data[ $key ] ) ) {
+				$value = $this->post_data[ $key ];
+			}
 
 			$this->post_data[ $key ] = apply_filters( "wp_data_sync_{$key}", $value, $this->post_id, $this );
 
 		}
+
+		// Remove the false values.
+		$this->post_data = array_filter( $this->post_data );
+
+	}
+
+	/**
+	 * Post object keys.
+	 *
+	 * @return array
+	 */
+
+	public function post_data_keys() {
+
+		$post_data_keys = [
+			'post_title',
+			'post_status',
+			'post_author',
+			'post_type',
+			'post_date',
+			'post_content',
+			'post_excerpt',
+			'post_password',
+			'post_parent',
+			'ping_status',
+			'comment_status'
+		];
+
+		return apply_filters( 'wp_data_sync_post_data_keys', $post_data_keys );
 
 	}
 
@@ -338,21 +392,17 @@ class DataSync {
 
 	public function post_data() {
 
-		global $wpdb;
-
 		do_action( 'wp_data_sync_before_post_data', $this->post_data );
 
 		if ( $this->is_new ) {
 			$this->post_data_defaults();
 		}
 
-		$wpdb->update(
-			$wpdb->posts,
-			$this->post_data,
-			[ 'ID' => $this->post_id ]
-		);
+		$this->post_data_apply_filters();
 
-		if ( empty( $wpdb->last_error ) ) {
+		$result = wp_update_post( $this->post_data );
+
+		if ( ! is_wp_error( $result ) ) {
 			do_action( 'wp_data_sync_after_post_data', $this->post_data );
 		}
 
@@ -511,17 +561,23 @@ class DataSync {
 
 			$term = wp_insert_term( $name, $taxonomy, [ 'parent' => $parent_id ] );
 
-			$term_id = is_wp_error( $term ) ? FALSE : (int) $term['term_id'];
+			if( is_wp_error( $term ) ) {
+
+				Log::write( 'wp-error-term', $term );
+
+				return FALSE;
+
+			}
+
+			$term_id = (int) $term['term_id'];
 
 		}
 
 		Log::write( 'term-id', $term_id );
 
-		if ( $term_id ) {
-			$this->term_desc( $description, $term_id, $taxonomy );
-			$this->term_thumb( $thumb_url, $term_id );
-			$this->term_meta( $term_meta, $term_id );
-		}
+		$this->term_desc( $description, $term_id, $taxonomy );
+		$this->term_thumb( $thumb_url, $term_id );
+		$this->term_meta( $term_meta, $term_id );
 
 		return $term_id;
 
@@ -562,7 +618,7 @@ class DataSync {
 
 		$term_id = $wpdb->get_var( $sql );
 
-		if ( null === $term_id || is_wp_error( $term_id ) ) {
+		if ( empty( $term_id ) || is_wp_error( $term_id ) ) {
 			Log::write( 'term-exists', 'Term Does Not Exist' );
 			Log::write( 'term-exists', $term_id );
 			return FALSE;
@@ -1004,32 +1060,6 @@ class DataSync {
 	}
 
 	/**
-	 * Post object keys.
-	 *
-	 * @return array
-	 */
-
-	public function post_data_keys() {
-
-		$post_data_keys = [
-			'post_title',
-			'post_status',
-			'post_author',
-			'post_type',
-			'post_date',
-			'post_content',
-			'post_excerpt',
-			'post_password',
-			'post_parent',
-			'ping_status',
-			'comment_status'
-		];
-
-		return apply_filters( 'wp_data_sync_post_data_keys', $post_data_keys );
-
-	}
-
-	/**
 	 * Filter Restricted Meta Keys.
 	 *
 	 * An array of restricted meta keys.
@@ -1062,6 +1092,16 @@ class DataSync {
 			do_action( "wp_data_sync_integration_$integration", $this->post_id, $values, $this );
 		}
 
+	}
+
+	/**
+	 * Is new.
+	 *
+	 * @return bool
+	 */
+
+	public function get_is_new() {
+		return $this->is_new;
 	}
 
 	/**
