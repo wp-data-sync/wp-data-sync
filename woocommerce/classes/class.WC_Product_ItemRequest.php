@@ -12,6 +12,7 @@
 namespace WP_DataSync\Woo;
 
 use WP_DataSync\App\ItemRequest;
+use WP_DataSync\App\Settings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -81,18 +82,29 @@ class WC_Product_ItemRequest {
 		$this->product      = wc_get_product( $product_id );
 		$this->item_request = $item_request;
 
-		if ( $images = $this->gallery_images() ) {
-			$item_data['gallery_images'] = $images;
+		if ( ! Settings::is_data_type_excluded( 'gallery_images' ) ) {
+
+			if ( $images = $this->gallery_images() ) {
+				$item_data['gallery_images'] = $images;
+			}
 		}
 
-		if ( $attributes = $this->product_attributes() ) {
-			$item_data['attributes'] = $attributes;
+		if ( ! Settings::is_data_type_excluded( 'attributes' ) ) {
+
+			if ( $attributes = $this->product_attributes() ) {
+				$item_data['attributes'] = $attributes;
+			}
+
 		}
 
-		if ( $this->product->is_type( 'variable' ) ) {
+		if ( ! Settings::is_data_type_excluded( 'variations' ) ) {
 
-			if ( $variations = $this->product_variations() ) {
-				$item_data['variations'] = $variations;
+			if ( $this->product->is_type( 'variable' ) ) {
+
+				if ( $variations = $this->product_variations() ) {
+					$item_data['variations'] = $variations;
+				}
+
 			}
 
 		}

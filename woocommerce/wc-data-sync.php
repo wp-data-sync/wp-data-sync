@@ -44,7 +44,9 @@ add_action( 'rest_api_init', function() {
 
 add_action( 'wp_data_sync_after_process', function ( $post_id, $data_sync ) {
 
-	if ( 'product' === $data_sync->get_post_type() ) {
+	$post_type = $data_sync->get_post_type();
+
+	if ( 'product' === $post_type ) {
 		WC_Product_DataSync::instance()->wc_process( $data_sync );
 	}
 
@@ -90,7 +92,9 @@ add_action( 'wp_data_sync_integration_woo_up_sells', function( $product_id, $val
 
 add_filter( 'wp_data_sync_item_request', function( $item_data, $item_id, $item_request ) {
 
-	if ( 'product' === $item_request->get_post_type() ) {
+	$post_type = $item_request->get_post_type();
+
+	if ( 'product' === $post_type ) {
 		return WC_Product_ItemRequest::instance()->wc_process( $item_data, $item_id, $item_request );
 	}
 

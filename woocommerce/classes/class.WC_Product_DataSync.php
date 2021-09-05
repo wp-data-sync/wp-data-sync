@@ -377,7 +377,9 @@ class WC_Product_DataSync {
 
 			$image = apply_filters( 'wp_data_sync_product_gallery_image', $image, $this->product_id );
 
-			if ( $attach_id = $this->data_sync->attachment( $image ) ) {
+			$this->data_sync->set_attachment( $image );
+
+			if ( $attach_id = $this->data_sync->attachment() ) {
 				$attach_ids[] = $attach_id;
 			}
 
