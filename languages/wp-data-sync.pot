@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the WP Data Sync plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: WP Data Sync 1.9.6\n"
+"Project-Id-Version: WP Data Sync 1.10.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wp-data-sync\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2021-07-25T17:12:48+00:00\n"
+"POT-Creation-Date: 2021-09-05T22:45:20+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.1.0\n"
 "X-Domain: wp-data-sync\n"
@@ -67,175 +67,207 @@ msgstr ""
 msgid "Show Order Sync Status Admin Column"
 msgstr ""
 
-#: app/classes/class.Log.php:108
-msgid "File does not exist. Please choose a different file and save changes."
+#: includes/classes/class.Log.php:111
+msgid "Please choose a file and save changes."
 msgstr ""
 
-#: app/classes/class.Settings.php:110
+#: includes/classes/class.Settings.php:111
 msgid "Dashboard"
 msgstr ""
 
-#: app/classes/class.Settings.php:113
+#: includes/classes/class.Settings.php:114
 msgid "Sync Settings"
 msgstr ""
 
-#: app/classes/class.Settings.php:116
+#: includes/classes/class.Settings.php:117
 msgid "Item Request"
 msgstr ""
 
-#: app/classes/class.Settings.php:124
+#: includes/classes/class.Settings.php:125
 msgid "Logs"
 msgstr ""
 
-#: app/classes/class.Settings.php:158
+#: includes/classes/class.Settings.php:159
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
-#: app/classes/class.Settings.php:302
+#: includes/classes/class.Settings.php:311
 msgid "Allow Data Sync API Access"
 msgstr ""
 
-#: app/classes/class.Settings.php:314
+#: includes/classes/class.Settings.php:323
 msgid "API Access Token"
 msgstr ""
 
-#: app/classes/class.Settings.php:326
+#: includes/classes/class.Settings.php:335
 msgid "API Private Token"
 msgstr ""
 
-#: app/classes/class.Settings.php:338
+#: includes/classes/class.Settings.php:347
 msgid "Automatically Update Plugin"
 msgstr ""
 
-#: app/classes/class.Settings.php:353
+#: includes/classes/class.Settings.php:362
 msgid "Default Title"
 msgstr ""
 
-#: app/classes/class.Settings.php:365
+#: includes/classes/class.Settings.php:374
 msgid "Default Author"
 msgstr ""
 
-#: app/classes/class.Settings.php:378
+#: includes/classes/class.Settings.php:387
 msgid "Default Status"
 msgstr ""
 
-#: app/classes/class.Settings.php:387
+#: includes/classes/class.Settings.php:396
 msgid "Publish"
 msgstr ""
 
-#: app/classes/class.Settings.php:388
+#: includes/classes/class.Settings.php:397
 msgid "Pending"
 msgstr ""
 
-#: app/classes/class.Settings.php:389
+#: includes/classes/class.Settings.php:398
 msgid "Draft"
 msgstr ""
 
-#: app/classes/class.Settings.php:390
+#: includes/classes/class.Settings.php:399
 msgid "Future"
 msgstr ""
 
-#: app/classes/class.Settings.php:391
+#: includes/classes/class.Settings.php:400
 msgid "Private"
 msgstr ""
 
-#: app/classes/class.Settings.php:392
+#: includes/classes/class.Settings.php:401
 msgid "Trash"
 msgstr ""
 
-#: app/classes/class.Settings.php:398
+#: includes/classes/class.Settings.php:402
+msgid "Inherit"
+msgstr ""
+
+#: includes/classes/class.Settings.php:408
 msgid "Default Type"
 msgstr ""
 
-#: app/classes/class.Settings.php:411
+#: includes/classes/class.Settings.php:421
 msgid "Append Terms"
 msgstr ""
 
-#: app/classes/class.Settings.php:420
+#: includes/classes/class.Settings.php:430
 msgid "No, I want old terms to be replaced (Recommended)"
 msgstr ""
 
-#: app/classes/class.Settings.php:421
+#: includes/classes/class.Settings.php:431
 msgid "Yes, I want to keep the old terms"
 msgstr ""
 
-#: app/classes/class.Settings.php:427
+#: includes/classes/class.Settings.php:437
 msgid "Sync Term Description"
 msgstr ""
 
-#: app/classes/class.Settings.php:436
+#: includes/classes/class.Settings.php:446
 msgid "Yes, I want to sync term descriptions"
 msgstr ""
 
-#: app/classes/class.Settings.php:437
+#: includes/classes/class.Settings.php:447
 msgid "No, I do not want to sync term descriptions"
 msgstr ""
 
-#: app/classes/class.Settings.php:443
+#: includes/classes/class.Settings.php:453
 msgid "Sync Term Thumbnail"
 msgstr ""
 
-#: app/classes/class.Settings.php:452
+#: includes/classes/class.Settings.php:462
 msgid "Yes, I want to sync term thumbnail"
 msgstr ""
 
-#: app/classes/class.Settings.php:453
+#: includes/classes/class.Settings.php:463
 msgid "No, I do not want to sync term thumbnail"
 msgstr ""
 
-#: app/classes/class.Settings.php:459
+#: includes/classes/class.Settings.php:469
 msgid "Sync Term Meta"
 msgstr ""
 
-#: app/classes/class.Settings.php:468
+#: includes/classes/class.Settings.php:478
 msgid "Yes, I want to sync term meta"
 msgstr ""
 
-#: app/classes/class.Settings.php:469
+#: includes/classes/class.Settings.php:479
 msgid "No, I do not want to sync term meta"
 msgstr ""
 
-#: app/classes/class.Settings.php:475
+#: includes/classes/class.Settings.php:485
 msgid "Force Delete"
 msgstr ""
 
-#: app/classes/class.Settings.php:488
+#: includes/classes/class.Settings.php:498
 msgid "Allow Unsecure Images"
 msgstr ""
 
-#: app/classes/class.Settings.php:501
+#: includes/classes/class.Settings.php:511
 msgid "Replace Images in Content"
 msgstr ""
 
-#: app/classes/class.Settings.php:514
+#: includes/classes/class.Settings.php:524
 msgid "Replace Images in Excerpt"
 msgstr ""
 
-#: app/classes/class.Settings.php:529
+#: includes/classes/class.Settings.php:539
 msgid "Item Request Access Token"
 msgstr ""
 
-#: app/classes/class.Settings.php:541
+#: includes/classes/class.Settings.php:551
 msgid "Item Request Private Token"
 msgstr ""
 
-#: app/classes/class.Settings.php:553
+#: includes/classes/class.Settings.php:563
 msgid "Unset Post Author"
 msgstr ""
 
-#: app/classes/class.Settings.php:566
+#: includes/classes/class.Settings.php:576
 msgid "Include items with status"
 msgstr ""
 
-#: app/classes/class.Settings.php:590
+#: includes/classes/class.Settings.php:600
+msgid "Exclude Data Types"
+msgstr ""
+
+#: includes/classes/class.Settings.php:612
+msgid "Exclude None"
+msgstr ""
+
+#: includes/classes/class.Settings.php:613
+msgid "Post Data"
+msgstr ""
+
+#: includes/classes/class.Settings.php:614
+msgid "Post Meta"
+msgstr ""
+
+#: includes/classes/class.Settings.php:615
+msgid "Taxonomies"
+msgstr ""
+
+#: includes/classes/class.Settings.php:616
+msgid "Featured Image"
+msgstr ""
+
+#: includes/classes/class.Settings.php:617
+msgid "Integrations"
+msgstr ""
+
+#: includes/classes/class.Settings.php:625
 msgid "Allow Logging"
 msgstr ""
 
-#: app/classes/class.Settings.php:603
+#: includes/classes/class.Settings.php:638
 msgid "Log File"
 msgstr ""
 
-#: app/classes/class.DataSync.php:275
+#: includes/classes/class.DataSync.php:359
 msgid "WP Data Sync Placeholder"
 msgstr ""
 
