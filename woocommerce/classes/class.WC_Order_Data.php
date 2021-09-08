@@ -80,14 +80,17 @@ class WC_Order_Data {
 
 		foreach ( $order->get_items() as $i => $item ) {
 
-			$order_items[ $i ]              = $item->get_data();
-			$order_items[ $i ]['meta_data'] = $this->format_meta( $item );
+			if ( apply_filters( 'wp_data_sync_include_order_item', TRUE, $item, $order ) ) {
 
-			if ( $product = wc_get_product( $item->get_product_id() ) ) {
-				$order_items[ $i ]['sku'] = $product->get_sku();
-			}
-			else {
-				$order_items[ $i ]['sku'] = 'NA';
+				$order_items[ $i ]              = $item->get_data();
+				$order_items[ $i ]['meta_data'] = $this->format_meta( $item );
+
+				if ( $product = wc_get_product( $item->get_product_id() ) ) {
+					$order_items[ $i ]['sku'] = $product->get_sku();
+				} else {
+					$order_items[ $i ]['sku'] = 'NA';
+				}
+
 			}
 
 		}

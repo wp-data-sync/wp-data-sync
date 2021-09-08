@@ -100,6 +100,35 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 				]
 			],
 			2 => [
+				'key' 		=> 'wp_data_sync_order_allowed_product_cats',
+				'label'		=> __( 'Allowed Product Categories', 'wp-data-sync' ),
+				'callback'  => 'input',
+				'args'      => [
+					'sanitize_callback' => [ $_settings, 'sanitize_array' ],
+					'basename'          => 'select-multiple',
+					'name'              => 'wp_data_sync_order_allowed_product_cats',
+					'type'		        => '',
+					'class'		        => 'wc-enhanced-select regular-text',
+					'placeholder'       => '',
+					'selected'          => get_option( 'wp_data_sync_order_allowed_product_cats', [] ),
+					'info'              => __( 'Include products with selected categories in order sync.', 'wp-data-sync' ),
+					'options'           => get_product_category_options_array()
+				]
+			],
+			3 => [
+				'key' 		=> 'wp_data_sync_order_require_valid_product',
+				'label'		=> __( 'Require Valid Product', 'wp-data-sync' ),
+				'callback'  => 'input',
+				'args'      => [
+					'sanitize_callback' => 'sanitize_text_field',
+					'basename'          => 'checkbox',
+					'tyoe'              => '',
+					'class'             => 'sync-order-without-valid-product',
+					'placeholder'       => '',
+					'info'              => __( 'Require a valid poroduct in the order.', 'wp-data-sync' )
+				]
+			],
+			4 => [
 				'key' 		=> 'wp_data_sync_show_order_sync_status_admin_column',
 				'label'		=> __( 'Show Order Sync Status Admin Column', 'wp-data-sync' ),
 				'callback'  => 'input',
@@ -109,7 +138,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 					'tyoe'              => '',
 					'class'             => 'show-admin-column',
 					'placeholder'       => '',
-					'info'              => __( 'Show admin column for order export status on Orders list.')
+					'info'              => __( 'Show admin column for order export status on Orders list.', 'wp-data-sync' )
 				]
 			],
 		]
