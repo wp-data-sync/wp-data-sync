@@ -223,7 +223,7 @@ class DataSync {
 
 				// Check to see if the post ID exists.
 				if ( ! get_post_status( $post_id ) ) {
-					$post_id = $this->insert_row( $post_id );
+					$post_id = $this->insert_post_row( $post_id );
 				}
 
 			}
@@ -237,8 +237,7 @@ class DataSync {
 
 		}
 
-		$this->post_id         = $post_id;
-		$this->post_data['ID'] = $post_id;
+		$this->post_id = $post_id;
 
 	}
 
@@ -303,6 +302,146 @@ class DataSync {
 	}
 
 	/**
+	 * Is new.
+	 *
+	 * @return bool
+	 */
+
+	public function get_is_new() {
+		return $this->is_new;
+	}
+
+	/**
+	 * Get the primary ID.
+	 *
+	 * @return int|bool
+	 */
+
+	public function get_primary_id() {
+		return $this->primary_id;
+	}
+
+	/**
+	 * Get the post ID.
+	 *
+	 * @return int|bool
+	 */
+
+	public function get_post_id() {
+		return $this->post_id;
+	}
+
+	/**
+	 * Get the post object.
+	 *
+	 * @return array|bool
+	 */
+
+	public function get_post_data() {
+		return $this->post_data;
+	}
+
+	/**
+	 * Get the post meta.
+	 *
+	 * @return array|bool
+	 */
+
+	public function get_post_meta() {
+		return $this->post_meta;
+	}
+
+	/**
+	 * Get post type.
+	 *
+	 * @return mixed
+	 */
+
+	public function get_post_type() {
+		return isset( $this->post_data['post_type'] ) ? $this->post_data['post_type'] : get_option( 'wp_data_sync_post_type' );
+	}
+
+	/**
+	 * Get the taxonomies.
+	 *
+	 * @return array|bool
+	 */
+
+	public function get_taxonomies() {
+		return $this->taxonomies;
+	}
+
+	/**
+	 * Get featured image.
+	 *
+	 * @return array|bool
+	 */
+
+	public function get_featured_image() {
+		return $this->featured_image;
+	}
+
+	/**
+	 * Get the attributes.
+	 *
+	 * @return array|bool
+	 */
+
+	public function get_attributes() {
+		return $this->attributes;
+	}
+
+	/**
+	 * Get variations.
+	 *
+	 * @return mixed|bool
+	 */
+
+	public function get_variations() {
+		return $this->variations;
+	}
+
+	/**
+	 * Get gallery images.
+	 *
+	 * @return array|bool
+	 */
+
+	public function get_gallery_images() {
+		return $this->gallery_images;
+	}
+
+	/**
+	 * Get the attachment.
+	 *
+	 * @return bool|string
+	 */
+
+	public function get_attachment() {
+		return $this->attachment;
+	}
+
+	/**
+	 * Get order items.
+	 *
+	 * @return array|bool
+	 */
+
+	public function get_order_items() {
+		return $this->order_items;
+	}
+
+	/**
+	 * Get Integrations.
+	 *
+	 * @return array|bool
+	 */
+
+	public function get_integrations() {
+		return $this->integrations;
+	}
+
+	/**
 	 * Fetch Post ID.
 	 *
 	 * @return bool|int
@@ -348,9 +487,12 @@ class DataSync {
 	/**
 	 * Insert a placeholder post.
 	 *
-	 * @since 1.10.0
+	 * We insert a placeholder with WP function to insure the table columns have
+	 * vaild values. Then we can update the values later if they are provided from the API.
 	 *
 	 * @return int|bool
+	 *
+	 * @since 1.10.0
 	 */
 
 	public function insert_placeholder() {
@@ -370,16 +512,17 @@ class DataSync {
 	}
 
 	/**
-	 * Insert Row.
+	 * Insert Post Row.
 	 *
-	 * Insert the a row into posts table with a specific ID.
+	 * Insert a row with a specific ID that
+	 * does not already exist in the posts table.
 	 *
 	 * @param $post_id
 	 *
 	 * @return bool|false|int
 	 */
 
-	public function insert_row( $post_id ) {
+	public function insert_post_row( $post_id ) {
 
 		global $wpdb;
 
@@ -501,12 +644,17 @@ class DataSync {
 	}
 
 	/**
-	 * Post object.
+	 * Post data.
 	 *
 	 * @return int|\WP_Error
+	 *
+	 * @since 1.0
+	 * @since 1.10.2 we update the posts data using $wpdb::update to insure posts dates are updated if provided by API.
 	 */
 
 	public function post_data() {
+
+		global $wpdb;
 
 		do_action( 'wp_data_sync_before_post_data', $this->post_data );
 
@@ -516,7 +664,11 @@ class DataSync {
 
 		$this->post_data_apply_filters();
 
-		$result = wp_update_post( $this->post_data );
+		$result = $wpdb->update(
+			$wpdb->posts,
+			$this->post_data,
+			[ 'ID' => $this->post_id ]
+		);
 
 		if ( ! is_wp_error( $result ) ) {
 			do_action( 'wp_data_sync_after_post_data', $this->post_data );
@@ -1233,146 +1385,6 @@ class DataSync {
 			do_action( "wp_data_sync_integration_$integration", $this->post_id, $values, $this );
 		}
 
-	}
-
-	/**
-	 * Is new.
-	 *
-	 * @return bool
-	 */
-
-	public function get_is_new() {
-		return $this->is_new;
-	}
-
-	/**
-	 * Get the primary ID.
-	 *
-	 * @return int|bool
-	 */
-
-	public function get_primary_id() {
-		return $this->primary_id;
-	}
-
-	/**
-	 * Get the post ID.
-	 *
-	 * @return int|bool
-	 */
-
-	public function get_post_id() {
-		return $this->post_id;
-	}
-
-	/**
-	 * Get the post object.
-	 *
-	 * @return array|bool
-	 */
-
-	public function get_post_data() {
-		return $this->post_data;
-	}
-
-	/**
-	 * Get the post meta.
-	 *
-	 * @return array|bool
-	 */
-
-	public function get_post_meta() {
-		return $this->post_meta;
-	}
-
-	/**
-	 * Get post type.
-	 *
-	 * @return mixed
-	 */
-
-	public function get_post_type() {
-		return isset( $this->post_data['post_type'] ) ? $this->post_data['post_type'] : get_option( 'wp_data_sync_post_type' );
-	}
-
-	/**
-	 * Get the taxonomies.
-	 *
-	 * @return array|bool
-	 */
-
-	public function get_taxonomies() {
-		return $this->taxonomies;
-	}
-
-	/**
-	 * Get featured image.
-	 *
-	 * @return array|bool
-	 */
-
-	public function get_featured_image() {
-		return $this->featured_image;
-	}
-
-	/**
-	 * Get the attributes.
-	 *
-	 * @return array|bool
-	 */
-
-	public function get_attributes() {
-		return $this->attributes;
-	}
-
-	/**
-	 * Get variations.
-	 *
-	 * @return mixed|bool
-	 */
-
-	public function get_variations() {
-		return $this->variations;
-	}
-
-	/**
-	 * Get gallery images.
-	 *
-	 * @return array|bool
-	 */
-
-	public function get_gallery_images() {
-		return $this->gallery_images;
-	}
-
-	/**
-	 * Get the attachment.
-	 *
-	 * @return bool|string
-	 */
-
-	public function get_attachment() {
-		return $this->attachment;
-	}
-
-	/**
-	 * Get order items.
-	 *
-	 * @return array|bool
-	 */
-
-	public function get_order_items() {
-		return $this->order_items;
-	}
-
-	/**
-	 * Get Integrations.
-	 *
-	 * @return array|bool
-	 */
-
-	public function get_integrations() {
-		return $this->integrations;
 	}
 
 }
