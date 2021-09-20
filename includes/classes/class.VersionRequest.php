@@ -75,8 +75,39 @@ class VersionRequest extends Access {
 
 	public function register_route() {
 
+		/**
+		 * Register enpoint with EP version.
+		 *
+		 * @deprecated 1.10.3
+		 */
 		register_rest_route(
 			'wp-data-sync/' . WPDSYNC_EP_VERSION,
+			'/get-version/(?P<access_token>\S+)/(?P<cache_buster>\S+)/',
+			[
+				'methods' => WP_REST_Server::READABLE,
+				'args'    => [
+					'access_token' => [
+						'sanitize_callback' => 'sanitize_text_field',
+						'validate_callback' => [ $this, 'access_token' ]
+					],
+					'cache_buster' => [
+						'validate_callback' => function( $param ) {
+							return is_string( $param );
+						}
+					]
+				],
+				'permission_callback' => [ $this, 'access' ],
+				'callback'            => [ $this, 'request' ],
+			]
+		);
+
+		/**
+		 * Register enpoint without EP version.
+		 *
+		 * @since 1.10.3
+		 */
+		register_rest_route(
+			'wp-data-sync',
 			'/get-version/(?P<access_token>\S+)/(?P<cache_buster>\S+)/',
 			[
 				'methods' => WP_REST_Server::READABLE,
