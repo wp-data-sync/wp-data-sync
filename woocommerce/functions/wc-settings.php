@@ -33,11 +33,25 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 						'visible'                                  => __( 'Shop and search results', 'woocommerce' ),
 						'exclude-from-search'                      => __( 'Shop only', 'woocommerce' ),
 						'exclude-from-catalog'                     => __( 'Search results only', 'woocommerce' ),
-						'exclude-from-catalog,exclude-from-search' => __( 'Hidden', 'woocommerce' )
+						'exclude-from-catalog,exclude-from-search' => __( 'Hidden', 'woocommerce' ),
+						'featured'                                 => __( 'Featured', 'woocommerce' )
 					]
 				]
 			],
 			1 => [
+				'key' 		=> 'wp_data_sync_use_current_product_visibility',
+				'label'		=> __( 'Use Current Product Visibility', 'wp-data-sync' ),
+				'callback'  => 'input',
+				'args'      => [
+					'sanitize_callback' => 'sanitize_text_field',
+					'basename'          => 'checkbox',
+					'type'		        => '',
+					'class'		        => '',
+					'placeholder'       => '',
+					'info'              => __( 'Use the current product visibility if the product visibility is already set. This will prevent DataSync from updating the current product visibility on existing products.' )
+				]
+			],
+			2 => [
 				'key' 		=> 'wp_data_sync_process_cross_sells',
 				'label'		=> __( 'Process Cross Sells', 'wp-data-sync' ),
 				'callback'  => 'input',
@@ -50,7 +64,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 					'info'              => __( 'This relates the IDs from your data source with the IDs from your website. Please note, if the related product does not exist, this system will relate the product when it is created in the data sync.' )
 				]
 			],
-			2 => [
+			3 => [
 				'key' 		=> 'wp_data_sync_process_up_sells',
 				'label'		=> __( 'Process Up Sells', 'wp-data-sync' ),
 				'callback'  => 'input',

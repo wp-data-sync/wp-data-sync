@@ -13,6 +13,7 @@ namespace WP_DataSync\Woo;
 
 use WP_DataSync\App\DataSync;
 use WP_DataSync\App\Log;
+use WP_DataSync\App\Settings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -396,9 +397,24 @@ class WC_Product_DataSync {
 
 	/**
 	 * Product visibility.
+	 *
+	 * @since 1.0.0
+	 * @since 1.10.4
 	 */
 
 	public function product_visibility() {
+
+		/**
+		 * Should we preserve the current product visibility?
+		 */
+		if ( Settings::is_checked( 'wp_data_sync_use_current_product_visibility' ) ) {
+
+			// Check for any product visibility.
+			if ( has_term( '', 'product_visibility', $this->product_id ) ) {
+				return;
+			}
+
+		}
 
 		if ( is_array( $this->taxonomies ) && array_key_exists( 'product_visibility', $this->taxonomies ) ) {
 
