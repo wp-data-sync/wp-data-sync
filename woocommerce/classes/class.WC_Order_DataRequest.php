@@ -11,7 +11,7 @@
 
 namespace WP_DataSync\Woo;
 
-use WP_DataSync\App\Access;
+use WP_DataSync\App\Request;
 use WP_DataSync\App\Log;
 use WP_REST_Server;
 use WP_REST_Request;
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class WC_Order_DataRequest extends Access {
+class WC_Order_DataRequest extends Request {
 
 	/**
 	 * @var string

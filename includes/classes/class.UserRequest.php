@@ -1,10 +1,10 @@
 <?php
 /**
- * SyncRequest
+ * UserRequest
  *
- * Process the DataSync Request.
+ * Process the DataSync User Request.
  *
- * @since   1.0.0
+ * @since   2.0.0
  *
  * @package WP_Data_Sync
  */
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SyncRequest extends Request {
+class UserRequest extends Request {
 
 	/**
 	 * @var string
@@ -43,16 +43,16 @@ class SyncRequest extends Request {
 	 * @var string
 	 */
 
-	protected $log_key = 'sync-request-data';
+	protected $log_key = 'sync-request-user';
 
 	/**
-	 * @var SyncRequest
+	 * @var UserRequest
 	 */
 
 	public static $instance;
 
 	/**
-	 * SyncRequest constructor.
+	 * UserRequest constructor.
 	 */
 
 	public function __construct() {
@@ -62,7 +62,7 @@ class SyncRequest extends Request {
 	/**
 	 * Instance.
 	 *
-	 * @return SyncRequest
+	 * @return UserRequest
 	 */
 
 	public static function instance() {
@@ -85,7 +85,7 @@ class SyncRequest extends Request {
 
 		register_rest_route(
 			'wp-data-sync/' . WPDSYNC_EP_VERSION,
-			'/sync/(?P<access_token>\S+)/(?P<cache_buster>\S+)/',
+			'/user/(?P<access_token>\S+)/(?P<cache_buster>\S+)/',
 			[
 				'methods' => WP_REST_Server::CREATABLE,
 				'args'    => [
@@ -118,31 +118,16 @@ class SyncRequest extends Request {
 
 		$start_request = microtime();
 		$response      = [];
-		$data_sync     = DataSync::instance();
+		$user_sync     = UserSync::instance();
 		$json          = $request->get_body();
-		$data          = $this->request_data( $json );
+		$user_data     = $this->request_data( $json );
 
-		if ( isset( $data['items'] ) && is_array( $data['items'] ) ) {
+		$user_sync->set_properties( $user_data );
 
-			foreach ( $data['items'] as $key => $data ) {
-
-				$data_sync->set_properties( $data );
-
-				$response['items'][ $key ] = $data_sync->process();
-
-			}
-
-		}
-		else {
-
-			$data_sync->set_properties( $data );
-
-			$response['items'][] = $data_sync->process();
-
-		}
-
+		$response['result']       = $user_sync->process();
 		$response['request_time'] = microtime() - $start_request;
-		Log::write( 'sync-request-response', $response );
+
+		Log::write( 'user-request-response', $response );
 
 		return rest_ensure_response( $response );
 

@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class ItemRequest extends Access {
+class ItemRequest extends Request {
 
 	/**
 	 * @var string

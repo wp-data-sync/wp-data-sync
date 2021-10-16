@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class KeyRequest extends Access {
+class KeyRequest extends Request {
 
 	/**
 	 * @var string
@@ -126,6 +126,8 @@ class KeyRequest extends Access {
 
 	public function get_keys() {
 
+		global $wpdb;
+
 		$keys =  [
 			0 => [
 				'heading' => __( 'Post Types' ),
@@ -139,7 +141,12 @@ class KeyRequest extends Access {
 			],
 			2  => [
 				'heading' => __( 'Meta Keys' ),
-				'keys'    => $this->meta_keys(),
+				'keys'    => $this->meta_keys( $wpdb->postmeta ),
+				'type'    => 'value'
+			],
+			3  => [
+				'heading' => __( 'User Meta Keys' ),
+				'keys'    => $this->meta_keys( $wpdb->usermeta ),
 				'type'    => 'value'
 			]
 		];
@@ -196,17 +203,19 @@ class KeyRequest extends Access {
 	/**
 	 * Get all the unique meta keys.
 	 *
+	 * @param $table
+	 *
 	 * @return array|object|null
 	 */
 
-	public function meta_keys() {
+	public function meta_keys( $table ) {
 
 		global $wpdb;
 
 		$rows = $wpdb->get_results(
 			"
 			SELECT DISTINCT meta_key 
-			FROM {$wpdb->postmeta}
+			FROM $table
 			WHERE meta_key NOT IN ( '_edit_last', '_edit_lock' )
 			AND meta_key NOT LIKE '_menu_item_%'
 			ORDER BY meta_key

@@ -2,7 +2,7 @@
 /**
  * DataSync
  *
- * Process to DataSync
+ * Process post type data.
  *
  * @since   1.0.0
  *
@@ -456,15 +456,13 @@ class DataSync {
 		$post_id = $wpdb->get_var( $wpdb->prepare(
 			"
 			SELECT post_id 
-    		FROM {$wpdb->postmeta} pm 
-    		JOIN {$wpdb->posts} p 
-      		ON p.ID = pm.post_id
+    		FROM $wpdb->postmeta 
     		WHERE meta_key = %s 
       		AND meta_value = %s 
       		ORDER BY meta_id DESC
 			",
-			esc_sql( $meta_key ),
-			esc_sql( $meta_value )
+			esc_sql( $key ),
+			esc_sql( $value )
 		) );
 
 		if ( empty( $post_id ) || is_wp_error( $post_id ) ) {

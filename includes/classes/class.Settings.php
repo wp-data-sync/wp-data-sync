@@ -110,8 +110,11 @@ class Settings {
 			'dashboard' => [
 				'label' => __( 'Dashboard', 'wp-data-sync' ),
 			],
-			'sync_settings' => [
-				'label' => __( 'Sync Settings', 'wp-data-sync' ),
+			'data_sync_settings' => [
+				'label' => __( 'Data Sync', 'wp-data-sync' ),
+			],
+			'user_sync_settings' => [
+				'label' => __( 'User Sync', 'wp-data-sync' ),
 			],
 			'item_request' => [
 				'label' => __( 'Item Request', 'wp-data-sync' ),
@@ -356,7 +359,7 @@ class Settings {
 					]
 				]
 			],
-			'sync_settings' => [
+			'data_sync_settings' => [
 				0 => [
 					'key' 		=> 'wp_data_sync_post_title',
 					'label'		=> __( 'Default Title', 'wp-data-sync' ),
@@ -529,7 +532,51 @@ class Settings {
 						'type'		        => '',
 						'class'		        => '',
 						'placeholder'       => '',
-						'info'              => __( 'Replace all valid full image URLs. This will make a copy of the images in this websites media library and replace the image URLs in the content.' )
+						'info'              => __( 'Replace all valid full image URLs. This will make a copy of the images in this websites media library and replace the image URLs in the content.', 'wp-data-sync' )
+					]
+				]
+			],
+			'user_sync_settings' => [
+				0 => [
+					'key' 		=> 'wp_data_sync_check_current_user_email',
+					'label'		=> __( 'Check Current User Emails', 'wp-data-sync' ),
+					'callback'  => 'input',
+					'args'      => [
+						'sanitize_callback' => 'sanitize_text_field',
+						'basename'          => 'checkbox',
+						'type'		        => '',
+						'class'		        => 'check-current-users-email',
+						'placeholder'       => '',
+						'info'              => __( 'If the primary ID search fails, check current users email to see if it exists. If it does exist, update that user. If not exists, create a new user with that email.', 'wp-data-sync' )
+					]
+				],
+				1 => [
+					'key' 		=> 'wp_data_sync_check_current_user_login',
+					'label'		=> __( 'Check Current Usernames', 'wp-data-sync' ),
+					'callback'  => 'input',
+					'args'      => [
+						'sanitize_callback' => 'sanitize_text_field',
+						'basename'          => 'checkbox',
+						'type'		        => '',
+						'class'		        => 'check-current-usernames',
+						'placeholder'       => '',
+						'info'              => __( 'If the primary ID search fails, check current usernames to see if it exists. If it does exist, update that user. If not exists, create a new user with that username.', 'wp-data-sync' )
+					]
+				],
+				2 => [
+					'key' 		=> 'wp_data_sync_default_user_role',
+					'label'		=> __( 'Default User Role', 'wp-data-sync' ),
+					'callback'  => 'input',
+					'args'      => [
+						'sanitize_callback' => 'sanitize_text_field',
+						'name'              => 'wp_data_sync_default_user_role',
+						'basename'          => 'select',
+						'type'		        => '',
+						'class'		        => 'default-user-role',
+						'placeholder'       => '',
+						'selected'          => get_option( 'wp_data_sync_default_user_role', '' ),
+						'info'              => __( 'Default user role applied when a new user is created.', 'wp-data-sync' ),
+						'values'            => $this->user_roles()
 					]
 				]
 			],
@@ -719,6 +766,26 @@ class Settings {
 
 	public static function is_data_type_excluded( $type ) {
 		return in_array( $type, get_option( 'wp_data_sync_item_request_exclude_data_types', [] ) );
+	}
+
+	/**
+	 * User Roles.
+	 *
+	 * @return array
+	 */
+
+	public function user_roles() {
+
+		global $wp_roles;
+
+		$formatted_roles = [];
+
+		foreach ( $wp_roles->roles as $key => $values ) {
+			$formatted_roles[ $key ] = $values['name'];
+		}
+
+		return $formatted_roles;
+
 	}
 
 }

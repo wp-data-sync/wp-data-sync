@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class VersionRequest extends Access {
+class VersionRequest extends Request {
 
 	/**
 	 * @var string
@@ -70,48 +70,23 @@ class VersionRequest extends Access {
 	/**
 	 * Register the route.
 	 *
-	 * @link https://developer.wordpress.org/rest-api/extending-the-rest-api/adding-custom-endpoints/
+	 * @since 1.0.0
+	 *        2.0.0 Require version as any 2 character string
 	 */
 
 	public function register_route() {
 
-		/**
-		 * Register enpoint with EP version.
-		 *
-		 * @deprecated 1.10.3
-		 */
-		register_rest_route(
-			'wp-data-sync/' . WPDSYNC_EP_VERSION,
-			'/get-version/(?P<access_token>\S+)/(?P<cache_buster>\S+)/',
-			[
-				'methods' => WP_REST_Server::READABLE,
-				'args'    => [
-					'access_token' => [
-						'sanitize_callback' => 'sanitize_text_field',
-						'validate_callback' => [ $this, 'access_token' ]
-					],
-					'cache_buster' => [
-						'validate_callback' => function( $param ) {
-							return is_string( $param );
-						}
-					]
-				],
-				'permission_callback' => [ $this, 'access' ],
-				'callback'            => [ $this, 'request' ],
-			]
-		);
-
-		/**
-		 * Register enpoint without EP version.
-		 *
-		 * @since 1.10.3
-		 */
 		register_rest_route(
 			'wp-data-sync',
-			'/get-version/(?P<access_token>\S+)/(?P<cache_buster>\S+)/',
+			'/(?P<ep_version>\S+)/get-version/(?P<access_token>\S+)/(?P<cache_buster>\S+)/',
 			[
 				'methods' => WP_REST_Server::READABLE,
 				'args'    => [
+					'ep_version' => [
+						'validate_callback' => function( $param ) {
+						    return is_string( $param ) && 2 === strlen( $param );
+					    }
+					],
 					'access_token' => [
 						'sanitize_callback' => 'sanitize_text_field',
 						'validate_callback' => [ $this, 'access_token' ]
