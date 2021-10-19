@@ -61,11 +61,11 @@ abstract class Request {
 			return FALSE;
 		}
 
-		Log::write( 'access-attempt', "Request Key Available" );
+		Log::write( 'access-attempt', "Access Token Provided" );
 
 		if ( $access_token === $local_token ) {
 
-			Log::write( 'access-attempt', "Request Key Approved" );
+			Log::write( 'access-attempt', "Access token Approved" );
 
 			return TRUE;
 
@@ -93,11 +93,11 @@ abstract class Request {
 			return FALSE;
 		}
 
-		Log::write( 'access-attempt', "Private Key Available" );
+		Log::write( 'access-attempt', "Private Token Provided" );
 
 		if ( $private_key === $local_token ) {
 
-			Log::write( 'access-attempt', "Private Key Approved" );
+			Log::write( 'access-attempt', "Private Token Approved" );
 
 			return TRUE;
 

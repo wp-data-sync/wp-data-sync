@@ -111,11 +111,11 @@ class ItemRequest extends Request {
 					],
 					'limit' => [
 						'sanitize_callback' => 'absint',
-						'validate_callback' => [ $this, 'limit' ]
+						'validate_callback' => [ $this, 'set_limit' ]
 					],
 					'api_id' => [
 						'sanitize_callback' => 'sanitize_text_field',
-						'validate_callback' => [ $this, 'api_id' ]
+						'validate_callback' => [ $this, 'set_api_id' ]
 					]
 				],
 				'permission_callback' => [ $this, 'access' ],
@@ -167,7 +167,7 @@ class ItemRequest extends Request {
 	 * @return bool
 	 */
 
-	public function api_id( $api_id ) {
+	public function set_api_id( $api_id ) {
 
 		$api_id = sanitize_text_field( $api_id );
 
@@ -185,7 +185,7 @@ class ItemRequest extends Request {
 	 * @return bool
 	 */
 
-	public function limit( $limit ) {
+	public function set_limit( $limit ) {
 
 		$this->limit = intval( $limit );
 
