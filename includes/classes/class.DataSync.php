@@ -751,6 +751,17 @@ class DataSync {
 
 			$taxonomy = trim( wp_unslash( $taxonomy ) );
 
+			/**
+			 * Filter: wp_data_sync_taxonomy
+			 *
+			 * @param string $taxonomy
+			 * @param int    $post_id
+			 *
+			 * @since 2.0.3
+			 */
+
+			$taxonomy = apply_filters( 'wp_data_sync_taxonomy', $taxonomy, $this->post_id );
+
 			if ( empty( $taxonomy ) || ! taxonomy_exists( $taxonomy ) ) {
 
 				Log::write( 'invalid-taxonomy', $taxonomy );
@@ -764,6 +775,17 @@ class DataSync {
 
 			foreach ( $terms as $term ) {
 
+				/**
+				 * Filter: wp_data_sync_term
+				 *
+				 * @param array  $term
+				 * @param string $taxonomy
+				 * @param int    $post_id
+				 *
+				 * @since 2.0.3
+				 */
+
+				$term      = apply_filters( 'wp_data_sync_term', $term, $taxonomy, $this->post_id );
 				$parent_id = 0;
 
 				if ( ! empty( $term['parents'] ) && is_array( $term['parents']  ) ) {
@@ -774,11 +796,13 @@ class DataSync {
 					 * @param array  $term_parents
 					 * @param array  $term
 					 * @param string $taxonomy
+					 * @param int    $post_id
 					 *
 					 * @since 2.0.2
+					 *        2.0.3 Add $post_id to args.
 					 */
 
-					$term_parents = apply_filters( 'wp_data_sync_term_parents', $term['parents'], $term, $taxonomy );
+					$term_parents = apply_filters( 'wp_data_sync_term_parents', $term['parents'], $term, $taxonomy, $this->post_id );
 ;
 					foreach ( $term_parents as $parent ) {
 						$parent_id = $this->set_term( $parent, $taxonomy, $parent_id );
@@ -819,21 +843,47 @@ class DataSync {
 		}
 
 		/**
-		 * Extract.
+		 * Extract $term
 		 *
 		 * $name
 		 * $description
 		 * $thumb_url
 		 * $term_meta
 		 */
+
 		extract( $term );
 
 		$name = trim( wp_unslash( $name ) );
 
 		Log::write( 'term-id', "$name - $taxonomy - $parent_id" );
 
-		$name     = apply_filters( 'wp_data_sync_term_name', $name, $taxonomy, $parent_id );
-		$taxonomy = apply_filters( 'wp_data_sync_taxonomy', $taxonomy, $name, $parent_id );
+		/**
+		 * Filter: wp_data_sync_term_name
+		 *
+		 * @param string $name
+		 * @param string $taxonomy
+		 * @param int    $parent_id
+		 * @param int    $post_id
+		 *
+		 * @since 1.0.0
+		 *        2.0.3 Add $post_id to args.
+		 */
+
+		$name = apply_filters( 'wp_data_sync_term_name', $name, $taxonomy, $parent_id, $this->post_id );
+
+		/**
+		 * Filter: wp_data_sync_term_taxonomy
+		 *
+		 * @param string $taxonomy
+		 * @param string $name
+		 * @param int    $parent_id
+		 * @param int    $post_id
+		 *
+		 * @since 1.0.0
+		 *        2.0.3 Add $post_id to args.
+		 */
+
+		$taxonomy = apply_filters( 'wp_data_sync_term_taxonomy', $taxonomy, $name, $parent_id, $this->post_id );
 
 		if ( ! $term_id = $this->term_exists( $name, $taxonomy, $parent_id ) ) {
 
