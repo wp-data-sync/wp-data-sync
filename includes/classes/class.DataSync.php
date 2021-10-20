@@ -768,7 +768,19 @@ class DataSync {
 
 				if ( ! empty( $term['parents'] ) && is_array( $term['parents']  ) ) {
 
-					foreach ( $term['parents'] as $parent ) {
+					/**
+					 * Filter: wp_data_sync_term_parents
+					 *
+					 * @param array  $term_parents
+					 * @param array  $term
+					 * @param string $taxonomy
+					 *
+					 * @since 2.0.2
+					 */
+
+					$term_parents = apply_filters( 'wp_data_sync_term_parents', $term['parents'], $term, $taxonomy );
+;
+					foreach ( $term_parents as $parent ) {
 						$parent_id = $this->set_term( $parent, $taxonomy, $parent_id );
 					}
 
