@@ -23,15 +23,16 @@ class Log {
 	/**
 	 * Write the log to the file.
 	 *
-	 * @param $key
-	 * @param $data
+	 * @param string              $key
+	 * @param string|array|object $data
+	 * @param string              $action
 	 */
 
-	public static function write( $key, $data ) {
+	public static function write( $key, $data, $action = '' ) {
 
 		if ( self::is_active() ) {
 
-			$msg        = self::message( $data );
+			$msg        = self::message( $data, $action );
 			$date       = date( 'Y-m-d' );
 			$error_file = WPDSYNC_LOG_DIR . "{$key}-{$date}.log";
 
@@ -58,13 +59,13 @@ class Log {
 	 * @return string
 	 */
 
-	public function message( $data ) {
+	public function message( $data, $action ) {
 
 		ob_start();
 
 		$date = date( "F j, Y, g:i a" );
 
-		echo "[{$date}] - ";
+		echo "[{$date}] - $action - ";
 
 		if ( is_array( $data ) || is_object( $data ) ) {
 			print_r( $data );
