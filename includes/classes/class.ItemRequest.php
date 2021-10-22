@@ -304,6 +304,9 @@ class ItemRequest extends Request {
 	/**
 	 * Get the item IDs.
 	 *
+	 * @since 1.0.0
+	 *        2.0.4 Add filters to SQL statements.
+	 *
 	 * @return bool|mixed
 	 */
 
@@ -311,32 +314,76 @@ class ItemRequest extends Request {
 
 		global $wpdb;
 
-		$table        = self::table();
+		$table = self::table();
+
+		/**
+		 * SELECT statement.
+		 */
+
+		$select = "
+			SELECT SQL_NO_CACHE SQL_CALC_FOUND_ROWS  p.ID 
+			FROM {$wpdb->prefix}posts p
+		";
+
+		/**
+		 * JOIN statement.
+		 */
+
+		$join = apply_filters( 'wp_data_sync_item_request_sql_join', $wpdb->prepare(
+			"
+			LEFT JOIN $table i
+			ON (p.ID = i.item_id AND i.api_id = %s)
+			",
+			esc_sql( $this->api_id )
+		), $this->post_type );
+
+		/**
+		 * WHERE statement
+		 */
+
 		$status       = get_option( 'wp_data_sync_item_request_status', [ 'publish' ] );
 		$count        = count( $status );
 		$placeholders = join( ', ', array_fill( 0, $count, '%s' ) );
-		$args         = array_merge(
-			[ esc_sql( $this->api_id ) ],
+		$where_args   = array_merge(
 			[ esc_sql( $this->post_type ) ],
-			array_map( 'esc_sql', $status ),
-			[ intval( $this->limit ) ]
+			array_map( 'esc_sql', $status )
 		);
 
-		$sql = $wpdb->prepare(
-			"
-			SELECT SQL_NO_CACHE SQL_CALC_FOUND_ROWS  p.ID 
-			FROM {$wpdb->prefix}posts p
-			LEFT JOIN $table i
-			ON (p.ID = i.item_id AND i.api_id = %s) 
+		$where = apply_filters( 'wp_data_sync_item_request_sql_where', $wpdb->prepare(
+			" 
 			WHERE i.item_id IS NULL 
 			AND p.post_type = %s 
 			AND p.post_status IN ( $placeholders )
-			GROUP BY p.ID 
-			ORDER BY p.ID DESC 
-			LIMIT %d
 			",
-			$args
-		);
+			$where_args
+		), $this->post_type );
+
+		/**
+		 * GROUP BY statement
+		 */
+
+		$group_by = apply_filters( 'wp_data_sync_item_request_sql_group_by', "GROUP BY p.ID", $this->post_type );
+
+		/**
+		 * ORDER BY statement
+		 */
+
+		$order_by = apply_filters( 'wp_data_sync_item_request_sql_order_by', "ORDER BY p.ID DESC", $this->post_type );
+
+		/**
+		 * LIMIT statement
+		 */
+
+		$limit = apply_filters( 'wp_data_sync_item_request_sql_limit', $wpdb->prepare(
+			"LIMIT %d",
+			intval( $this->limit )
+		), $limit, $this->post_type );
+
+		/**
+		 * Combine parts to make the SQL statement.
+		 */
+
+		$sql = "$select $join $where $group_by $order_by $limit";
 
 		Log::write( 'item-request-sql', $sql );
 

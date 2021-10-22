@@ -54,7 +54,8 @@ class Log {
 	/**
 	 * Log message..
 	 *
-	 * @param $data
+	 * @param string|array|object $data
+	 * @param string              $action
 	 *
 	 * @return string
 	 */
