@@ -203,6 +203,8 @@ class DataSync {
 
 		do_action( 'wp_data_sync_after_process', $this->post_id, $this );
 
+		$this->update_last_modified();
+
 		return [ 'post_id' => $this->post_id ];
 
 	}
@@ -1445,6 +1447,16 @@ class DataSync {
 			do_action( "wp_data_sync_integration_$integration", $this->post_id, $values, $this );
 		}
 
+	}
+
+	/**
+	 * Update the last modified date.
+	 *
+	 * @since 2.0.6
+	 */
+
+	public function update_last_modified() {
+		wp_update_post( [ 'ID' => $this->post_id ] );
 	}
 
 }
