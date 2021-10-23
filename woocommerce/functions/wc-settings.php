@@ -19,7 +19,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 
 	$settings = array_merge( $settings, [
 		'woocommerce' => [
-			0 => [
+			[
 				'key' 		=> 'wp_data_sync_product_visibility',
 				'label'		=> __( 'Default Product Visibility', 'wp-data-sync' ),
 				'callback'  => 'input',
@@ -38,7 +38,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 					]
 				]
 			],
-			1 => [
+			[
 				'key' 		=> 'wp_data_sync_use_current_product_visibility',
 				'label'		=> __( 'Use Current Product Visibility', 'wp-data-sync' ),
 				'callback'  => 'input',
@@ -51,7 +51,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 					'info'              => __( 'Use the current product visibility if the product visibility is already set. This will prevent DataSync from updating the current product visibility on existing products.' )
 				]
 			],
-			2 => [
+			[
 				'key' 		=> 'wp_data_sync_process_cross_sells',
 				'label'		=> __( 'Process Cross Sells', 'wp-data-sync' ),
 				'callback'  => 'input',
@@ -64,7 +64,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 					'info'              => __( 'This relates the IDs from your data source with the IDs from your website. Please note, if the related product does not exist, this system will relate the product when it is created in the data sync.' )
 				]
 			],
-			3 => [
+			[
 				'key' 		=> 'wp_data_sync_process_up_sells',
 				'label'		=> __( 'Process Up Sells', 'wp-data-sync' ),
 				'callback'  => 'input',
@@ -79,7 +79,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 			]
 		],
 		'orders' => [
-			0 => [
+			[
 				'key' 		=> 'wp_data_sync_order_sync_allowed',
 				'label'		=> __( 'Allow Order Sync', 'wp-data-sync' ),
 				'callback'  => 'input',
@@ -92,7 +92,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 					'info'              => __( 'Allow order details to sync with the WP Data Sync API.')
 				]
 			],
-			1 => [
+			[
 				'key' 		=> 'wp_data_sync_allowed_order_status',
 				'label'		=> __( 'Allowed Order Status', 'wp-data-sync' ),
 				'callback'  => 'input',
@@ -113,7 +113,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 					] )
 				]
 			],
-			2 => [
+			[
 				'key' 		=> 'wp_data_sync_order_allowed_product_cats',
 				'label'		=> __( 'Allowed Product Categories', 'wp-data-sync' ),
 				'callback'  => 'input',
@@ -129,7 +129,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 					'options'           => get_product_category_options_array()
 				]
 			],
-			3 => [
+			[
 				'key' 		=> 'wp_data_sync_order_require_valid_product',
 				'label'		=> __( 'Require Valid Product', 'wp-data-sync' ),
 				'callback'  => 'input',
@@ -142,7 +142,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 					'info'              => __( 'Require a valid poroduct in the order.', 'wp-data-sync' )
 				]
 			],
-			4 => [
+			[
 				'key' 		=> 'wp_data_sync_show_order_sync_status_admin_column',
 				'label'		=> __( 'Show Order Sync Status Admin Column', 'wp-data-sync' ),
 				'callback'  => 'input',
@@ -160,4 +160,4 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 
 	return $settings;
 
-}, 10, 2 );
+}, 1, 2 );

@@ -290,12 +290,6 @@ class ItemRequest extends Request {
 		}
 
 		unset( $item->ID );
-		unset( $item->guid );
-		unset( $item->post_parent );
-
-		if ( Settings::is_checked( 'wp_data_sync_unset_post_author' ) ) {
-			unset( $item->post_author );
-		}
 
 		return $item;
 

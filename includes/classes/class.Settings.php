@@ -309,7 +309,7 @@ class Settings {
 
 		$options = apply_filters( 'wp_data_sync_settings', [
 			'dashboard' => [
-				0 => [
+				[
 					'key' 		=> 'wp_data_sync_allowed',
 					'label'		=> __( 'Allow Data Sync API Access', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -321,7 +321,7 @@ class Settings {
 						'placeholder'       => ''
 					]
 				],
-				1 => [
+				[
 					'key' 		=> 'wp_data_sync_access_token',
 					'label'		=> __( 'API Access Token', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -333,7 +333,7 @@ class Settings {
 						'placeholder'       => ''
 					]
 				],
-				2 => [
+				[
 					'key' 		=> 'wp_data_sync_private_token',
 					'label'		=> __( 'API Private Token', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -345,7 +345,7 @@ class Settings {
 						'placeholder'       => ''
 					]
 				],
-				3 => [
+				[
 					'key' 		=> 'wp_data_sync_auto_update',
 					'label'		=> __( 'Automatically Update Plugin', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -360,7 +360,7 @@ class Settings {
 				]
 			],
 			'data_sync_settings' => [
-				0 => [
+				[
 					'key' 		=> 'wp_data_sync_post_title',
 					'label'		=> __( 'Default Title', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -372,7 +372,7 @@ class Settings {
 						'placeholder'       => ''
 					]
 				],
-				1 => [
+				[
 					'key' 		=> 'wp_data_sync_post_author',
 					'label'		=> __( 'Default Author', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -385,7 +385,7 @@ class Settings {
 						'class'             => 'default-author widefat'
 					]
 				],
-				2 => [
+				[
 					'key' 		=> 'wp_data_sync_post_status',
 					'label'		=> __( 'Default Status', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -406,7 +406,7 @@ class Settings {
 						]
 					]
 				],
-				3 => [
+				[
 					'key' 		=> 'wp_data_sync_post_type',
 					'label'		=> __( 'Default Type', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -419,7 +419,7 @@ class Settings {
 						'values'            => get_post_types()
 					]
 				],
-				4 => [
+				[
 					'key' 		=> 'wp_data_sync_append_terms',
 					'label'		=> __( 'Append Terms', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -435,7 +435,7 @@ class Settings {
 						]
 					]
 				],
-				5 => [
+				[
 					'key' 		=> 'wp_data_sync_sync_term_desc',
 					'label'		=> __( 'Sync Term Description', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -451,7 +451,7 @@ class Settings {
 						]
 					]
 				],
-				6 => [
+				[
 					'key' 		=> 'wp_data_sync_sync_term_thumb',
 					'label'		=> __( 'Sync Term Thumbnail', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -467,7 +467,7 @@ class Settings {
 						]
 					]
 				],
-				7 => [
+				[
 					'key' 		=> 'wp_data_sync_sync_term_meta',
 					'label'		=> __( 'Sync Term Meta', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -483,7 +483,7 @@ class Settings {
 						]
 					]
 				],
-				8 => [
+				[
 					'key' 		=> 'wp_data_sync_force_delete',
 					'label'		=> __( 'Force Delete', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -496,7 +496,7 @@ class Settings {
 						'info'              => __( 'When synced items have the trash status permanently delete the items and all related data.' )
 					]
 				],
-				9 => [
+				[
 					'key' 		=> 'wp_data_sync_allow_unsecure_images',
 					'label'		=> __( 'Allow Unsecure Images', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -509,7 +509,7 @@ class Settings {
 						'info'              => __( 'Allow images without valid SSL certificates to be imported.' )
 					]
 				],
-				10 => [
+				[
 					'key' 		=> 'wp_data_sync_replace_post_content_images',
 					'label'		=> __( 'Replace Images in Content', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -522,7 +522,7 @@ class Settings {
 						'info'              => __( 'Replace all valid full image URLs. This will make a copy of the images in this websites media library and replace the image URLs in the content.' )
 					]
 				],
-				11 => [
+				[
 					'key' 		=> 'wp_data_sync_replace_post_excerpt_images',
 					'label'		=> __( 'Replace Images in Excerpt', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -537,7 +537,7 @@ class Settings {
 				]
 			],
 			'user_sync_settings' => [
-				0 => [
+				[
 					'key' 		=> 'wp_data_sync_check_current_user_email',
 					'label'		=> __( 'Check Current User Emails', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -550,7 +550,7 @@ class Settings {
 						'info'              => __( 'If the primary ID search fails, check current users email to see if it exists. If it does exist, update that user. If not exists, create a new user with that email.', 'wp-data-sync' )
 					]
 				],
-				1 => [
+				[
 					'key' 		=> 'wp_data_sync_check_current_user_login',
 					'label'		=> __( 'Check Current Usernames', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -563,7 +563,7 @@ class Settings {
 						'info'              => __( 'If the primary ID search fails, check current usernames to see if it exists. If it does exist, update that user. If not exists, create a new user with that username.', 'wp-data-sync' )
 					]
 				],
-				2 => [
+				[
 					'key' 		=> 'wp_data_sync_default_user_role',
 					'label'		=> __( 'Default User Role', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -581,7 +581,7 @@ class Settings {
 				]
 			],
 			'item_request' => [
-				0 => [
+				[
 					'key' 		=> 'wp_data_sync_item_request_access_token',
 					'label'		=> __( 'Item Request Access Token', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -593,7 +593,7 @@ class Settings {
 						'placeholder'       => ''
 					]
 				],
-				1 => [
+				[
 					'key' 		=> 'wp_data_sync_item_request_private_token',
 					'label'		=> __( 'Item Request Private Token', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -605,20 +605,7 @@ class Settings {
 						'placeholder'       => ''
 					]
 				],
-				2 => [
-					'key' 		=> 'wp_data_sync_unset_post_author',
-					'label'		=> __( 'Unset Post Author', 'wp-data-sync' ),
-					'callback'  => 'input',
-					'args'      => [
-						'sanitize_callback' => 'sanitize_text_field',
-						'basename'          => 'checkbox',
-						'type'		        => '',
-						'class'		        => '',
-						'placeholder'       => '',
-						'info'              => __( 'Remove the post author ID from items. This will allow the default author to be assigned when syncing data.' )
-					]
-				],
-				3 => [
+				[
 					'key' 		=> 'wp_data_sync_item_request_status',
 					'label'		=> __( 'Include items with status', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -642,7 +629,7 @@ class Settings {
 						] )
 					]
 				],
-				4 => [
+				[
 					'key' 		=> 'wp_data_sync_item_request_exclude_data_types',
 					'label'		=> __( 'Exclude Data Types', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -667,7 +654,7 @@ class Settings {
 				]
 			],
 			'logs' => [
-				0 => [
+				[
 					'key' 		=> Log::ALLOWED_KEY,
 					'label'		=> __( 'Allow Logging', 'wp-data-sync' ),
 					'callback'  => 'input',
@@ -680,7 +667,7 @@ class Settings {
 						'info'              => __( 'We reccommend keeping this off unless you are having an issue with the data sync. If you do have an issue, please activate this before contacting support. Please note when this is deactivated all log files will be deleted.' )
 					]
 				],
-				1 => [
+				[
 					'key' 		=> Log::FILE_KEY,
 					'label'		=> __( 'Log File', 'wp-data-sync' ),
 					'callback'  => 'input',
