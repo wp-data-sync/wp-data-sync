@@ -107,7 +107,7 @@ class ItemRequest extends Request {
 					],
 					'post_type' => [
 						'sanitize_callback' => 'sanitize_text_field',
-						'validate_callback' => [ $this, 'post_type' ]
+						'validate_callback' => [ $this, 'set_post_type' ]
 					],
 					'limit' => [
 						'sanitize_callback' => 'absint',
@@ -151,7 +151,7 @@ class ItemRequest extends Request {
 	 * @return bool
 	 */
 
-	public function post_type( $post_type ) {
+	public function set_post_type( $post_type ) {
 
 		$this->post_type = sanitize_text_field( $post_type );
 
@@ -237,7 +237,7 @@ class ItemRequest extends Request {
 		$item_data['source_item_id'] = $item_id;
 
 		if ( ! Settings::is_data_type_excluded( 'post_data' ) ) {
-			$item_data['post_data'] = $this->get_post( $item_id );
+			$item_data['post_data'] = $this->post_data( $item_id );
 		}
 
 		if ( ! Settings::is_data_type_excluded( 'post_meta' ) ) {
@@ -252,12 +252,12 @@ class ItemRequest extends Request {
 			$item_data['featured_image'] = $this->featured_image( $item_id );
 		}
 
-		if ( ! Settings::is_data_type_excluded( 'integrations' ) ) {
-			$item_data['integrations'] = apply_filters( 'wp_data_sync_item_request_integrations', [], $item_id );
-		}
-
 		if ( 'attachment' === $this->get_post_type() ) {
 			$item_data['attachment'] = $this->attachment( $item_id );
+		}
+
+		if ( ! Settings::is_data_type_excluded( 'integrations' ) ) {
+			$item_data['integrations'] = apply_filters( 'wp_data_sync_item_request_integrations', [], $item_id, $this );
 		}
 
 		return apply_filters( 'wp_data_sync_item_request', $item_data, $item_id, $this );
@@ -265,33 +265,33 @@ class ItemRequest extends Request {
 	}
 
 	/**
-	 * Get post.
+	 * Post Data.
 	 *
 	 * @param $item_id int
 	 *
 	 * @return array|\WP_Post|null
 	 */
 
-	public function get_post( $item_id ) {
+	public function post_data( $item_id ) {
 
 		global $wpdb;
 
-		$item = $wpdb->get_row( $wpdb->prepare(
+		$post_data = $wpdb->get_row( $wpdb->prepare(
 			"
 			SELECT * 
 			FROM $wpdb->posts
 			WHERE ID = %d
 			",
 			intval( $item_id )
-		) );
+		), ARRAY_A );
 
-		if ( empty( $item ) || is_wp_error( $item ) ) {
+		if ( empty( $post_data ) || is_wp_error( $post_data ) ) {
 			return [];
 		}
 
-		unset( $item->ID );
+		unset( $post_data['ID'] );
 
-		return $item;
+		return apply_filters( 'wp_data_sync_item_request_post_data', $post_data, $item_id, $this );
 
 	}
 
@@ -405,22 +405,22 @@ class ItemRequest extends Request {
 
 	public function post_meta( $item_id ) {
 
-		$meta_values = [];
-		$post_meta   = get_post_meta( $item_id );
+		$post_meta   = [];
+		$meta_values = get_post_meta( $item_id );
 
-		foreach ( $post_meta as $meta_key => $values ) {
+		foreach ( $meta_values as $meta_key => $values ) {
 
 			// Get the first element of array.
 			$meta_value = array_shift( $values );
 
-			$meta_values[ $meta_key ] = maybe_unserialize( $meta_value );
+			$post_meta[ $meta_key ] = maybe_unserialize( $meta_value );
 
 		}
 
 		// Save the post ID into meta data.
-		$meta_values['_source_item_id'] = $item_id;
+		$post_meta['_source_item_id'] = $item_id;
 
-		return $meta_values;
+		return apply_filters( 'wp_data_sync_item_request_post_meta', $post_meta, $item_id, $this );
 
 	}
 
@@ -444,7 +444,7 @@ class ItemRequest extends Request {
 			'alt'         => get_post_meta( $item_id, '_wp_attachment_image_alt', TRUE ) ?: ''
 		];
 
-		return apply_filters( 'wp_data_sync_item_request_featured_image', $featured_image );
+		return apply_filters( 'wp_data_sync_item_request_featured_image', $featured_image, $item_id, $this );
 
 	}
 
@@ -458,7 +458,7 @@ class ItemRequest extends Request {
 
 	public function attachment( $item_id ) {
 
-		$featured_image = [
+		$attachment = [
 			'image_url'   => wp_get_attachment_image_url( $item_id, 'full' ),
 			'title'       => get_the_title( $item_id ) ?: '',
 			'description' => get_the_content( $item_id ) ?: '',
@@ -466,7 +466,7 @@ class ItemRequest extends Request {
 			'alt'         => get_post_meta( $item_id, '_wp_attachment_image_alt', TRUE ) ?: ''
 		];
 
-		return apply_filters( 'wp_data_sync_item_request_featured_image', $featured_image );
+		return apply_filters( 'wp_data_sync_item_request_attachment', $attachment, $item_id, $this );
 
 	}
 
@@ -501,7 +501,7 @@ class ItemRequest extends Request {
 
 		}
 
-		return array_filter( $results );
+		return apply_filters( 'wp_data_sync_item_request_taxonomies', array_filter( $results ), $item_id, $this );
 
 	}
 
@@ -630,7 +630,7 @@ class ItemRequest extends Request {
 
 		}
 
-		return $meta_values;
+		return apply_filters( 'wp_data_sync_item_request_term_meta', $meta_values, $term, $this );
 
 	}
 
