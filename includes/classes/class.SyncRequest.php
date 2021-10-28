@@ -116,6 +116,12 @@ class SyncRequest extends Request {
 
 	public function process( WP_REST_Request $request ) {
 
+		/**
+		 * Disable revisions for now.
+		 */
+
+		add_filter( 'wp_revisions_to_keep', '__return_false' );
+
 		$start_request = microtime();
 		$response      = [];
 		$data_sync     = DataSync::instance();

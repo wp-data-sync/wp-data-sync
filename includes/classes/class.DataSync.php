@@ -203,7 +203,7 @@ class DataSync {
 
 		do_action( 'wp_data_sync_after_process', $this->post_id, $this );
 
-		$this->update_last_modified();
+		$this->update_date();
 
 		return [ 'post_id' => $this->post_id ];
 
@@ -457,11 +457,13 @@ class DataSync {
 
 		$post_id = $wpdb->get_var( $wpdb->prepare(
 			"
-			SELECT post_id 
-    		FROM $wpdb->postmeta 
-    		WHERE meta_key = %s 
-      		AND meta_value = %s 
-      		ORDER BY meta_id DESC
+			SELECT p.ID 
+    		FROM $wpdb->posts p
+			INNER JOIN $wpdb->postmeta pm
+			ON p.ID = pm.post_id
+    		WHERE pm.meta_key = %s 
+      		AND pm.meta_value = %s 
+      		ORDER BY pm.meta_id DESC
 			",
 			esc_sql( $key ),
 			esc_sql( $value )
@@ -499,7 +501,7 @@ class DataSync {
 
 		$post_id = wp_insert_post( [
 			'post_title'  => __( 'WP Data Sync Placeholder', 'wp-data-sync' ),
-			'post_type'   => get_option( 'wp_data_sync_post_type' ),
+			'post_type'   => $this->get_post_type(),
 			'post_status' => 'draft'
 		] );
 
@@ -649,12 +651,9 @@ class DataSync {
 	 * @return int|\WP_Error
 	 *
 	 * @since 1.0
-	 * @since 1.10.2 we update the posts data using $wpdb::update to insure posts dates are updated if provided by API.
 	 */
 
 	public function post_data() {
-
-		global $wpdb;
 
 		do_action( 'wp_data_sync_before_post_data', $this->post_data );
 
@@ -664,14 +663,16 @@ class DataSync {
 
 		$this->post_data_apply_filters();
 
-		$result = $wpdb->update(
-			$wpdb->posts,
-			$this->post_data,
-			[ 'ID' => $this->post_id ]
-		);
+		$this->post_data['ID'] = $this->post_id;
+
+		$result = wp_update_post( $this->post_data );
 
 		if ( ! is_wp_error( $result ) ) {
 			do_action( 'wp_data_sync_after_post_data', $this->post_data );
+		}
+
+		else {
+			Log::write( 'wp-error-update-post-data', $result );
 		}
 
 	}
@@ -787,32 +788,9 @@ class DataSync {
 				 * @since 2.0.3
 				 */
 
-				$term      = apply_filters( 'wp_data_sync_term', $term, $taxonomy, $this->post_id );
-				$parent_id = 0;
+				$term = apply_filters( 'wp_data_sync_term', $term, $taxonomy, $this->post_id );
 
-				if ( ! empty( $term['parents'] ) && is_array( $term['parents']  ) ) {
-
-					/**
-					 * Filter: wp_data_sync_term_parents
-					 *
-					 * @param array  $term_parents
-					 * @param array  $term
-					 * @param string $taxonomy
-					 * @param int    $post_id
-					 *
-					 * @since 2.0.2
-					 *        2.0.3 Add $post_id to args.
-					 */
-
-					$term_parents = apply_filters( 'wp_data_sync_term_parents', $term['parents'], $term, $taxonomy, $this->post_id );
-;
-					foreach ( $term_parents as $parent ) {
-						$parent_id = $this->set_term( $parent, $taxonomy, $parent_id );
-					}
-
-				}
-
-				if( $term_id = $this->set_term( $term, $taxonomy, $parent_id ) ) {
+				if( $term_id = $this->set_term( $term, $taxonomy ) ) {
 					$term_ids[] = $term_id;
 				}
 
@@ -831,14 +809,14 @@ class DataSync {
 	/**
 	 * Set term..
 	 *
-	 * @param $term array
-	 * @param $taxonomy string
-	 * @param $parent_id int
+	 * @param array  $term
+	 * @param string $taxonomy
+	 * @param int    $parent_id
 	 *
 	 * @return int|bool
 	 */
 
-	public function set_term( $term, $taxonomy, $parent_id ) {
+	public function set_term( $term, $taxonomy, $parent_id = 0 ) {
 
 		if ( ! is_array( $term ) ) {
 			return FALSE;
@@ -851,9 +829,32 @@ class DataSync {
 		 * $description
 		 * $thumb_url
 		 * $term_meta
+		 * $parents
 		 */
 
 		extract( $term );
+
+		if ( ! empty( $parents ) && is_array( $parents  ) ) {
+
+			/**
+			 * Filter: wp_data_sync_term_parents
+			 *
+			 * @param array  $parents
+			 * @param array  $term
+			 * @param string $taxonomy
+			 * @param int    $post_id
+			 *
+			 * @since 2.0.2
+			 *        2.0.3 Add $post_id to args.
+			 */
+
+			$parents = apply_filters( 'wp_data_sync_term_parents', $parents, $term, $taxonomy, $this->post_id );
+
+			foreach ( $parents as $parent ) {
+				$parent_id = $this->set_term( $parent, $taxonomy, $parent_id );
+			}
+
+		}
 
 		$name = trim( wp_unslash( $name ) );
 
@@ -1452,11 +1453,36 @@ class DataSync {
 	/**
 	 * Update the last modified date.
 	 *
+	 * Update the dates last to insure core WP does not change them.
+	 *
 	 * @since 2.0.6
 	 */
 
-	public function update_last_modified() {
+	public function update_date() {
+
 		wp_update_post( [ 'ID' => $this->post_id ] );
+
+		$date_keys = [
+			'post_date',
+			'post_date_gmt',
+			'post_modified',
+			'post_modified_gmt'
+		];
+
+		foreach ( $date_keys as $date_key ) {
+
+			if ( ! empty( $this->post_data[ $date_key ] ) ) {
+
+				$wpdb->update(
+					$wpdb->posts,
+					[ $date_key => $this->post_data[ $date_key ] ],
+					$this->post_id
+				);
+
+			}
+
+		}
+
 	}
 
 }

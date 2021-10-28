@@ -249,7 +249,13 @@ class ItemRequest extends Request {
 		}
 
 		if ( ! Settings::is_data_type_excluded( 'featured_image' ) ) {
+
 			$item_data['featured_image'] = $this->featured_image( $item_id );
+
+			if ( empty( $item_data['featured_image']['image_url'] ) ) {
+				unset( $item_data['featured_image'] );
+			}
+
 		}
 
 		if ( 'attachment' === $this->get_post_type() ) {
@@ -260,7 +266,7 @@ class ItemRequest extends Request {
 			$item_data['integrations'] = apply_filters( 'wp_data_sync_item_request_integrations', [], $item_id, $this );
 		}
 
-		return apply_filters( 'wp_data_sync_item_request', $item_data, $item_id, $this );
+		return apply_filters( 'wp_data_sync_item_request', array_filter( $item_data ), $item_id, $this );
 
 	}
 
