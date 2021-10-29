@@ -1460,6 +1460,8 @@ class DataSync {
 
 	public function update_date() {
 
+		global $wpdb;
+
 		wp_update_post( [ 'ID' => $this->post_id ] );
 
 		$date_keys = [
