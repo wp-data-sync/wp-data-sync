@@ -105,7 +105,7 @@ class DataSync {
 	 * @var DataSync
 	 */
 
-	public static $instance;
+	private static $instance;
 
 	/**
 	 * DataSync constructor.
@@ -122,13 +122,8 @@ class DataSync {
 	 */
 
 	public static function instance() {
-
-		if ( self::$instance === null ) {
-			self::$instance = new self();
-		}
-
+		self::$instance = new self();
 		return self::$instance;
-
 	}
 
 	/**

@@ -351,12 +351,13 @@ class WC_Product_DataSync {
 					$variation['post_data']['post_status'] = 'publish';
 				}
 
-				Log::write( 'variation', $variation );
-
 				$data_sync->set_properties( $variation );
-				$result = $data_sync->process();
+				$data_sync->process();
 
-				Log::write( 'variation', 'Variation ID: ' . $result['post_id'] );
+				$variation_id = $data_sync->get_post_id();
+
+				Log::write( 'variation', $variation_id, 'Variation ID' );
+				Log::write( 'variation', $variation, 'Variation Data' );
 
 			}
 
