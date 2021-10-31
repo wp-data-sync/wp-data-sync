@@ -12,7 +12,6 @@
 namespace WP_DataSync\Woo;
 
 use WP_DataSync\App\Log;
-use WC_Customer;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
