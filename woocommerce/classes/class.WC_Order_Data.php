@@ -12,6 +12,7 @@
 namespace WP_DataSync\Woo;
 
 use WP_DataSync\App\Log;
+use WC_Customer;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -58,6 +59,7 @@ class WC_Order_Data {
 	public function get( $order ) {
 
 		$_order                  = $order->get_data();
+		$_order                  = $this->formatted_data( $_order, $order );
 		$_order['meta_data']     = $this->format_meta( $order );
 		$_order['items']         = $this->get_items( $order );
 		$_order['shipping_data'] = $this->get_shipping_data( $order );
@@ -100,7 +102,54 @@ class WC_Order_Data {
 	}
 
 	/**
-	 * Foemat meta.
+	 * Formatted data.
+	 *
+	 * @param $_order
+	 * @param $order
+	 *
+	 * @return mixed
+	 */
+
+	public function formatted_data( $_order, $order ) {
+
+		// Billing fields
+		$_order['billing']['full_name']     = $order->get_formatted_billing_full_name();
+		$_order['billing']['address_full']  = $this->format_address( $order, 'billing' );
+
+		// Shipping fields
+		$_order['shipping']['full_name']    = $order->get_formatted_shipping_full_name();
+		$_order['shipping']['address_full']  = $this->format_address( $order, 'shipping' );
+
+		return $_order;
+
+	}
+
+	/**
+	 * Format Address.
+	 *
+	 * @param $order
+	 * @param $type
+	 *
+	 * @return string
+	 */
+
+	public function format_address( $order, $type ) {
+
+		$data  = $order->get_data();
+
+		return join( ' ', array_filter( [
+			$data[ $type ]['address_1'],
+			$data[ $type ]['address_2'],
+			$data[ $type ]['city'],
+			$data[ $type ]['state'],
+			$data[ $type ]['postcode'],
+			$data[ $type ]['country']
+		] ) );
+
+	}
+
+	/**
+	 * Format meta.
 	 *
 	 * @param \WC_Order|\WC_Order_Item $order
 	 *

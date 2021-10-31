@@ -136,7 +136,7 @@ class WC_Order_DataRequest extends Request {
 
 				if ( $order = wc_get_order( $order_id ) ) {
 
-					$_order_data = $order_data->get( $order );;
+					$_order_data = $order_data->get( $order );
 
 					if ( apply_filters( 'wp_data_sync_can_sync_order', TRUE, $_order_data, $order_id, $order ) ) {
 
@@ -228,3 +228,17 @@ class WC_Order_DataRequest extends Request {
 	}
 
 }
+
+add_action( 'admin_init', function() {
+
+	$order_data = WC_Order_Data::instance();
+
+	if ( $order = wc_get_order( 1481 ) ) {
+
+		$response[ $order_id ] = $order_data->get( $order );
+
+	}
+
+	var_dump( $response ); die();
+
+});
