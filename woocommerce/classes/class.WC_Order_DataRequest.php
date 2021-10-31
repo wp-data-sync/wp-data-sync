@@ -228,17 +228,3 @@ class WC_Order_DataRequest extends Request {
 	}
 
 }
-
-add_action( 'admin_init', function() {
-
-	$order_data = WC_Order_Data::instance();
-
-	if ( $order = wc_get_order( 1481 ) ) {
-
-		$response[ $order_id ] = $order_data->get( $order );
-
-	}
-
-	var_dump( $response ); die();
-
-});
