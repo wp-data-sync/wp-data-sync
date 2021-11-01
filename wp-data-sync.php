@@ -3,7 +3,7 @@
  * Plugin Name: WP Data Sync
  * Plugin URI:  https://wpdatasync.com/products/
  * Description: Sync raw data from any data source to your WordPress website
- * Version:     2.0.11
+ * Version:     2.0.12
  * Author:      WP Data Sync
  * Author URI:  https://wpdatasync.com
  * License:     GPL2
