@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $uploads = wp_get_upload_dir();
 
 $defines = [
-	'WPDSYNC_VERSION'    => '2.0.11',
+	'WPDSYNC_VERSION'    => '2.0.12',
 	'WPDSYNC_CAP'        => 'manage_options',
 	'WPDSYNC_PLUGIN'     => plugin_basename( __FILE__ ),
 	'WPDSYNC_VIEWS'      => plugin_dir_path( __FILE__ ) . 'views/',

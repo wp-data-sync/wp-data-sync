@@ -359,12 +359,6 @@ class ItemRequest extends Request {
 		), $this->post_type );
 
 		/**
-		 * GROUP BY statement
-		 */
-
-		$group_by = apply_filters( 'wp_data_sync_item_request_sql_group_by', "GROUP BY p.ID", $this->post_type );
-
-		/**
 		 * ORDER BY statement
 		 */
 
@@ -383,7 +377,7 @@ class ItemRequest extends Request {
 		 * Combine parts to make the SQL statement.
 		 */
 
-		$sql = "$select $join $where $group_by $order_by $limit";
+		$sql = "$select $join $where $order_by $limit";
 
 		Log::write( 'item-request-sql', $sql );
 
