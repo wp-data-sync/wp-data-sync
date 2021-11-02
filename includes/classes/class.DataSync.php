@@ -102,17 +102,11 @@ class DataSync {
 	private $is_new = FALSE;
 
 	/**
-	 * @var DataSync
-	 */
-
-	private static $instance;
-
-	/**
 	 * DataSync constructor.
 	 */
 
 	public function __construct() {
-		self::$instance = $this;
+		// Empty construct
 	}
 
 	/**
@@ -122,8 +116,7 @@ class DataSync {
 	 */
 
 	public static function instance() {
-		self::$instance = new self();
-		return self::$instance;
+		return new self();
 	}
 
 	/**
@@ -154,20 +147,25 @@ class DataSync {
 
 	public function process() {
 
+		global $wpds_response;
+
 		// A primary ID is required!!
 		if ( empty( $this->primary_id ) ) {
-			return [ 'error' => 'Primary ID empty!!' ];
+			$wpds_response['error'] = 'Primary ID empty!!';
+			return;
 		}
 
 		// Set the post_id.
 		$this->set_post_id();
 
 		if ( ! $this->post_id ) {
-			return [ 'error' => 'Post ID failed!!' ];
+			$wpds_response['error'] = 'Post ID failed!!';
+			return;
 		}
 
 		if ( $this->maybe_trash_post() ) {
-			return [ 'success' => 'Trash Post' ];
+			$wpds_response['trash'] = 'Post Trashed';
+			return;
 		}
 
 		if ( $this->post_data ) {
@@ -196,11 +194,16 @@ class DataSync {
 			$this->integrations();
 		}
 
-		do_action( 'wp_data_sync_after_process', $this->post_id, $this );
+		$wpds_response['items'][] = [
+			'post_id'   => $this->post_id,
+			'post_type' => $this->get_post_type()
+		];
 
 		$this->update_date();
 
-		return [ 'post_id' => $this->post_id ];
+		do_action( 'wp_data_sync_after_process', $this->post_id, $this );
+
+		return TRUE;
 
 	}
 
