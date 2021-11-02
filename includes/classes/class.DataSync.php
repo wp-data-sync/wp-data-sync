@@ -461,7 +461,7 @@ class DataSync {
 			ON p.ID = pm.post_id
     		WHERE pm.meta_key = %s 
       		AND pm.meta_value = %s 
-      		ORDER BY pm.meta_id DESC
+      		ORDER BY p.ID DESC
 			",
 			esc_sql( $key ),
 			esc_sql( $value )
