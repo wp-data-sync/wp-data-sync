@@ -345,11 +345,12 @@ class WC_Product_DataSync {
 		if ( is_array( $this->variations ) ) {
 
 			$data_sync = DataSync::instance();
+			$parent_id = $this->product_id;
 
 			foreach ( $this->variations as $variation ) {
 
 				// Set the parent ID for the variation.
-				$variation['post_data']['post_parent'] = $this->product_id;
+				$variation['post_data']['post_parent'] = $parent_id;
 
 				if ( ! isset( $variation['post_data']['post_status'] ) ) {
 					$variation['post_data']['post_status'] = 'publish';
@@ -361,6 +362,7 @@ class WC_Product_DataSync {
 				$variation_id = $data_sync->get_post_id();
 
 				Log::write( 'variation', $variation_id, 'Variation ID' );
+				Log::write( 'variation', $parent_id, 'Variation Parent ID' );
 				Log::write( 'variation', $variation, 'Variation Data' );
 
 			}
