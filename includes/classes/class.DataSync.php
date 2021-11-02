@@ -151,7 +151,7 @@ class DataSync {
 
 		// A primary ID is required!!
 		if ( empty( $this->primary_id ) ) {
-			$wpds_response['error'] = 'Primary ID empty!!';
+			$wpds_response['items'][]['error'] = 'Primary ID empty!!';
 			return;
 		}
 
@@ -159,12 +159,12 @@ class DataSync {
 		$this->set_post_id();
 
 		if ( ! $this->post_id ) {
-			$wpds_response['error'] = 'Post ID failed!!';
+			$wpds_response['items'][]['error'] = 'Post ID failed!!';
 			return;
 		}
 
 		if ( $this->maybe_trash_post() ) {
-			$wpds_response['trash'] = 'Post Trashed';
+			$wpds_response['items'][]['trash'] = 'Post Trashed';
 			return;
 		}
 
