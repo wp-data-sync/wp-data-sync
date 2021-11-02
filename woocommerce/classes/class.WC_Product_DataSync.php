@@ -108,25 +108,29 @@ class WC_Product_DataSync {
 			$this->price();
 		}
 
-		if ( $this->attributes = $this->data_sync->get_attributes() ) {
-			$this->attributes();
-			$this->data_sync->reset_term_taxonomy_count();
-		}
+		if ( 'product' === get_post_type( $this->product_id ) ) {
 
-		if ( has_term( 'variable', 'product_type', $this->porduct_id ) ) {
-			$this->set_variations_inactive();
-		}
+			if ( $this->attributes = $this->data_sync->get_attributes() ) {
+				$this->attributes();
+				$this->data_sync->reset_term_taxonomy_count();
+			}
 
-		if ( $this->variations = $this->data_sync->get_variations() ) {
-			$this->variations();
-		}
+			if ( has_term( 'variable', 'product_type', $this->porduct_id ) ) {
+				$this->set_variations_inactive();
+			}
 
-		if ( $this->gallery_images = $this->data_sync->get_gallery_images() ) {
-			$this->gallery_images();
-		}
+			if ( $this->variations = $this->data_sync->get_variations() ) {
+				$this->variations();
+			}
 
-		if ( $this->taxonomies = $this->data_sync->get_taxonomies() ) {
-			$this->product_visibility();
+			if ( $this->gallery_images = $this->data_sync->get_gallery_images() ) {
+				$this->gallery_images();
+			}
+
+			if ( $this->taxonomies = $this->data_sync->get_taxonomies() ) {
+				$this->product_visibility();
+			}
+
 		}
 
 	}
