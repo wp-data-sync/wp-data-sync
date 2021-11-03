@@ -169,21 +169,40 @@ class DataSync {
 		}
 
 		if ( $this->post_data ) {
+
+			do_action( 'wp_data_sync_before_post_data', $this->post_data, $this->post_id, $this );
+
 			$this->post_data();
+
+			do_action( 'wp_data_sync_after_post_data', $this->post_data, $this->post_id, $this );
+
 		}
 
 		if ( $this->post_meta ) {
+
 			$this->post_meta();
+
+			do_action( 'wp_data_sync_post_meta', $this->post_id, $this->post_meta, $this );
+
 		}
 
 		if ( $this->taxonomies ) {
+
 			$this->taxonomy();
+
+			do_action( 'wp_data_sync_taxonomies', $this->post_id, $this->taxonomies, $this );
+
 			$this->reset_term_taxonomy_count();
+
 		}
 
 		if ( $this->featured_image ) {
+
 			$this->set_attachment( $this->featured_image  );
 			$this->featured_image();
+
+			do_action( 'wp_data_sync_featured_image', $this->post_id, $this->featured_image, $this );
+
 		}
 
 		if ( $this->attachment ) {
@@ -653,8 +672,6 @@ class DataSync {
 
 	public function post_data() {
 
-		do_action( 'wp_data_sync_before_post_data', $this->post_data );
-
 		if ( $this->is_new ) {
 			$this->post_data_defaults();
 		}
@@ -665,11 +682,7 @@ class DataSync {
 
 		$result = wp_update_post( $this->post_data );
 
-		if ( ! is_wp_error( $result ) ) {
-			do_action( 'wp_data_sync_after_post_data', $this->post_data );
-		}
-
-		else {
+		if ( is_wp_error( $result ) ) {
 			Log::write( 'wp-error-update-post-data', $result );
 		}
 
@@ -699,8 +712,6 @@ class DataSync {
 			}
 
 		}
-
-		do_action( 'wp_data_sync_post_meta', $this->post_id, $this->post_meta, $this );
 
 	}
 
@@ -799,8 +810,6 @@ class DataSync {
 			wp_set_object_terms( $this->post_id, $term_ids, $taxonomy, $append );
 
 		}
-
-		do_action( 'wp_data_sync_taxonomies', $this->post_id, $this->taxonomies );
 
 	}
 
@@ -1073,11 +1082,7 @@ class DataSync {
 	public function featured_image() {
 
 		if ( $attach_id = $this->attachment() ) {
-
 			set_post_thumbnail( $this->post_id, $attach_id );
-
-			do_action( 'wp_data_sync_featured_image', $this->post_id, $this->featured_image );
-
 		}
 
 	}

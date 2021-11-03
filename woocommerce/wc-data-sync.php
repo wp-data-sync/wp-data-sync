@@ -18,11 +18,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Used to handle WooCommerce integration versions.
-define( 'WCDSYNC_VERSION', '1.1.0' );
+define( 'WCDSYNC_VERSION', '2.0.0' );
 define( 'WCDSYNC_ORDER_SYNC_STATUS', '_wpds_order_synced' );
 
 // Load WooCommerce scripts
-foreach ( glob( plugin_dir_path( __FILE__ ) . '**/*.php' ) as $file ) {
+foreach ( glob( plugin_dir_path( __FILE__ ) . 'includes/**/*.php' ) as $file ) {
 	require_once $file;
 }
 
@@ -43,7 +43,14 @@ add_action( 'rest_api_init', function() {
  */
 
 add_action( 'wp_data_sync_after_process', function ( $post_id, $data_sync ) {
-		WC_Product_DataSync::instance()->wc_process( $data_sync );
+
+	if ( 'product' === $data_sync->get_post_type() ) {
+		$wc_product_data_sync = WC_Product_DataSync::instance();
+		$wc_product_data_sync->set_product_id( $post_id );
+		$wc_product_data_sync->set_data_sync( $data_sync );
+		$wc_product_data_sync->wc_process();
+	}
+
 }, 10, 2 );
 
 /**
