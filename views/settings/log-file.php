@@ -26,7 +26,7 @@ if ( ! $files ) {
 $file_name = get_option( Log::FILE_KEY ); ?>
 
 <p>
-	<select name="<?php esc_attr_e( Log::FILE_KEY );?>">
+	<select name="<?php esc_attr_e( Log::FILE_KEY );?>" id="log-file-select" class="log-file-select">
 		<?php printf( '<option value="-1">%s</option>', esc_html( 'Select One' ) ); ?>
 		<?php foreach ( $files as $file ) { ?>
 
@@ -38,3 +38,11 @@ $file_name = get_option( Log::FILE_KEY ); ?>
 </p>
 
 <p><textarea class="widefat wpds-log-content" rows="20"><?php esc_html_e( $log ); ?></textarea></p>
+
+<script>
+	jQuery(document).ready( function($) {
+		$('form #log-file-select').on('change', function() {
+			$(this).closest('form').find('input[type=submit]').click();
+		});
+	});
+</script>

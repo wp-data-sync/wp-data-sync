@@ -664,7 +664,7 @@ class Settings {
 						'type'		        => '',
 						'class'		        => '',
 						'placeholder'       => '',
-						'info'              => __( 'We reccommend keeping this off unless you are having an issue with the data sync. If you do have an issue, please activate this before contacting support. Please note when this is deactivated all log files will be deleted.' )
+						'info'              => __( 'We reccommend keeping this off unless you are having an issue with the data sync. If you do have an issue, please activate this before contacting support. Log files will be automatically deleted after 10 days. Please note when allow logging is deactivated all log files will be deleted.' )
 					]
 				],
 				[

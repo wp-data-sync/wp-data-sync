@@ -42,7 +42,11 @@ class Log {
 			}
 
 			if ( ! file_exists( $error_file ) ) {
+
 				fopen( $error_file, 'w' );
+
+				// Schedule deletion of log file in 10 days
+				wp_schedule_single_event( time() + ( 10 * DAY_IN_SECONDS ), 'wpds_delete_log_file', [ $error_file ] );
 			}
 
 			error_log( $msg, 3, $error_file );

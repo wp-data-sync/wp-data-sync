@@ -132,7 +132,7 @@ class DataSync {
 		if ( is_array( $data ) ) {
 
 			foreach ( $data as $key => $value ) {
-				$this->$key = $value;
+				$this->$key = apply_filters( "wp_data_sync_set_property_$key", $value );
 			}
 
 		}
