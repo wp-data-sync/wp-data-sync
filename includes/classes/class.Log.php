@@ -34,7 +34,8 @@ class Log {
 
 			$msg        = self::message( $data, $action );
 			$date       = date( 'Y-m-d' );
-			$error_file = WPDSYNC_LOG_DIR . "{$key}-{$date}.log";
+			$hash       = self::log_hash();
+			$error_file = WPDSYNC_LOG_DIR . "{$key}-{$date}-{$hash}.log";
 
 			// Create the log file dir if we do not already have one.
 			if ( ! file_exists( WPDSYNC_LOG_DIR ) ) {
@@ -133,6 +134,28 @@ class Log {
 		}
 
 		return FALSE;
+
+	}
+
+	/**
+	 * Log Hash
+	 *
+	 * Random hash for log file name.
+	 *
+	 * @return bool|false|mixed|string|void
+	 */
+
+	public static function log_hash() {
+
+		if ( ! $log_hash = get_option( 'wp_data_sync_log_hash' ) ) {
+
+			$log_hash = wp_hash( home_url() . rand() );
+
+			add_option( 'wp_data_sync_log_hash', $log_hash );
+
+		}
+
+		return $log_hash;
 
 	}
 
