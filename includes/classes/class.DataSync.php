@@ -841,6 +841,10 @@ class DataSync {
 
 		extract( $term );
 
+		if ( ! is_string( $name ) ) {
+			return FALSE;
+		}
+
 		if ( ! empty( $parents ) && is_array( $parents  ) ) {
 
 			/**

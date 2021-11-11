@@ -65,7 +65,7 @@ class Log {
 	 * @return string
 	 */
 
-	public function message( $data, $action ) {
+	public static function message( $data, $action ) {
 
 		ob_start();
 
