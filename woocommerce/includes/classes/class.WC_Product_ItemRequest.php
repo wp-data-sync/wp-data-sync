@@ -226,7 +226,7 @@ class WC_Product_ItemRequest {
 
 			$variation                   = [];
 			$variation['source_item_id'] = $variation_id;
-			$variation['post_data']      = $this->item_request->get_post( $variation_id );
+			$variation['post_data']      = $this->item_request->get_item( $variation_id );
             $variation['post_meta']      = $this->item_request->post_meta( $variation_id );
 
             if ( has_post_thumbnail( $variation_id ) ) {

@@ -84,5 +84,8 @@ Yes. We have WordPress hooks and filters throughout the plugin to allow for almo
 
 == Upgrade Notice ==
 
+= 2.1.4 =
+* Critical Update - Bug fix for fatal error in Product Item Request
+
 = 1.4.5 =
 * Critical Update - API endpoint versioning was added.
