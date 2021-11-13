@@ -24,9 +24,16 @@ add_action( 'admin_init', 'WP_DataSync\App\plugin_update' );
 
 function plugin_update() {
 
-	if ( WPDSYNC_VERSION !== get_option( 'WPDSYNC_VERSION' ) ) {
+	$current_version = get_option( 'WPDSYNC_VERSION', '1.0.0' );
+
+	if ( WPDSYNC_VERSION !== $current_version ) {
 
 		ItemRequest::create_table();
+
+		if ( version_compare( $current_version, '2.1.5', '<' ) ) {
+			Settings::delete_all_log_files();
+			Log::write( 'deleted-error-logs', 'Old Log Files Deleted' );
+		}
 
 		update_option( 'WPDSYNC_VERSION', WPDSYNC_VERSION );
 

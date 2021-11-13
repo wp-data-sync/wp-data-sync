@@ -219,6 +219,18 @@ class Settings {
 	}
 
 	/**
+	 * Delete all log files
+	 */
+
+	public static function delete_all_log_files() {
+
+		foreach ( glob( WPDSYNC_LOG_DIR . '*.log' ) as $file ) {
+			unlink( $file );
+		}
+
+	}
+
+	/**
 	 * Delete log files on setting saved.
 	 *
 	 * @param $old_value
@@ -228,14 +240,17 @@ class Settings {
 	public function delete_log_files( $old_value, $value ) {
 
 		if ( 'checked' !== $value ) {
-
-			foreach ( glob( WPDSYNC_LOG_DIR . '*.log' ) as $file ) {
-				unlink( $file );
-			}
-
+			self::delete_all_log_files();
 		}
 
 	}
+
+	/**
+	 * Delete log file name.
+	 *
+	 * @param $old_value
+	 * @param $value
+	 */
 
 	public function delete_log_file_name( $old_value, $value ) {
 
