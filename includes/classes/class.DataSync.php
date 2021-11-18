@@ -982,12 +982,28 @@ class DataSync {
 
 	public function term_desc( $description, $term_id, $taxonomy ) {
 
-		if ( ! Settings::is_true( 'wp_data_sync_sync_term_desc' ) ) {
+		$option = 'sync_term_desc';
+
+		if ( ! Settings::is_set( $option ) ) {
+			return;
+		}
+
+		if ( Settings::is_equal( $option, '-1' ) ) {
+			return;
+		}
+
+		if ( Settings::is_equal( $option, 'false' ) ) {
 			return;
 		}
 
 		if ( empty( $description ) ) {
+
+			if ( Settings::is_equal( $option, 'skip_empty' ) ) {
+				return;
+			}
+
 			$description = '';
+
 		}
 
 		$args = [ 'description' => $description ];
@@ -1005,14 +1021,38 @@ class DataSync {
 
 	public function term_thumb( $thumb_url, $term_id ) {
 
-		if ( ! Settings::is_true( 'wp_data_sync_sync_term_thumb' ) ) {
+		$option = 'sync_term_thumb';
+
+		if ( ! Settings::is_set( $option ) ) {
 			return;
 		}
 
-		$this->set_attachment( $thumb_url  );
+		if ( Settings::is_equal( $option, '-1' ) ) {
+			return;
+		}
 
-		if ( ! $attach_id = $this->attachment() ) {
+		if ( Settings::is_equal( $option, 'false' ) ) {
+			return;
+		}
+
+		if ( empty( $thumb_url ) ) {
+
+			if ( Settings::is_equal( $option, 'skip_empty' ) ) {
+				return;
+			}
+
 			$attach_id = '';
+
+		}
+
+		else {
+
+			$this->set_attachment( $thumb_url );
+
+			if ( ! $attach_id = $this->attachment() ) {
+				$attach_id = '';
+			}
+
 		}
 
 		update_term_meta( $term_id, 'thumbnail_id', $attach_id );
@@ -1028,7 +1068,17 @@ class DataSync {
 
 	public function term_meta( $term_meta, $term_id ) {
 
-		if ( ! Settings::is_true( 'wp_data_sync_sync_term_meta' ) ) {
+		$option = 'sync_term_meta';
+
+		if ( ! Settings::is_set( $option ) ) {
+			return;
+		}
+
+		if ( Settings::is_equal( $option, '-1' ) ) {
+			return;
+		}
+
+		if ( Settings::is_equal( $option, 'false' ) ) {
 			return;
 		}
 

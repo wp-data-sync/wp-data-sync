@@ -460,9 +460,11 @@ class Settings {
 						'selected'          => get_option( 'wp_data_sync_sync_term_desc' ),
 						'name'              => 'wp_data_sync_sync_term_desc',
 						'class'             => 'sync-term-desc widefat',
+						'info'              => __( 'Sync term descriptions. Skip Empty: skip sync if value is empty.', 'wp-data-sync' ),
 						'values'            => [
-							'true'  => __( 'Yes, I want to sync term descriptions', 'wp-data-sync' ),
-							'false' => __( 'No, I do not want to sync term descriptions', 'wp-data-sync' )
+							'true'       => __( 'Yes, I want to sync term descriptions', 'wp-data-sync' ),
+							'skip_empty' => __( 'Yes, I want to sync term descriptions (skip empty value)', 'wp-data-sync' ),
+							'false'      => __( 'No, I do not want to sync term descriptions', 'wp-data-sync' )
 						]
 					]
 				],
@@ -476,9 +478,11 @@ class Settings {
 						'selected'          => get_option( 'wp_data_sync_sync_term_thumb' ),
 						'name'              => 'wp_data_sync_sync_term_thumb',
 						'class'             => 'sync-term-thumb widefat',
+						'info'              => __( 'Sync term thumbnail. Skip Empty: skip sync if value is empty.', 'wp-data-sync' ),
 						'values'            => [
-							'true'  => __( 'Yes, I want to sync term thumbnail', 'wp-data-sync' ),
-							'false' => __( 'No, I do not want to sync term thumbnail', 'wp-data-sync' )
+							'true'       => __( 'Yes, I want to sync term thumbnail', 'wp-data-sync' ),
+							'skip_empty' => __( 'Yes, I want to sync term thumbnail (skip empty value)', 'wp-data-sync' ),
+							'false'      => __( 'No, I do not want to sync term thumbnail', 'wp-data-sync' )
 						]
 					]
 				],
@@ -756,6 +760,31 @@ class Settings {
 
 	public static function is_true( $option ) {
 		return ( 'true' === get_option( $option ) );
+	}
+
+	/**
+	 * Is Equal
+	 *
+	 * @param $option
+	 * @param $value
+	 *
+	 * @return bool
+	 */
+
+	public static function is_equal( $option, $value ) {
+		return ( $value === get_option( "wp_data_sync_$option" ) );
+	}
+
+	/**
+	 * Is Set
+	 *
+	 * @param $option
+	 *
+	 * @return bool|mixed|void
+	 */
+
+	public static function is_set( $option ) {
+		return get_option( "wp_data_sync_$option" );
 	}
 
 	/**
