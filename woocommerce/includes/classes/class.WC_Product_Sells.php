@@ -365,7 +365,7 @@ class WC_Product_Sells {
 
 		global $wpdb;
 
-		return $wpdb->prefix . 'data_sync_related_sells';
+		return $wpdb->prefix . 'data_sync_product_sells';
 
 	}
 
