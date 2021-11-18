@@ -4,7 +4,7 @@
  *
  * Setup WP Data Sync for WooCommerce
  *
- * @since   1.0.0
+ * @since   1.0.1
  *
  * @package WP_Data_Sync
  */
@@ -61,7 +61,7 @@ add_action( 'wp_data_sync_after_process', function ( $post_id, $data_sync ) {
 add_action( 'wp_data_sync_integration_woo_cross_sells', function( $product_id, $values ) {
 
 	$values['product_id'] = $product_id;
-	$values['type']       = 'cross_sells';
+	$values['type']       = '_crosssell_ids';
 
 	Log::write( 'product-sells', $values, 'Cross sells' );
 
@@ -80,7 +80,7 @@ add_action( 'wp_data_sync_integration_woo_cross_sells', function( $product_id, $
 add_action( 'wp_data_sync_integration_woo_up_sells', function( $product_id, $values ) {
 
 	$values['product_id'] = $product_id;
-	$values['type']       = 'up_sells';
+	$values['type']       = '_upsell_ids';
 
 	Log::write( 'product-sells', $values, 'Up sells' );
 

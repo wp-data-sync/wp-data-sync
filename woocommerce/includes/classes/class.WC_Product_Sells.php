@@ -301,27 +301,9 @@ class WC_Product_Sells {
 
 		if( $product_ids = $this->get_product_ids( $row, $post_id ) ) {
 
-			$key = FALSE;
+			update_post_meta( $post_id, $row->type, $product_ids );
 
-			switch( $row->type ) {
-
-				case 'cross_sells':
-					$meta_key = '_crosssell_ids';
-					break;
-
-				case 'up_sells':
-					$meta_key = '_upsell_ids';
-					break;
-
-			}
-
-			if ( $key ) {
-
-				update_post_meta( $post_id, $meta_key, $product_ids );
-
-				Log::write( 'product-sells', $product_ids, "Ralated $key IDs: $post_id" );
-
-			}
+			Log::write( 'product-sells', $product_ids, "Ralated $row->type IDs: $post_id" );
 
 		}
 
