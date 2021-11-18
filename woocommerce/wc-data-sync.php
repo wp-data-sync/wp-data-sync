@@ -4,7 +4,7 @@
  *
  * Setup WP Data Sync for WooCommerce
  *
- * @since   2.0.1
+ * @since   1.0.0
  *
  * @package WP_Data_Sync
  */
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Used to handle WooCommerce integration versions.
-define( 'WCDSYNC_VERSION', '2.0.1' );
+define( 'WCDSYNC_VERSION', '2.0.2' );
 define( 'WCDSYNC_ORDER_SYNC_STATUS', '_wpds_order_synced' );
 
 // Load WooCommerce scripts

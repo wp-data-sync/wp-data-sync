@@ -52,7 +52,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 				]
 			],
 			[
-				'key' 		=> 'wp_data_sync_process_cross_sells',
+				'key' 		=> 'wp_data_sync_process__crosssell_ids',
 				'label'		=> __( 'Process Cross Sells', 'wp-data-sync' ),
 				'callback'  => 'input',
 				'args'      => [
@@ -65,7 +65,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 				]
 			],
 			[
-				'key' 		=> 'wp_data_sync_process_up_sells',
+				'key' 		=> 'wp_data_sync_process__upsell_ids',
 				'label'		=> __( 'Process Up Sells', 'wp-data-sync' ),
 				'callback'  => 'input',
 				'args'      => [

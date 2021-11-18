@@ -28,8 +28,22 @@ function wc_update() {
 
 		WC_Product_Sells::create_table();
 
+		update_product_sells_settings();
+
 		update_option( 'WCDSYNC_VERSION', WCDSYNC_VERSION );
 
+	}
+
+}
+
+function update_product_sells_settings() {
+
+	if ( $value = get_option( 'wp_data_sync_process_up_sells' ) ) {
+		update_option( 'wp_data_sync_process__upsell_ids', $value );
+	}
+
+	if ( $value = get_option( 'wp_data_sync_process_cross_sells' ) ) {
+		update_option( 'wp_data_sync_process__crosssell_ids', $value );
 	}
 
 }
