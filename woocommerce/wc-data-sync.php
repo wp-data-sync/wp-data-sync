@@ -11,6 +11,7 @@
 
 namespace WP_DataSync\Woo;
 
+use WP_DataSync\App\Log;
 use WP_DataSync\App\Settings;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -62,6 +63,8 @@ add_action( 'wp_data_sync_integration_woo_cross_sells', function( $product_id, $
 	$values['product_id'] = $product_id;
 	$values['type']       = 'cross_sells';
 
+	Log::write( 'product-sells', $values, 'Cross sells' );
+
 	$product_sells = WC_Product_Sells::instance();
 
 	if ( $product_sells->set_properties( $values ) ) {
@@ -78,6 +81,8 @@ add_action( 'wp_data_sync_integration_woo_up_sells', function( $product_id, $val
 
 	$values['product_id'] = $product_id;
 	$values['type']       = 'up_sells';
+
+	Log::write( 'product-sells', $values, 'Up sells' );
 
 	$product_sells = WC_Product_Sells::instance();
 

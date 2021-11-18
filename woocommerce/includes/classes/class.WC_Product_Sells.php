@@ -111,7 +111,11 @@ class WC_Product_Sells {
 			foreach ( $this->sell_ids as $sell_id ) {
 
 				if ( ! $this->sell_id_exists( $sell_id ) ) {
+
 					$this->insert_sell_id( $sell_id );
+
+					Log::write( 'product-sells', $sell_id, 'Insert Sell ID' );
+
 				}
 
 			}
@@ -195,6 +199,8 @@ class WC_Product_Sells {
 
 					$this->update_relation( $row, $post_id );
 					$this->set_product_ids( $row, $post_id );
+
+					Log::write( 'product-sells', $row, "Ralation Exists: $post_id" );
 
 				}
 
@@ -300,16 +306,21 @@ class WC_Product_Sells {
 			switch( $row->type ) {
 
 				case 'cross_sells':
-					$key = 'cross_sell_ids';
+					$meta_key = '_crosssell_ids';
 					break;
+
 				case 'up_sells':
-					$key = 'cross_sell_ids';
+					$meta_key = '_upsell_ids';
 					break;
 
 			}
 
 			if ( $key ) {
-				update_post_meta( $post_id, $key, $product_ids );
+
+				update_post_meta( $post_id, $meta_key, $product_ids );
+
+				Log::write( 'product-sells', $product_ids, "Ralated $key IDs: $post_id" );
+
 			}
 
 		}
