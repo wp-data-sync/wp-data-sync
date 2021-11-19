@@ -11,6 +11,8 @@
 
 namespace WP_DataSync\App;
 
+use WP_REST_Request;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -18,14 +20,36 @@ if ( ! defined( 'ABSPATH' ) ) {
 abstract class Request {
 
 	/**
+	 * @var WP_REST_Request
+	 */
+
+	private $request;
+
+	/**
+	 * Set Request
+	 *
+	 * @param WP_REST_Request $request
+	 */
+
+	public function set_request( WP_REST_Request $request ) {
+		$this->request = $request;
+	}
+
+	/**
 	 * Allow access to sync data.
+	 *
+	 * @param WP_REST_Request $request
 	 *
 	 * @return bool
 	 */
 
-	public function access() {
+	public function access( WP_REST_Request $request ) {
 
-		if ( $this->allowed() && $this->referer() ) {
+		$this->set_request( $request );
+
+		Log::write( 'request', $this->request->get_method(), 'Resquest Method' );
+
+		if ( $this->allowed() && $this->referer() && $this->content_length() && $this->user_agent() ) {
 			return $this->private_key();
 		}
 
@@ -61,11 +85,11 @@ abstract class Request {
 			return FALSE;
 		}
 
-		Log::write( 'access-attempt', "Access Token Provided" );
+		Log::write( 'request', "Access Token Provided" );
 
 		if ( $access_token === $local_token ) {
 
-			Log::write( 'access-attempt', "Access token Approved" );
+			Log::write( 'request', "Access token Approved" );
 
 			return TRUE;
 
@@ -83,7 +107,7 @@ abstract class Request {
 
 	public function private_key() {
 
-		$private_key = sanitize_key( $_SERVER['HTTP_AUTHENTICATION'] );
+		$private_key = sanitize_key( $this->request->get_header( 'authentication' ) );
 
 		if ( empty( $private_key ) ) {
 			return FALSE;
@@ -93,11 +117,11 @@ abstract class Request {
 			return FALSE;
 		}
 
-		Log::write( 'access-attempt', "Private Token Provided" );
+		Log::write( 'request', "Private Token Provided" );
 
 		if ( $private_key === $local_token ) {
 
-			Log::write( 'access-attempt', "Private Token Approved" );
+			Log::write( 'request', "Private Token Approved" );
 
 			return TRUE;
 
@@ -115,27 +139,80 @@ abstract class Request {
 
 	public function referer() {
 
-		$referer = sanitize_text_field( $_SERVER['HTTP_REFERER'] );
+		$referer = sanitize_text_field( $this->request->get_header( 'referer' ) );
 
 		if ( empty( $referer )  ) {
 			return FALSE;
 		}
 
-		Log::write( 'access-attempt', "Referer: $referer" );
+		Log::write( 'request', "Referer: $referer" );
 
 		return TRUE;
 
 	}
 
 	/**
-	 * Request data.
+	 * Content length.
 	 *
-	 * @param $json
+	 * @return bool
+	 */
+
+	public function content_length() {
+
+		global $wpds_response;
+
+		if ( 'GET' === $this->request->get_method() ) {
+			return TRUE;
+		}
+
+		$json           = $this->request->get_body();
+		$content_length = $this->request->get_header( 'content-length' );
+
+		if ( empty( $content_length ) ) {
+
+			$wpds_response['content-length'] = 'Content length not provided.';
+
+			return FALSE;
+
+		}
+
+		$match = strlen( $json ) === intval( $content_length );
+
+		if ( ! $match ) {
+			$wpds_response['content-length'] = 'Content length does not match.';
+		}
+
+		Log::write( 'request', $content_length, 'Content Length Match' );
+
+		return $match;
+
+	}
+
+	/**
+	 * User Agent
+	 *
+	 * @return bool
+	 */
+
+	public function user_agent() {
+
+		$user_agent = $this->request->get_header( 'user-agent' );
+
+		Log::write( 'request', $user_agent, 'User Agent' );
+
+		return 'WP Data Sync API' === $user_agent;
+
+	}
+
+	/**
+	 * Request data.
 	 *
 	 * @return mixed|void
 	 */
 
-	public function request_data( $json ) {
+	public function request_data() {
+
+		$json     = $this->request->get_body();
 
 		Log::write( $this->log_key, 'Sync Request JSON' );
 		Log::write( $this->log_key, $json );

@@ -109,22 +109,19 @@ class UserRequest extends Request {
 	/**
 	 * Process the request.
 	 *
-	 * @param WP_REST_Request $request
-	 *
 	 * @return mixed|\WP_REST_Response
 	 */
 
-	public function process( WP_REST_Request $request ) {
+	public function process() {
 
 		$start_request = microtime();
 		$response      = [];
 		$user_sync     = UserSync::instance();
-		$json          = $request->get_body();
-		$user_data     = $this->request_data( $json );
+		$user_data     = $this->request_data();
 
 		$user_sync->set_properties( $user_data );
 
-		$response['result']       = $user_sync->process();
+		$response['result'] = $user_sync->process();
 		$response['request_time'] = microtime() - $start_request;
 
 		Log::write( 'user-request-response', $response );

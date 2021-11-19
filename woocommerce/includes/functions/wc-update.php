@@ -36,6 +36,14 @@ function wc_update() {
 
 }
 
+/**
+ * Update product sells settings.
+ *
+ * Update the setting names since WooCommerce changed the meta keys.
+ *
+ * @since 2.1.9
+ */
+
 function update_product_sells_settings() {
 
 	if ( $value = get_option( 'wp_data_sync_process_up_sells' ) ) {

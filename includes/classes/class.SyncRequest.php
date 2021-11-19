@@ -109,26 +109,23 @@ class SyncRequest extends Request {
 	/**
 	 * Process the request.
 	 *
-	 * @param WP_REST_Request $request
-	 *
 	 * @return mixed|\WP_REST_Response
 	 */
 
-	public function process( WP_REST_Request $request ) {
+	public function process() {
 
 		global $wpds_response;
 
 		/**
-		 * Disable revisions for now.
+		 * Disable revisions.
 		 */
 
 		add_filter( 'wp_revisions_to_keep', '__return_false' );
 
-		$start_request = microtime();
-		$wpds_response = [];
-		$data_sync     = DataSync::instance();
-		$json          = $request->get_body();
-		$data          = $this->request_data( $json );
+		$start_request  = microtime();
+		$wpds_response  = [];
+		$data_sync = DataSync::instance();
+		$data      = $this->request_data();
 
 		if ( isset( $data['items'] ) && is_array( $data['items'] ) ) {
 

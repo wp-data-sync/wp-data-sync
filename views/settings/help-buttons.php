@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?php _e( 'Support', 'wp-data-sync' ); ?>
 	</a>
 
-	<a href="https://wpdatasync.com/docunentation/?affid=admin" class="button-primary" target="_blank">
+	<a href="https://wpdatasync.com/docunentation/getting-started/?affid=admin" class="button-primary" target="_blank">
 		<?php _e( 'Documentation', 'wp-data-sync' ); ?>
 	</a>
 
