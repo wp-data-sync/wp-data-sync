@@ -240,7 +240,7 @@ class Settings {
 			],
 			[
 				'label' => __( 'WordPress Multisite' ),
-				'value' => is_multisite() ? '&#9989;' : '&#10005;'
+				'value' => is_multisite() ? 'Yes' : 'No'
 			],
 			[
 				'label' => __( 'WP PHP Memory Limit' ),
