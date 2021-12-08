@@ -1149,13 +1149,13 @@ class DataSync {
 
 	public function attachment() {
 
-		Log::write( 'attachment', $this->attachment );
+		Log::write( 'attachment', $this->attachment, 'Start Process' );
 
 		$image = $this->image();
 
 		extract( $image );
 
-		Log::write( 'attachment', "Image URL: $image_url" );
+		Log::write( 'attachment', $image_url, 'Image URL' );
 
 		if ( empty( $image_url ) ) {
 			return FALSE;
@@ -1170,8 +1170,8 @@ class DataSync {
 		$basename    = $this->basename( $image );
 		$image_title = preg_replace( '/\.[^.]+$/', '', $basename );
 
-		Log::write( 'attachment', "Basename: $basename" );
-		Log::write( 'attachment', "Image Title: $image_title" );
+		Log::write( 'attachment', $basename, 'Basename' );
+		Log::write( 'attachment', $image_title, 'Image Title' );
 
 		$attachment = [
 			'post_title'   => empty( $name ) ? $image_title : $name,
@@ -1185,7 +1185,7 @@ class DataSync {
 
 		elseif ( $attachment['ID'] = $this->attachment_exists( $image_url ) ) {
 
-			Log::write( 'attachment', "Exists: {$attachment['ID']} - {$attachment['post_title']}" );
+			Log::write( 'attachment', "{$attachment['ID']} - {$attachment['post_title']}", 'Exists' );
 
 			// Update the attachement
 			wp_update_post( $attachment );
@@ -1207,7 +1207,7 @@ class DataSync {
 				$upload_dir = wp_upload_dir();
 				$file_path  = $this->file_path( $upload_dir, $basename );
 
-				Log::write( 'attachment', "File Path: $file_path" );
+				Log::write( 'attachment', $file_path, 'File Path' );
 
 				// Copy the image to image upload dir
 				file_put_contents( $file_path, $image_data );
@@ -1221,14 +1221,14 @@ class DataSync {
 				// Insert image data
 				$attach_id = wp_insert_attachment( $attachment, $file_path, $this->post_id );
 
-				Log::write( 'attachment', "Attachment ID: $attach_id" );
+				Log::write( 'attachment', $attach_id, 'Attachment ID' );
 
 				if ( is_int( $attach_id ) && 0 < $attach_id ) {
 
 					// Get metadata for featured image
 					$attach_data = wp_generate_attachment_metadata( $attach_id, $file_path );
 
-					Log::write( 'attachment', $attach_data );
+					Log::write( 'attachment', $attach_data, 'Attachment Data' );
 
 					// Update metadata
 					wp_update_attachment_metadata( $attach_id, $attach_data );
@@ -1266,7 +1266,7 @@ class DataSync {
 			return apply_filters( 'wp_data_sync_is_valid_image_url', $image_url );
 		}
 
-		Log::write( 'attachment', "Invalid URL: $image_url" );
+		Log::write( 'attachment', $image_url, 'Invalid URL' );
 
 		return FALSE;
 
@@ -1286,7 +1286,7 @@ class DataSync {
 
 		if ( ! empty( $file_type['type'] ) ) {
 
-			Log::write( 'attachment', "File Type: {$file_type['type']}" );
+			Log::write( 'attachment', $file_type['type'], 'File Type' );
 
 			return $file_type['type'];
 
@@ -1314,7 +1314,7 @@ class DataSync {
 
 		}
 
-		Log::write( 'attachment', "File Type: $file_type" );
+		Log::write( 'attachment', $file_type, 'File Type' );
 
 		return $file_type;
 
@@ -1330,13 +1330,16 @@ class DataSync {
 
 	public function fetch_image_data( $image_url ) {
 
-		$response = wp_remote_get( $image_url, [ 'sslverify' => $this->ssl_verify() ] );
+		$response      = wp_remote_get( $image_url, [ 'sslverify' => $this->ssl_verify() ] );
+		$response_code = wp_remote_retrieve_response_code( $response );
 
-		Log::write( 'attachment', $response );
+		Log::write( 'attachment', $response_code, 'Response Code' );
 
-		if ( 200 === wp_remote_retrieve_response_code( $response ) ) {
+		if ( 200 === $response_code ) {
 			return wp_remote_retrieve_body( $response );
 		}
+
+		Log::write( 'attachment', $response, 'Response Failed' );
 
 		return FALSE;
 

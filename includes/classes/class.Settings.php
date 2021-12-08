@@ -123,6 +123,10 @@ class Settings {
 
 		$tabs = apply_filters( 'wp_data_sync_admin_tabs', $tabs, $this );
 
+		$tabs['report'] = [
+			'label' => __( 'System Report', 'wp-data-sync' ),
+		];
+
 		// Include logs as last tab.
 		$tabs['logs'] = [
 			'label' => __( 'Logs', 'wp-data-sync' ),
@@ -174,7 +178,80 @@ class Settings {
 			'href'  => admin_url( "admin.php?page=" . Settings::SLUG . "&active_tab=" )
 		];
 
-		view( 'settings/page', $args );
+		if ( 'report' === $this->active_tab ) {
+
+			$report_values  = $this->report_values();
+			$args['report'] = '';
+
+			foreach ( $report_values as $value ) {
+				$args['report'] .= sprintf( '%s: %s &#013;', esc_html( $value['label'] ), esc_html( $value['value'] ) );
+			}
+
+			view( 'settings/system-report', $args );
+
+		}
+
+		else {
+
+			view( 'settings/form', $args );
+
+		}
+
+	}
+
+	/**
+	 * Report Values
+	 *
+	 * @return mixed|void
+	 */
+
+	public function report_values() {
+
+		$report_values = [
+			[
+				'label' => __( 'WP PHP Memory Limit' ),
+				'value' => defined( 'WP_MEMORY_LIMIT' ) ? WP_MEMORY_LIMIT : 'NA'
+			],
+			[
+				'label' => __( 'PHP Memory Limit' ),
+				'value' => ini_get( 'memory_limit' )
+			],
+			[
+				'label' => __( 'Post Max Size' ),
+				'value' => ini_get( 'post_max_size' )
+			],
+			[
+				'label' => __( 'Max Execution Time' ),
+				'value' => ini_get( 'max_execution_time' )
+			],
+			[
+				'label' => __( 'Upload Max Filesize' ),
+				'value' => ini_get( 'upload_max_filesize' )
+			],
+		];
+
+		$settings = $this->get_options();
+
+		foreach ( $settings as $options ) {
+
+			foreach ( $options as $option ) {
+
+				if ( ! $option['no_report'] ) {
+
+					$value = get_option( $option['key'] );
+
+					$report_values[] = [
+						'label' => $option['label'],
+						'value' => is_array( $value ) ? join( ', ', $value ) : $value
+					];
+
+				}
+
+			}
+
+		}
+
+		return apply_filters( 'wp_data_sync_report_values', $report_values );
 
 	}
 
@@ -320,7 +397,7 @@ class Settings {
 	 * @return array
 	 */
 
-	private function get_options() {
+	public function get_options() {
 
 		$options = apply_filters( 'wp_data_sync_settings', [
 			'dashboard' => [
@@ -340,6 +417,7 @@ class Settings {
 					'key' 		=> 'wp_data_sync_access_token',
 					'label'		=> __( 'API Access Token', 'wp-data-sync' ),
 					'callback'  => 'input',
+					'no_report' => TRUE,
 					'args'      => [
 						'sanitize_callback' => 'sanitize_key',
 						'basename'          => 'text-input',
@@ -352,6 +430,7 @@ class Settings {
 					'key' 		=> 'wp_data_sync_private_token',
 					'label'		=> __( 'API Private Token', 'wp-data-sync' ),
 					'callback'  => 'input',
+					'no_report' => TRUE,
 					'args'      => [
 						'sanitize_callback' => 'sanitize_key',
 						'basename'          => 'text-input',
@@ -604,6 +683,7 @@ class Settings {
 					'key' 		=> 'wp_data_sync_item_request_access_token',
 					'label'		=> __( 'Item Request Access Token', 'wp-data-sync' ),
 					'callback'  => 'input',
+					'no_report' => TRUE,
 					'args'      => [
 						'sanitize_callback' => 'sanitize_key',
 						'basename'          => 'text-input',
@@ -616,6 +696,7 @@ class Settings {
 					'key' 		=> 'wp_data_sync_item_request_private_token',
 					'label'		=> __( 'Item Request Private Token', 'wp-data-sync' ),
 					'callback'  => 'input',
+					'no_report' => TRUE,
 					'args'      => [
 						'sanitize_callback' => 'sanitize_key',
 						'basename'          => 'text-input',
@@ -690,6 +771,7 @@ class Settings {
 					'key' 		=> Log::FILE_KEY,
 					'label'		=> __( 'Log File', 'wp-data-sync' ),
 					'callback'  => 'input',
+					'no_report' => TRUE,
 					'args'      => [
 						'sanitize_callback' => 'sanitize_text_field',
 						'files'             => Log::log_files(),
@@ -700,7 +782,11 @@ class Settings {
 			]
 		], $this );
 
-		if ( isset( $options[ $this->active_tab ] ) ) {
+		if ( 'report' === $this->active_tab ) {
+			return $options;
+		}
+
+		elseif ( isset( $options[ $this->active_tab ] ) ) {
 			return $options[ $this->active_tab ];
 		}
 
