@@ -207,7 +207,41 @@ class Settings {
 
 	public function report_values() {
 
+		global $wp_version;
+
 		$report_values = [
+			[
+				'label' => __( 'Home URL' ),
+				'value' => home_url()
+			],
+			[
+				'label' => __( 'Site URL' ),
+				'value' => site_url()
+			],
+			[
+				'label' => __( 'REST API URL' ),
+				'value' => get_rest_url()
+			],
+			[
+				'label' => __( 'WP Data Sync Version' ),
+				'value' => defined( 'WPDSYNC_VERSION' ) ? WPDSYNC_VERSION : 'NA'
+			],
+			[
+				'label' => __( 'WordPress Version' ),
+				'value' => $wp_version
+			],
+			[
+				'label' => __( 'WooCommerce Version' ),
+				'value' => defined( 'WC_VERSION' ) ? WC_VERSION : 'NA'
+			],
+			[
+				'label' => __( 'PHP Version' ),
+				'value' => phpversion()
+			],
+			[
+				'label' => __( 'WordPress Multisite' ),
+				'value' => is_multisite() ? '&#9989;' : '&#10005;'
+			],
 			[
 				'label' => __( 'WP PHP Memory Limit' ),
 				'value' => defined( 'WP_MEMORY_LIMIT' ) ? WP_MEMORY_LIMIT : 'NA'
@@ -223,6 +257,10 @@ class Settings {
 			[
 				'label' => __( 'Max Execution Time' ),
 				'value' => ini_get( 'max_execution_time' )
+			],
+			[
+				'label' => __( 'Max Upload Size' ),
+				'value' => ini_get( 'max_upload_size' )
 			],
 			[
 				'label' => __( 'Upload Max Filesize' ),
@@ -248,6 +286,17 @@ class Settings {
 				}
 
 			}
+
+		}
+
+		$plugins = get_option('active_plugins');
+
+		foreach ( $plugins as $plugin ) {
+
+			$report_values[] = [
+				'label' => __( 'Plugin (active)' ),
+				'value' => $plugin
+			];
 
 		}
 
