@@ -266,6 +266,10 @@ class Settings {
 				'label' => __( 'Upload Max Filesize' ),
 				'value' => ini_get( 'upload_max_filesize' )
 			],
+			[
+				'label' => __( 'Max Input Time' ),
+				'value' => ini_get( 'max_input_time' )
+			],
 		];
 
 		$settings = $this->get_options();

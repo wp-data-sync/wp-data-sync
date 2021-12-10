@@ -289,6 +289,10 @@ class WC_Product_DataSync {
 					$variation['post_data']['post_status'] = 'publish';
 				}
 
+				if ( ! isset( $variation['post_data']['post_type'] ) ) {
+					$variation['post_data']['post_type'] = 'product_variation';
+				}
+
 				$data_sync->set_properties( $variation );
 				$data_sync->process();
 

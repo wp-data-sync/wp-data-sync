@@ -377,7 +377,13 @@ class DataSync {
 	 */
 
 	public function get_post_type() {
-		return isset( $this->post_data['post_type'] ) ? $this->post_data['post_type'] : get_option( 'wp_data_sync_post_type' );
+
+		if ( isset( $this->post_data['post_type'] ) ) {
+			return $this->post_data['post_type'];
+		}
+
+        return get_option( 'wp_data_sync_post_type' );
+
 	}
 
 	/**
