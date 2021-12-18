@@ -413,7 +413,7 @@ class DataSync {
 	 */
 
 	public function get_attributes() {
-		return $this->attributes;
+		return apply_filters( 'wp_data_sync_product_attributes', $this->attributes, $this );
 	}
 
 	/**
@@ -423,7 +423,7 @@ class DataSync {
 	 */
 
 	public function get_variations() {
-		return $this->variations;
+		return apply_filters( 'wp_data_sync_product_variations', $this->variations, $this );
 	}
 
 	/**
@@ -433,7 +433,7 @@ class DataSync {
 	 */
 
 	public function get_gallery_images() {
-		return $this->gallery_images;
+		return apply_filters( 'wp_data_sync_product_gallery_images', $this->gallery_images, $this );
 	}
 
 	/**

@@ -126,10 +126,8 @@ class WC_Product_DataSync {
 		}
 
 		$product_attributes = [];
-		$position = 1;
-		$attributes = apply_filters( 'wp_data_sync_product_attributes', $attributes );
 
-		foreach ( $attributes as $attribute ) {
+		foreach ( $attributes as $position => $attribute ) {
 
 			extract( $attribute );
 
@@ -144,7 +142,7 @@ class WC_Product_DataSync {
 
 			$product_attributes[ $is_taxonomy ? $taxonomy : $name ] = [
 				'name'         => $is_taxonomy ? $taxonomy : $name,
-				'value'        => $is_taxonomy ? $values : join( '|', $values ),
+				'value'        => join( '|', $values ),
 				'position'     => $position,
 				'is_visible'   => (int) $is_visible,
 				'is_variation' => (int) $is_variation,
@@ -172,7 +170,7 @@ class WC_Product_DataSync {
 
 		extract( $attribute );
 
-		$term_ids   = [];
+		$term_ids = [];
 
 		foreach ( $values as $value ) {
 
