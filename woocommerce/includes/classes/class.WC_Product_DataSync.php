@@ -95,7 +95,11 @@ class WC_Product_DataSync {
 			$this->data_sync->reset_term_taxonomy_count();
 		}
 
-		if ( has_term( 'variable', 'product_type', $this->porduct_id ) ) {
+		if (
+			has_term( 'variable', 'product_type', $this->product_id )
+			||
+			has_term( 'variable-subscription', 'product_type', $this->product_id )
+		) {
 			$this->set_variations_inactive();
 		}
 

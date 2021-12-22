@@ -648,6 +648,10 @@ class DataSync {
 
 	public function maybe_trash_post() {
 
+		if ( ! isset( $this->post_data['post_status'] ) ) {
+			return FALSE;
+		}
+
 		if ( 0 < $this->post_id && 'trash' === $this->post_data['post_status'] ) {
 
 			if ( Settings::is_checked( 'wp_data_sync_force_delete' ) ) {
@@ -923,9 +927,17 @@ class DataSync {
 
 		Log::write( 'term-id', $term_id );
 
-		$this->term_desc( $description, $term_id, $taxonomy );
-		$this->term_thumb( $thumb_url, $term_id );
-		$this->term_meta( $term_meta, $term_id );
+		if ( isset( $description ) ) {
+			$this->term_desc( $description, $term_id, $taxonomy );
+		}
+
+		if ( isset( $thumb_url ) ) {
+			$this->term_thumb( $thumb_url, $term_id );
+		}
+
+		if ( isset( $term_meta ) ) {
+			$this->term_meta( $term_meta, $term_id );
+		}
 
 		return $term_id;
 
