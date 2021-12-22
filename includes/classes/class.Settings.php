@@ -278,7 +278,7 @@ class Settings {
 
 			foreach ( $options as $option ) {
 
-				if ( ! $option['no_report'] ) {
+				if ( ! isset( $option['no_report'] ) ) {
 
 					$value = get_option( $option['key'] );
 
@@ -426,19 +426,23 @@ class Settings {
 
 		foreach ( $options as $option ) {
 
-			// Add the key into the args array
-			$option['args']['key'] = $option['key'];
+			if ( isset( $option['key'] ) ) {
 
-			register_setting( $this->active_tab, $option['key'], $option['args'] );
+				// Add the key into the args array
+				$option['args']['key'] = $option['key'];
 
-			add_settings_field(
-				$option['key'],
-				$option['label'],
-				[ $this, $option['callback'] ],
-				WPDSYNC_CAP,
-				$this->active_tab,
-				$option['args']
-			);
+				register_setting( $this->active_tab, $option['key'], $option['args'] );
+
+				add_settings_field(
+					$option['key'],
+					$option['label'],
+					[ $this, $option['callback'] ],
+					WPDSYNC_CAP,
+					$this->active_tab,
+					$option['args']
+				);
+
+			}
 
 		}
 

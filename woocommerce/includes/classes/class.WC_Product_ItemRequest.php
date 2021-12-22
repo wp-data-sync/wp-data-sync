@@ -216,27 +216,13 @@ class WC_Product_ItemRequest {
 
 		$variations    = [];
 		$variation_ids = $this->product->get_children();
-		$i             = 1;
 
 		if ( empty( $variation_ids ) ) {
 			return FALSE;
 		}
 
 		foreach ( $variation_ids as $variation_id ) {
-
-			$variation                   = [];
-			$variation['source_item_id'] = $variation_id;
-			$variation['post_data']      = $this->item_request->get_item( $variation_id );
-            $variation['post_meta']      = $this->item_request->post_meta( $variation_id );
-
-            if ( has_post_thumbnail( $variation_id ) ) {
-	            $variation['featured_image'] = $this->item_request->featured_image( $variation_id );
-            }
-
-			$variations["variation_$i"] = array_filter( $variation );
-
-            $i++;
-
+			$variations[] = $this->item_request->get_item( $variation_id );
 		}
 
 		return $variations;
