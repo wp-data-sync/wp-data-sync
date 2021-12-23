@@ -363,6 +363,7 @@ class WC_Product_DataSync {
 
 		}
 
+		$term       = NULL;
 		$taxonomies = $this->data_sync->get_taxonomies();
 
 		if ( is_array( $taxonomies ) && array_key_exists( 'product_visibility', $taxonomies ) ) {
