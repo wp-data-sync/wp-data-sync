@@ -72,7 +72,7 @@ Your data is private to you. No one else has access to the data, except for the 
 
 = Is WP Data Sync developer friendly? =
 
-Yes. We have WordPress hooks and filters throughout the plugin to allow for almost any situation. [Developer Documentation](https://wpdatasync.com/docunentation/?affid=admin "Developer Documentation")
+Yes. We have WordPress hooks and filters throughout the plugin to allow for almost any situation. [Developer Documentation](https://wpdatasync.com/documentation/?affid=admin "Developer Documentation")
 
 == Screenshots ==
 

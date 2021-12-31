@@ -18,6 +18,6 @@ Here are a variety of links that we’ve found helpful in explaining our plugin 
 
 * [WP Data Sync](https://wpdatasync.com "WP Data Sync")
 * [WP Data Sync Blog](https://wpdatasync.com/blog/ "WP Data Sync Blog")
-* [Developer Documentation](https://wpdatasync.com/docunentation/ "Developer Documentation")
+* [Developer Documentation](https://wpdatasync.com/documentation/ "Developer Documentation")
 
 __[Change Log](https://wpdatasync.com/changelog/wp-data-sync-1/ "Change Log")__
