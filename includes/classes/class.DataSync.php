@@ -1169,9 +1169,18 @@ class DataSync {
 
 		Log::write( 'attachment', $this->attachment, 'Start Process' );
 
-		$image = $this->image();
+		$image_array = $this->image_array();
 
-		extract( $image );
+		/**
+		 * Extract.
+		 *
+		 * $image_url
+		 * $title
+		 * $description
+		 * $caption
+		 * $alt
+		 */
+		extract( $image_array );
 
 		Log::write( 'attachment', $image_url, 'Image URL' );
 
@@ -1185,7 +1194,7 @@ class DataSync {
 			return FALSE;
 		}
 
-		$basename    = $this->basename( $image );
+		$basename    = $this->basename( $image_array );
 		$image_title = preg_replace( '/\.[^.]+$/', '', $basename );
 
 		Log::write( 'attachment', $basename, 'Basename' );
@@ -1256,6 +1265,8 @@ class DataSync {
 
 					// Update the image source URL.
 					update_post_meta( $attach_id, '_source_url', $image_url );
+
+					do_action( 'wp_data_sync_attachment_created', $attach_id, $image_array, $this );
 
 					return $attach_id;
 
@@ -1456,26 +1467,26 @@ class DataSync {
 	/**
 	 * Basename.
 	 *
-	 * @param array $image
+	 * @param array $image_array
 	 *
 	 * @return mixed|void
 	 */
 
-	public function basename( $image ) {
+	public function basename( $image_array ) {
 
-		$basename = sanitize_file_name( basename( $image['image_url'] ) );
+		$basename = sanitize_file_name( basename( $image_array['image_url'] ) );
 
-		return apply_filters( 'wp_data_sync_basename', $basename, $this->post_id, $image );
+		return apply_filters( 'wp_data_sync_basename', $basename, $this->post_id, $image_array );
 
 	}
 
 	/**
-	 * Image.
+	 * Image Array.
 	 *
 	 * @return mixed|void
 	 */
 
-	public function image() {
+	public function image_array() {
 
 		if ( ! is_array( $this->attachment ) ) {
 
