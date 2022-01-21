@@ -35,6 +35,12 @@ class WC_Product_DataSync {
 	private $product_id;
 
 	/**
+	 * @var string
+	 */
+
+	private $product_type = 'simple';
+
+	/**
 	 * @var WC_Product_DataSync
 	 */
 
@@ -72,6 +78,18 @@ class WC_Product_DataSync {
 
 	public function set_product_id( $product_id ) {
 		$this->product_id = (int) $product_id;
+	}
+
+	/**
+	 * Set product type.
+	 *
+	 * @param $product_type
+	 *
+	 * @return void
+	 */
+
+	public function set_product_type( $product_type ) {
+		$this->product_type = $product_type;
 	}
 
 	/**
@@ -114,6 +132,8 @@ class WC_Product_DataSync {
 		if ( $this->data_sync->get_taxonomies() ) {
 			$this->product_visibility();
 		}
+
+		$this->product_type();
 
 	}
 
@@ -385,6 +405,43 @@ class WC_Product_DataSync {
 		}
 
 		wp_set_object_terms( $this->product_id, $term, 'product_visibility' );
+
+	}
+
+	/**
+	 * Product type.
+	 *
+	 * @since 2.1.21
+	 */
+
+	public function product_type() {
+
+		if ( $taxonomies = $this->data_sync->get_taxonomies() ) {
+
+			if ( ! empty( $taxonomies['product_type'] ) && is_array( $taxonomies['product_type'] ) ) {
+
+				foreach( $taxonomies['product_type'] as $term ) {
+
+					if ( ! empty( $term['name'] ) ) {
+						$this->set_product_type( $term['name'] );
+					}
+
+				}
+
+			}
+
+		}
+
+		Log::write( 'product-type', [
+			'product_id' => $this->product_id,
+			'product_type' => $this->product_type
+		], 'Product Type' );
+
+		$result = wp_set_object_terms( $this->product_id, [ $this->product_type ], 'product_type' );
+
+		if ( is_wp_error( $result ) ) {
+			Log::write( 'wp-error', $result, 'Product Type' );
+		}
 
 	}
 
