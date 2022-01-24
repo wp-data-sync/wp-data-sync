@@ -22,7 +22,7 @@ add_action( 'wp_data_sync_admin_tabs', function( $tabs ) {
 			'label' => __( 'WooCommerce' )
 		],
 		'orders' => [
-			'label' => __( 'Orders' )
+			'label' => __( 'Orders', 'wp-data-sync' )
 		]
 	] );
 

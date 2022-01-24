@@ -19,7 +19,7 @@ add_filter( 'plugin_action_links', function( $links, $file ) {
 
 	if ( $file === WPDSYNC_PLUGIN ) {
 
-		$link = '<a href="options-general.php?page=wp-data-sync">' . __( 'Settings' ) . '</a>';
+		$link = '<a href="options-general.php?page=wp-data-sync">' . __( 'Settings', 'wp-data-sync' ) . '</a>';
 
 		array_unshift( $links, $link );
 

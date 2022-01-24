@@ -18,9 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 add_filter( 'wp_data_sync_item_request_exclude_data_types', function( $options ) {
 
 	$options = array_merge( $options, apply_filters( 'wc_data_sync_item_request_exclude_data_types', [
-		'gallery_images' => __( 'Galley Images', 'woocommerce' ),
-		'attributes'     => __( 'Attributes', 'woocommerce' ),
-		'variations'     => __( 'Variations', 'woocommerce' )
+		'gallery_images' => __( 'Galley Images', 'wp-data-sync' ),
+		'attributes'     => __( 'Attributes', 'wp-data-sync' ),
+		'variations'     => __( 'Variations', 'wp-data-sync' )
 	] ) );
 
 	return $options;

@@ -70,6 +70,7 @@ class Settings {
 		add_action( 'admin_menu', [ $this, 'add_pages' ], 5 );
 		add_action( 'wp_data_sync_help_buttons', [ $this, 'help_buttons' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'scripts' ] );
+		add_action( 'in_admin_header', [ $this, 'remove_admin_notices' ], 999 );
 
 		// Delete log files on setting change.
 		add_action( 'update_option_wp_data_sync_allow_logging', [ $this, 'delete_log_files' ], 10, 2 );
@@ -165,9 +166,6 @@ class Settings {
 		if ( ! current_user_can( WPDSYNC_CAP ) ) {
 			wp_die( __( 'You do not have sufficient permissions to access this page.', 'wp-data-sync' ) );
 		}
-
-		remove_all_actions( 'admin_notices' );
-		remove_all_actions( 'all_admin_notices' );
 
 		wp_enqueue_style( 'jquery-ui-min' );
 		wp_enqueue_script( 'jquery-ui-tooltip' );
@@ -506,7 +504,7 @@ class Settings {
 						'type'		        => '',
 						'class'		        => '',
 						'placeholder'       => '',
-						'info'              => __( 'We reccommend keeping this activated to keep your website up to date with the Data Sync API.' )
+						'info'              => __( 'We reccommend keeping this activated to keep your website up to date with the Data Sync API.', 'wp-data-sync' )
 					]
 				]
 			],
@@ -959,6 +957,19 @@ class Settings {
 		}
 
 		return $formatted_roles;
+
+	}
+
+	/**
+	 * Remove admin notices.
+	 */
+	public function remove_admin_notices() {
+
+		if ( isset( $_GET['page'] ) && self::SLUG === $_GET['page'] ) {
+			remove_all_actions( 'user_admin_notices' );
+			remove_all_actions( 'admin_notices' );
+			remove_all_actions( 'network_admin_notices' );
+		}
 
 	}
 

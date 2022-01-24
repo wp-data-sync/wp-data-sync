@@ -48,7 +48,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 					'type'		        => '',
 					'class'		        => '',
 					'placeholder'       => '',
-					'info'              => __( 'Use the current product visibility if the product visibility is already set. This will prevent DataSync from updating the current product visibility on existing products.' )
+					'info'              => __( 'Use the current product visibility if the product visibility is already set. This will prevent DataSync from updating the current product visibility on existing products.', 'wp-data-sync' )
 				]
 			],
 			[
@@ -61,7 +61,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 					'type'		        => '',
 					'class'		        => '',
 					'placeholder'       => '',
-					'info'              => __( 'This relates the IDs from your data source with the IDs from your website. Please note, if the related product does not exist, this system will relate the product when it is created in the data sync.' )
+					'info'              => __( 'This relates the IDs from your data source with the IDs from your website. Please note, if the related product does not exist, this system will relate the product when it is created in the data sync.', 'wp-data-sync' )
 				]
 			],
 			[
@@ -74,7 +74,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 					'type'		        => '',
 					'class'		        => '',
 					'placeholder'       => '',
-					'info'              => __( 'This relates the IDs from your data source with the IDs from your website. Please note, if the related product does not exist, this system will relate the product when it is created in the data sync.' )
+					'info'              => __( 'This relates the IDs from your data source with the IDs from your website. Please note, if the related product does not exist, this system will relate the product when it is created in the data sync.', 'wp-data-sync' )
 				]
 			]
 		],
@@ -89,7 +89,7 @@ add_filter( 'wp_data_sync_settings', function( $settings, $_settings ) {
 					'tyoe'              => '',
 					'class'             => 'sync-orders',
 					'placeholder'       => '',
-					'info'              => __( 'Allow order details to sync with the WP Data Sync API.')
+					'info'              => __( 'Allow order details to sync with the WP Data Sync API.', 'wp-data-sync' )
 				]
 			],
 			[

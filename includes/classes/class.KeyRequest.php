@@ -130,22 +130,22 @@ class KeyRequest extends Request {
 
 		$keys =  [
 			0 => [
-				'heading' => __( 'Post Types' ),
+				'heading' => __( 'Post Types', 'wp-data-sync' ),
 				'keys'    => $this->get_post_types(),
 				'type'    => 'key_value'
 			],
 			1 => [
-				'heading' => __( 'Taxonomies' ),
+				'heading' => __( 'Taxonomies', 'wp-data-sync' ),
 				'keys'    => $this->get_taxonomies(),
 				'type'    => 'key_value'
 			],
 			2  => [
-				'heading' => __( 'Meta Keys' ),
+				'heading' => __( 'Meta Keys', 'wp-data-sync' ),
 				'keys'    => $this->meta_keys( $wpdb->postmeta ),
 				'type'    => 'value'
 			],
 			3  => [
-				'heading' => __( 'User Meta Keys' ),
+				'heading' => __( 'User Meta Keys', 'wp-data-sync' ),
 				'keys'    => $this->meta_keys( $wpdb->usermeta ),
 				'type'    => 'value'
 			]

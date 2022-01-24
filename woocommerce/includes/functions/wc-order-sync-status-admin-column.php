@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 add_filter( 'manage_edit-shop_order_columns', function( $columns ) {
 
 	if ( Settings::is_checked( 'wp_data_sync_show_order_sync_status_admin_column' ) ) {
-		$columns['wpds_sync_status'] = __( 'Sync Status', 'wp-data-sync-api' );
+		$columns['wpds_sync_status'] = __( 'Sync Status', 'wp-data-sync' );
 	}
 
 	return $columns;

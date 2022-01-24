@@ -114,9 +114,9 @@ class VersionRequest extends Request {
 
 	public function request() {
 
-		$response = WPDSYNC_VERSION;
-
-		return rest_ensure_response( $response );
+		return rest_ensure_response( [
+			'version' => WPDSYNC_VERSION
+		] );
 
 	}
 
