@@ -646,7 +646,7 @@ class Settings {
 						'type'		        => '',
 						'class'		        => '',
 						'placeholder'       => '',
-						'info'              => __( 'When synced items have the trash status permanently delete the items and all related data.' )
+						'info'              => __( 'When synced items have the trash status permanently delete the items and all related data.', 'wp-data-sync' )
 					]
 				],
 				[
@@ -659,7 +659,20 @@ class Settings {
 						'type'		        => '',
 						'class'		        => '',
 						'placeholder'       => '',
-						'info'              => __( 'Allow images without valid SSL certificates to be imported.' )
+						'info'              => __( 'Allow images without valid SSL certificates to be imported.', 'wp-data-sync' )
+					]
+				],
+				[
+					'key' 		=> 'wp_data_sync_verify_invalid_image_urls',
+					'label'		=> __( 'Verify Invalid Image URLs', 'wp-data-sync' ),
+					'callback'  => 'input',
+					'args'      => [
+						'sanitize_callback' => 'sanitize_text_field',
+						'basename'          => 'checkbox',
+						'type'		        => '',
+						'class'		        => '',
+						'placeholder'       => '',
+						'info'              => __( 'Verify invalid image URLs that fail the first validation process. NOT RECOMMENDED!!', 'wp-data-sync' )
 					]
 				],
 				[
@@ -672,7 +685,7 @@ class Settings {
 						'type'		        => '',
 						'class'		        => '',
 						'placeholder'       => '',
-						'info'              => __( 'Replace all valid full image URLs. This will make a copy of the images in this websites media library and replace the image URLs in the content.' )
+						'info'              => __( 'Replace all valid full image URLs. This will make a copy of the images in this websites media library and replace the image URLs in the content.', 'wp-data-sync' )
 					]
 				],
 				[
@@ -771,7 +784,7 @@ class Settings {
 						'type'		        => '',
 						'class'		        => 'item-request-status regular-text',
 						'placeholder'       => '',
-						'info'              => __( 'Include the selected post ststuses from the item request. Select all that apply.' ),
+						'info'              => __( 'Include the selected post ststuses from the item request. Select all that apply.', 'wp-data-sync' ),
 						'selected'          => get_option( 'wp_data_sync_item_request_status', [] ),
 						'options'           => apply_filters( 'wp_data_sync_item_request_include_status', [
 							'publish' => __( 'Publish' ),
@@ -795,7 +808,7 @@ class Settings {
 						'type'		        => '',
 						'class'		        => 'item-request-exclude-data-types regular-text',
 						'placeholder'       => '',
-						'info'              => __( 'Exclude the selected data types from the item request. Select all that apply.' ),
+						'info'              => __( 'Exclude the selected data types from the item request. Select all that apply.', 'wp-data-sync' ),
 						'selected'          => get_option( 'wp_data_sync_item_request_exclude_data_types', [] ),
 						'options'           => apply_filters( 'wp_data_sync_item_request_exclude_data_types', [
 							'none'           => __( 'Exclude None', 'wp-data-sync' ),
@@ -819,7 +832,7 @@ class Settings {
 						'type'		        => '',
 						'class'		        => '',
 						'placeholder'       => '',
-						'info'              => __( 'We reccommend keeping this off unless you are having an issue with the data sync. If you do have an issue, please activate this before contacting support. Log files will be automatically deleted after 10 days. Please note when allow logging is deactivated all log files will be deleted.' )
+						'info'              => __( 'We reccommend keeping this off unless you are having an issue with the data sync. If you do have an issue, please activate this before contacting support. Log files will be automatically deleted after 10 days. Please note when allow logging is deactivated all log files will be deleted.', 'wp-data-sync' )
 					]
 				],
 				[

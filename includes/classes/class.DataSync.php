@@ -1291,13 +1291,13 @@ class DataSync {
 	public function is_valid_image_url( $image_url ) {
 
 		// Check for a valid URL.
-		if ( FALSE !== filter_var( $image_url, FILTER_VALIDATE_URL ) ) {
-			return apply_filters( 'wp_data_sync_is_valid_image_url', $image_url );
+		$info = filter_var( $image_url, FILTER_VALIDATE_URL );
+
+		if ( ! $info ) {
+			Log::write( 'attachment', $image_url, 'Invalid URL' );
 		}
 
-		Log::write( 'attachment', $image_url, 'Invalid URL' );
-
-		return FALSE;
+		return apply_filters( 'wp_data_sync_is_valid_image_url', $info, $image_url, $this );
 
 	}
 

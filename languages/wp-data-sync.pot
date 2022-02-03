@@ -2,14 +2,14 @@
 # This file is distributed under the GPL2.
 msgid ""
 msgstr ""
-"Project-Id-Version: WP Data Sync 2.1.22\n"
+"Project-Id-Version: WP Data Sync 2.1.24\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wp-data-sync\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2022-01-24T17:46:44+00:00\n"
+"POT-Creation-Date: 2022-02-03T17:04:53+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.5.0\n"
 "X-Domain: wp-data-sync\n"
@@ -45,7 +45,7 @@ msgid "Post Types"
 msgstr ""
 
 #: includes/classes/class.KeyRequest.php:138
-#: includes/classes/class.Settings.php:804
+#: includes/classes/class.Settings.php:817
 msgid "Taxonomies"
 msgstr ""
 
@@ -221,87 +221,116 @@ msgstr ""
 msgid "Force Delete"
 msgstr ""
 
+#: includes/classes/class.Settings.php:649
+msgid "When synced items have the trash status permanently delete the items and all related data."
+msgstr ""
+
 #: includes/classes/class.Settings.php:654
 msgid "Allow Unsecure Images"
 msgstr ""
 
+#: includes/classes/class.Settings.php:662
+msgid "Allow images without valid SSL certificates to be imported."
+msgstr ""
+
 #: includes/classes/class.Settings.php:667
-msgid "Replace Images in Content"
+msgid "Verify Invalid Image URLs"
+msgstr ""
+
+#: includes/classes/class.Settings.php:675
+msgid "Verify invalid image URLs that fail the first validation process. NOT RECOMMENDED!!"
 msgstr ""
 
 #: includes/classes/class.Settings.php:680
-msgid "Replace Images in Excerpt"
+msgid "Replace Images in Content"
 msgstr ""
 
 #: includes/classes/class.Settings.php:688
+#: includes/classes/class.Settings.php:701
 msgid "Replace all valid full image URLs. This will make a copy of the images in this websites media library and replace the image URLs in the content."
 msgstr ""
 
-#: includes/classes/class.Settings.php:695
-msgid "Check Current User Emails"
-msgstr ""
-
-#: includes/classes/class.Settings.php:703
-msgid "If the primary ID search fails, check current users email to see if it exists. If it does exist, update that user. If not exists, create a new user with that email."
+#: includes/classes/class.Settings.php:693
+msgid "Replace Images in Excerpt"
 msgstr ""
 
 #: includes/classes/class.Settings.php:708
-msgid "Check Current Usernames"
+msgid "Check Current User Emails"
 msgstr ""
 
 #: includes/classes/class.Settings.php:716
-msgid "If the primary ID search fails, check current usernames to see if it exists. If it does exist, update that user. If not exists, create a new user with that username."
+msgid "If the primary ID search fails, check current users email to see if it exists. If it does exist, update that user. If not exists, create a new user with that email."
 msgstr ""
 
 #: includes/classes/class.Settings.php:721
+msgid "Check Current Usernames"
+msgstr ""
+
+#: includes/classes/class.Settings.php:729
+msgid "If the primary ID search fails, check current usernames to see if it exists. If it does exist, update that user. If not exists, create a new user with that username."
+msgstr ""
+
+#: includes/classes/class.Settings.php:734
 msgid "Default User Role"
 msgstr ""
 
-#: includes/classes/class.Settings.php:731
+#: includes/classes/class.Settings.php:744
 msgid "Default user role applied when a new user is created."
 msgstr ""
 
-#: includes/classes/class.Settings.php:739
+#: includes/classes/class.Settings.php:752
 msgid "Item Request Access Token"
 msgstr ""
 
-#: includes/classes/class.Settings.php:752
+#: includes/classes/class.Settings.php:765
 msgid "Item Request Private Token"
 msgstr ""
 
-#: includes/classes/class.Settings.php:765
+#: includes/classes/class.Settings.php:778
 msgid "Include items with status"
 msgstr ""
 
-#: includes/classes/class.Settings.php:789
-msgid "Exclude Data Types"
-msgstr ""
-
-#: includes/classes/class.Settings.php:801
-msgid "Exclude None"
+#: includes/classes/class.Settings.php:787
+msgid "Include the selected post ststuses from the item request. Select all that apply."
 msgstr ""
 
 #: includes/classes/class.Settings.php:802
-msgid "Post Data"
+msgid "Exclude Data Types"
 msgstr ""
 
-#: includes/classes/class.Settings.php:803
-msgid "Post Meta"
-msgstr ""
-
-#: includes/classes/class.Settings.php:805
-msgid "Featured Image"
-msgstr ""
-
-#: includes/classes/class.Settings.php:806
-msgid "Integrations"
+#: includes/classes/class.Settings.php:811
+msgid "Exclude the selected data types from the item request. Select all that apply."
 msgstr ""
 
 #: includes/classes/class.Settings.php:814
-msgid "Allow Logging"
+msgid "Exclude None"
+msgstr ""
+
+#: includes/classes/class.Settings.php:815
+msgid "Post Data"
+msgstr ""
+
+#: includes/classes/class.Settings.php:816
+msgid "Post Meta"
+msgstr ""
+
+#: includes/classes/class.Settings.php:818
+msgid "Featured Image"
+msgstr ""
+
+#: includes/classes/class.Settings.php:819
+msgid "Integrations"
 msgstr ""
 
 #: includes/classes/class.Settings.php:827
+msgid "Allow Logging"
+msgstr ""
+
+#: includes/classes/class.Settings.php:835
+msgid "We reccommend keeping this off unless you are having an issue with the data sync. If you do have an issue, please activate this before contacting support. Log files will be automatically deleted after 10 days. Please note when allow logging is deactivated all log files will be deleted."
+msgstr ""
+
+#: includes/classes/class.Settings.php:840
 msgid "Log File"
 msgstr ""
 
