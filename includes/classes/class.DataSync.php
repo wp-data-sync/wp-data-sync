@@ -532,6 +532,9 @@ class DataSync {
 			return FALSE;
 		}
 
+		// Set the primary ID for the placeholder early in case request fails.
+		update_post_meta( $post_id, $this->primary_id['key'], $this->primary_id['value'] );
+
 		return $post_id;
 
 	}
