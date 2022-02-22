@@ -15,7 +15,6 @@ use WP_DataSync\Api\App\Data;
 use WP_DataSync\App\DataSync;
 use WP_DataSync\App\Log;
 use WP_DataSync\App\Settings;
-use WC_Cache_Helper;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -135,7 +134,6 @@ class WC_Product_DataSync {
 		}
 
 		$this->product_type();
-		$this->set_price();
 
 	}
 
@@ -155,7 +153,7 @@ class WC_Product_DataSync {
 
 		foreach ( $attributes as $position => $attribute ) {
 
-			if ( ! is_array( $attribute ) ) {
+			if ( is_array( $attribute ) ) {
 
 				extract( $attribute );
 
@@ -447,34 +445,6 @@ class WC_Product_DataSync {
 
 		if ( is_wp_error( $result ) ) {
 			Log::write( 'wp-error', $result, 'Product Type' );
-		}
-
-	}
-
-	/**
-	 * Set price.
-	 *
-	 * @return void
-	 */
-
-	public function set_price() {
-
-		if ( $product = wc_get_product( $this->product_id ) ) {
-
-			if ( $product->is_on_sale() ) {
-				$current_price = $product->get_sale_price();
-			}
-			else {
-				$current_price = $product->get_regular_price();
-			}
-
-			Log::write( 'set-price', $current_price, 'Current Price' );
-
-			update_post_meta( $this->product_id, '_price', $current_price );
-
-			WC_Cache_Helper::get_transient_version( 'product', true );
-			delete_transient( 'wc_products_onsale' );
-
 		}
 
 	}

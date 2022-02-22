@@ -43,9 +43,9 @@ add_action( 'rest_api_init', function() {
  * Process WooCommerce.
  */
 
-add_action( 'wp_data_sync_after_process', function ( $product_id, $data_sync ) {
+add_action( 'wp_data_sync_after_process', function( $product_id, $data_sync ) {
 
-	if ( wc_get_product( $product_id ) ) {
+	if ( 'product' === $data_sync->get_post_type() ) {
 		$wc_product_data_sync = WC_Product_DataSync::instance();
 		$wc_product_data_sync->set_product_id( $product_id );
 		$wc_product_data_sync->set_data_sync( $data_sync );

@@ -478,6 +478,10 @@ class DataSync {
 
 		extract( $this->primary_id );
 
+		if ( empty( $key ) || empty( $value ) ) {
+			return FALSE;
+		}
+
 		$post_id = $wpdb->get_var( $wpdb->prepare(
 			"
 			SELECT p.ID 
