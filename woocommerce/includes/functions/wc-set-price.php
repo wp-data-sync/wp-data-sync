@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 add_action( 'wp_data_sync_after_process', function( $product_id, $data_sync ) {
 
-	$post_meta = $data_sync->post_meta();
+	$post_meta = $data_sync->get_post_meta();
 
 	if ( ! isset( $post_meta['_regular_price'] ) && ! isset( $post_meta['_sale_price'] ) ) {
 		return;
