@@ -155,25 +155,29 @@ class WC_Product_DataSync {
 
 		foreach ( $attributes as $position => $attribute ) {
 
-			extract( $attribute );
+			if ( ! is_array( $attribute ) ) {
 
-			if ( $is_taxonomy ) {
+				extract( $attribute );
 
-				$taxonomy = $this->attribute_taxonomy( $name );
-				$term_ids = $this->attribute_term_ids( $taxonomy, $attribute );
+				if ( $is_taxonomy ) {
 
-				wp_set_object_terms( $this->product_id, $term_ids, $taxonomy );
+					$taxonomy = $this->attribute_taxonomy( $name );
+					$term_ids = $this->attribute_term_ids( $taxonomy, $attribute );
+
+					wp_set_object_terms( $this->product_id, $term_ids, $taxonomy );
+
+				}
+
+				$product_attributes[ $is_taxonomy ? $taxonomy : $name ] = [
+					'name'         => $is_taxonomy ? $taxonomy : $name,
+					'value'        => join( '|', $values ),
+					'position'     => $position,
+					'is_visible'   => (int) $is_visible,
+					'is_variation' => (int) $is_variation,
+					'is_taxonomy'  => (int) $is_taxonomy
+				];
 
 			}
-
-			$product_attributes[ $is_taxonomy ? $taxonomy : $name ] = [
-				'name'         => $is_taxonomy ? $taxonomy : $name,
-				'value'        => join( '|', $values ),
-				'position'     => $position,
-				'is_visible'   => (int) $is_visible,
-				'is_variation' => (int) $is_variation,
-				'is_taxonomy'  => (int) $is_taxonomy
-			];
 
 		}
 
