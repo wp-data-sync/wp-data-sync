@@ -124,10 +124,6 @@ class Settings {
 
 		$tabs = apply_filters( 'wp_data_sync_admin_tabs', $tabs, $this );
 
-		$tabs['report'] = [
-			'label' => __( 'System Report', 'wp-data-sync' ),
-		];
-
 		// Include logs as last tab.
 		$tabs['logs'] = [
 			'label' => __( 'Logs', 'wp-data-sync' ),
@@ -176,24 +172,7 @@ class Settings {
 			'href'  => admin_url( "admin.php?page=" . Settings::SLUG . "&active_tab=" )
 		];
 
-		if ( 'report' === $this->active_tab ) {
-
-			$report_values  = $this->report_values();
-			$args['report'] = '';
-
-			foreach ( $report_values as $value ) {
-				$args['report'] .= sprintf( '%s: %s &#013;', esc_html( $value['label'] ), esc_html( $value['value'] ) );
-			}
-
-			view( 'settings/system-report', $args );
-
-		}
-
-		else {
-
-			view( 'settings/form', $args );
-
-		}
+		view( 'settings/form', $args );
 
 	}
 
@@ -850,15 +829,11 @@ class Settings {
 			]
 		], $this );
 
-		if ( 'report' === $this->active_tab ) {
+		if ( defined( 'WPDS_DOING_REPORT_REQUEST' ) ) {
 			return $options;
 		}
 
-		elseif ( isset( $options[ $this->active_tab ] ) ) {
-			return $options[ $this->active_tab ];
-		}
-
-		return [];
+		return $options[ $this->active_tab ];
 
 	}
 
