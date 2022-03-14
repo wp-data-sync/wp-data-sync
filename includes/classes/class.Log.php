@@ -107,15 +107,33 @@ class Log {
 
 		if ( $file_name = get_option( Log::FILE_KEY ) ) {
 
-			$file = WPDSYNC_LOG_DIR . $file_name;
-
-			if ( file_exists( $file ) ) {
-				return file_get_contents( $file );
+			if ( $contents = self::contents( $file_name ) ) {
+				return $contents;
 			}
 
 		}
 
 		return __( 'Please choose a file and save changes.', 'wp-data-sync' );
+
+	}
+
+	/**
+	 * Contents.
+	 *
+	 * @param $file_name
+	 *
+	 * @return false|string
+	 */
+
+	public static function contents( $file_name ) {
+
+		$file = WPDSYNC_LOG_DIR . $file_name;
+
+		if ( file_exists( $file ) ) {
+			return file_get_contents( $file );
+		}
+
+		return FALSE;
 
 	}
 

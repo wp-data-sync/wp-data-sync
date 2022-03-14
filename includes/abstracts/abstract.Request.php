@@ -385,6 +385,17 @@ abstract class Request {
 
 		}
 
+		$encoding = mb_detect_encoding( $clean_value, 'auto' );
+
+		if ( 'ASCII' !== $encoding ) {
+
+			Log::write( 'encoding', [
+				'encoding'    => $encoding,
+				'clean_value' => $clean_value
+			] );
+
+		}
+
 		return apply_filters( 'wp_data_sync_clean_value', $clean_value, $sanitize_callback );
 
 	}
