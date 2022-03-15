@@ -15,6 +15,7 @@ use WP_DataSync\Api\App\Data;
 use WP_DataSync\App\DataSync;
 use WP_DataSync\App\Log;
 use WP_DataSync\App\Settings;
+use WC_Product_Variation;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -134,6 +135,10 @@ class WC_Product_DataSync {
 		}
 
 		$this->product_type();
+
+		// Set all missing product defaults
+		$product = wc_get_product( $this->product_id );
+		$product->save();
 
 	}
 
@@ -328,6 +333,10 @@ class WC_Product_DataSync {
 				$data_sync->process();
 
 				$variation_id = $data_sync->get_post_id();
+
+				// Set all missing product variation defaults
+				$_variation = new WC_Product_Variation( $variation_id );
+				$_variation->save();
 
 				Log::write( 'variation', [
 					'Variation ID'   => $variation_id,
