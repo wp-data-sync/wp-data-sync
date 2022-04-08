@@ -721,7 +721,13 @@ class DataSync {
 				$meta_value = $this->post_meta_value( $meta_value, $meta_key );
 
 				if ( ! in_array( $meta_key, $restricted_meta_keys ) ) {
+
 					update_post_meta( $this->post_id, $meta_key, $meta_value );
+
+					if ( apply_filters( 'wp_data_sync_is_acf_field_post_meta', FALSE, $meta_key, $this->post_id, $this ) ) {
+						do_action( 'wp_data_sync_process_acf_field_post_meta', $meta_key, $meta_value, $this->post_id, $this );
+					}
+
 				}
 
 				do_action( "wp_data_sync_post_meta_$meta_key", $this->post_id, $meta_value, $this );

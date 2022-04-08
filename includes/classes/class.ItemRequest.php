@@ -370,8 +370,8 @@ class ItemRequest extends Request {
 
 		$limit = apply_filters( 'wp_data_sync_item_request_sql_limit', $wpdb->prepare(
 			"LIMIT %d",
-			intval( $this->limit )
-		), $limit, $this->post_type );
+			$this->limit
+		), $this->limit, $this->post_type );
 
 		/**
 		 * Combine parts to make the SQL statement.
