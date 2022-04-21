@@ -50,5 +50,5 @@ add_filter( 'wp_data_sync_is_acf_field_post_meta', function( $is_field, $meta_ke
  */
 
 add_action( 'wp_data_sync_process_acf_field_post_meta', function( $meta_key, $meta_value, $post_id ) {
-	update_field( $meta_key, $meta_key, $post_id );
+	update_field( $meta_key, $meta_value, $post_id );
 }, 10, 3 );

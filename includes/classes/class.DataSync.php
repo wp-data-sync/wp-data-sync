@@ -78,6 +78,12 @@ class DataSync {
 	private $gallery_images = FALSE;
 
 	/**
+	 * @var bool|array
+	 */
+
+	private $gallery_details = FALSE;
+
+	/**
 	 * @var array|bool
 	 */
 
@@ -203,6 +209,10 @@ class DataSync {
 
 			do_action( 'wp_data_sync_featured_image', $this->post_id, $this->featured_image, $this );
 
+		}
+
+		if ( $this->gallery_images ) {
+			$this->gallery_images();
 		}
 
 		if ( $this->attachment ) {
@@ -434,6 +444,16 @@ class DataSync {
 
 	public function get_gallery_images() {
 		return apply_filters( 'wp_data_sync_product_gallery_images', $this->gallery_images, $this );
+	}
+
+	/**
+	 * Get gallery details.
+	 *
+	 * @return mixed|void
+	 */
+
+	public function get_gallery_details() {
+		return apply_filters( 'wp_data_sync_product_gallery_details', $this->gallery_details, $this );
 	}
 
 	/**
@@ -1169,6 +1189,52 @@ class DataSync {
 		if ( $attach_id = $this->attachment() ) {
 			set_post_thumbnail( $this->post_id, $attach_id );
 		}
+
+	}
+
+	/**
+	 * Gallery Images
+	 *
+	 * @since 1.6.0
+	 * @since 2.4.2 Moved here from WC_Product_DataSync
+	 *
+	 * @return void
+	 */
+
+	public function gallery_images() {
+
+		if ( empty( $this->gallery_details ) ) {
+			return;
+		}
+
+		$attach_ids = [];
+
+		foreach ( $this->gallery_images as $image ) {
+
+			$image = apply_filters( 'wp_data_sync_product_gallery_image', $image, $this->post_id, $this );
+
+			$this->set_attachment( $image );
+
+			if ( $attach_id = $this->attachment() ) {
+				$attach_ids[] = $attach_id;
+			}
+
+		}
+
+		$gallery_ids = apply_filters( 'wp_data_sync_gallery_image_ids', $attach_ids, $this->post_id, $this );
+		$gallery_key = apply_filters( 'wp_data_sync_gallery_image_meta_key', $this->gallery_details['key'], $this->post_id, $this );
+
+		switch ( $this->gallery_details['format'] ) {
+
+			case 'comma_join' :
+				$gallery_ids = join( ',', $gallery_ids );
+				break;
+
+		}
+
+		update_post_meta( $this->post_id, $gallery_key, $gallery_ids );
+
+		do_action( 'wp_data_sync_gallery_images', $this->post_id, $gallery_images, $this );
 
 	}
 

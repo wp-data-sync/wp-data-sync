@@ -126,10 +126,6 @@ class WC_Product_DataSync {
 			$this->variations();
 		}
 
-		if ( $this->data_sync->get_gallery_images() ) {
-			$this->gallery_images();
-		}
-
 		if ( $this->data_sync->get_taxonomies() ) {
 			$this->product_visibility();
 		}
@@ -347,38 +343,6 @@ class WC_Product_DataSync {
 			}
 
 		}
-
-	}
-
-	/**
-	 * Gallery images.
-	 *
-	 * @since 1.6.0
-	 */
-
-	public function gallery_images() {
-
-		$gallery_images = $this->data_sync->get_gallery_images();
-		$attach_ids     = [];
-
-		foreach ( $gallery_images as $image ) {
-
-			$image = apply_filters( 'wp_data_sync_product_gallery_image', $image, $this->product_id );
-
-			$this->data_sync->set_attachment( $image );
-
-			if ( $attach_id = $this->data_sync->attachment() ) {
-				$attach_ids[] = $attach_id;
-			}
-
-		}
-
-		$gallery_ids = apply_filters( 'wp_data_sync_gallery_image_ids', $attach_ids, $this->product_id );
-		$gallery_key = apply_filters( 'wp_data_sync_gallery_image_meta_key', '_product_image_gallery', $this->product_id );
-
-		update_post_meta( $this->product_id, $gallery_key, join( ',', $gallery_ids ) );
-
-		do_action( 'wp_data_sync_gallery_images', $this->product_id, $gallery_images );
 
 	}
 
