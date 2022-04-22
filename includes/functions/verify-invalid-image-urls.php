@@ -41,11 +41,11 @@ add_filter( 'wp_data_sync_is_valid_image_url', function( $info, $image_url, $dat
 		] );
 
 		if ( is_wp_error( $response ) ) {
-			return FALSE;
+			return false;
 		}
 
 		if ( 200 === wp_remote_retrieve_response_code( $response ) ) {
-			return TRUE;
+			return true;
 		}
 
 	}

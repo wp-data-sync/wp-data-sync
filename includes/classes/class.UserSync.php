@@ -53,7 +53,7 @@ class UserSync {
 	 * @var bool
 	 */
 
-	private $is_new = FALSE;
+	private $is_new = false;
 
 	/**
 	 * @var UserSync
@@ -111,7 +111,7 @@ class UserSync {
 	 * @param bool|int $user_id
 	 */
 
-	public function set_user_id( $user_id = FALSE ) {
+	public function set_user_id( $user_id = false ) {
 
 		if ( ! $user_id ) {
 			$user_id = $this->user_id();
@@ -127,7 +127,7 @@ class UserSync {
 	 * @param bool $user_id
 	 */
 
-	public function set_user( $user_id = FALSE ) {
+	public function set_user( $user_id = false ) {
 
 		if ( ! $user_id ) {
 			$user_id = $this->user_id;
@@ -211,7 +211,7 @@ class UserSync {
 
 		}
 
-		return FALSE;
+		return false;
 
 	}
 
@@ -251,13 +251,13 @@ class UserSync {
 				return $user_id;
 			}
 
-			$this->is_new = TRUE;
+			$this->is_new = true;
 
 			$user_id = $this->insert_placeholder();
 
 		}
 
-		return $user_id ? (int) $user_id : FALSE;
+		return $user_id ? (int) $user_id : false;
 
 	}
 
@@ -295,13 +295,13 @@ class UserSync {
 				return $user_id;
 			}
 
-			$this->is_new = TRUE;
+			$this->is_new = true;
 
 			$user_id = $this->insert_placeholder();
 
 		}
 
-		return $user_id ? (int) $user_id : FALSE;
+		return $user_id ? (int) $user_id : false;
 
 	}
 
@@ -339,7 +339,7 @@ class UserSync {
 
 		}
 
-		return FALSE;
+		return false;
 
 	}
 
@@ -384,7 +384,7 @@ class UserSync {
 
 			Log::write( 'wp-error-insert-user', $user_id );
 
-			return FALSE;
+			return false;
 		}
 
 		return (int) $user_id;

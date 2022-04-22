@@ -229,7 +229,7 @@ class WC_Product_DataSync {
 
 		// These are exported as labels, so convert the label to a name if possible first.
 		$attribute_labels = wp_list_pluck( wc_get_attribute_taxonomies(), 'attribute_label', 'attribute_name' );
-		$attribute_name   = array_search( $raw_name, $attribute_labels, TRUE );
+		$attribute_name   = array_search( $raw_name, $attribute_labels, true );
 
 		if ( ! $attribute_name ) {
 			$attribute_name = wc_sanitize_taxonomy_name( $raw_name );
@@ -248,7 +248,7 @@ class WC_Product_DataSync {
 			'slug'         => $attribute_name,
 			'type'         => 'select',
 			'order_by'     => 'menu_order',
-			'has_archives' => FALSE,
+			'has_archives' => false,
 		] );
 
 		// Register as taxonomy while importing.
@@ -259,10 +259,10 @@ class WC_Product_DataSync {
 				'labels'       => [
 					'name' => $raw_name,
 				],
-				'hierarchical' => TRUE,
-				'show_ui'      => FALSE,
-				'query_var'    => TRUE,
-				'rewrite'      => FALSE,
+				'hierarchical' => true,
+				'show_ui'      => false,
+				'query_var'    => true,
+				'rewrite'      => false,
 			] )
 		);
 

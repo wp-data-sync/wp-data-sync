@@ -39,7 +39,7 @@ class Log {
 
 			// Create the log file dir if we do not already have one.
 			if ( ! file_exists( WPDSYNC_LOG_DIR ) ) {
-				mkdir( WPDSYNC_LOG_DIR, 0755, TRUE );
+				mkdir( WPDSYNC_LOG_DIR, 0755, true );
 			}
 
 			if ( ! file_exists( $error_file ) ) {
@@ -133,7 +133,7 @@ class Log {
 			return file_get_contents( $file );
 		}
 
-		return FALSE;
+		return false;
 
 	}
 
@@ -151,7 +151,7 @@ class Log {
 			return array_map( 'basename', $files );
 		}
 
-		return FALSE;
+		return false;
 
 	}
 

@@ -122,7 +122,7 @@ class SyncRequest extends Request {
 
 		add_filter( 'wp_revisions_to_keep', '__return_false' );
 
-		$start_request  = microtime( TRUE );
+		$start_request  = microtime( true );
 		$wpds_response  = [];
 		$data_sync = DataSync::instance();
 		$data      = $this->request_data();
@@ -144,7 +144,7 @@ class SyncRequest extends Request {
 
 		}
 
-		$wpds_response['request_time'] = microtime( TRUE ) - $start_request;
+		$wpds_response['request_time'] = microtime( true ) - $start_request;
 		Log::write( 'sync-request-response', $wpds_response );
 
 		return rest_ensure_response( $wpds_response );

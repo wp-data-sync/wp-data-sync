@@ -21,67 +21,67 @@ class DataSync {
 	 * @var bool|array
 	 */
 
-	private $primary_id = FALSE;
+	private $primary_id = false;
 
 	/**
 	 * @var bool|int
 	 */
 
-	private $post_id = FALSE;
+	private $post_id = false;
 
 	/**
 	 * @var bool
 	 */
 
-	private $is_accelerated = FALSE;
+	private $is_accelerated = false;
 
 	/**
 	 * @var bool|array
 	 */
 
-	private $post_data = FALSE;
+	private $post_data = false;
 
 	/**
 	 * @var bool|array
 	 */
 
-	private $post_meta = FALSE;
+	private $post_meta = false;
 
 	/**
 	 * @var bool|array
 	 */
 
-	private $taxonomies = FALSE;
+	private $taxonomies = false;
 
 	/**
 	 * @var bool|array
 	 */
 
-	private $featured_image = FALSE;
+	private $featured_image = false;
 
 	/**
 	 * @var bool|array
 	 */
 
-	private $attributes = FALSE;
+	private $attributes = false;
 
 	/**
 	 * @var bool|array
 	 */
 
-	private $variations = FALSE;
+	private $variations = false;
 
 	/**
 	 * @var bool|array
 	 */
 
-	private $gallery_images = FALSE;
+	private $gallery_images = false;
 
 	/**
 	 * @var bool|array
 	 */
 
-	private $gallery_details = FALSE;
+	private $gallery_details = false;
 
 	/**
 	 * @var array|bool
@@ -93,19 +93,19 @@ class DataSync {
 	 * @var bool|array
 	 */
 
-	private $order_items = FALSE;
+	private $order_items = false;
 
 	/**
 	 * @var bool|array
 	 */
 
-	private $integrations = FALSE;
+	private $integrations = false;
 
 	/**
 	 * @var bool
 	 */
 
-	private $is_new = FALSE;
+	private $is_new = false;
 
 	/**
 	 * DataSync constructor.
@@ -232,7 +232,7 @@ class DataSync {
 
 		do_action( 'wp_data_sync_after_process', $this->post_id, $this );
 
-		return TRUE;
+		return true;
 
 	}
 
@@ -242,7 +242,7 @@ class DataSync {
 	 * @param bool $post_id
 	 */
 
-	public function set_post_id( $post_id = FALSE ) {
+	public function set_post_id( $post_id = false ) {
 
 		if ( ! $post_id ) {
 
@@ -499,7 +499,7 @@ class DataSync {
 		extract( $this->primary_id );
 
 		if ( empty( $key ) || empty( $value ) ) {
-			return FALSE;
+			return false;
 		}
 
 		$post_id = $wpdb->get_var( $wpdb->prepare(
@@ -520,16 +520,16 @@ class DataSync {
 
 			// Do not create a new post if accelerated sync.
 			if ( $this->is_accelerated ) {
-				return FALSE;
+				return false;
 			}
 
-			$this->is_new = TRUE;
+			$this->is_new = true;
 
 			$post_id = $this->insert_placeholder();
 
 		}
 
-		return $post_id ? (int) $post_id : FALSE;
+		return $post_id ? (int) $post_id : false;
 
 	}
 
@@ -553,7 +553,7 @@ class DataSync {
 		] );
 
 		if ( empty( $post_id ) || is_wp_error( $post_id ) ) {
-			return FALSE;
+			return false;
 		}
 
 		// Set the primary ID for the placeholder early in case request fails.
@@ -588,7 +588,7 @@ class DataSync {
 
 			Log::write( 'wpdb-error-post_id',  $success);
 
-			return FALSE;
+			return false;
 
 		}
 
@@ -626,7 +626,7 @@ class DataSync {
 
 		foreach ( $keys as $key ) {
 
-			$value = FALSE;
+			$value = false;
 
 			if ( isset( $this->post_data[ $key ] ) ) {
 				$value = $this->post_data[ $key ];
@@ -676,26 +676,26 @@ class DataSync {
 	public function maybe_trash_post() {
 
 		if ( ! isset( $this->post_data['post_status'] ) ) {
-			return FALSE;
+			return false;
 		}
 
 		if ( 0 < $this->post_id && 'trash' === $this->post_data['post_status'] ) {
 
 			if ( Settings::is_checked( 'wp_data_sync_force_delete' ) ) {
 
-				if ( wp_delete_post( $this->post_id, TRUE ) ) {
-					return TRUE;
+				if ( wp_delete_post( $this->post_id, true ) ) {
+					return true;
 				}
 
 			}
 
 			if ( wp_trash_post( $this->post_id ) ) {
-				return TRUE;
+				return true;
 			}
 
 		}
 
-		return FALSE;
+		return false;
 
 	}
 
@@ -733,28 +733,39 @@ class DataSync {
 
 		if ( is_array( $this->post_meta ) ) {
 
-			$restricted_meta_keys = $this->restricted_meta_keys();
-
 			foreach( $this->post_meta as $meta_key => $meta_value ) {
-
-				$meta_key   = $this->post_meta_key( $meta_key, $meta_value );
-				$meta_value = $this->post_meta_value( $meta_value, $meta_key );
-
-				if ( ! in_array( $meta_key, $restricted_meta_keys ) ) {
-
-					update_post_meta( $this->post_id, $meta_key, $meta_value );
-
-					if ( apply_filters( 'wp_data_sync_is_acf_field_post_meta', FALSE, $meta_key, $this->post_id, $this ) ) {
-						do_action( 'wp_data_sync_process_acf_field_post_meta', $meta_key, $meta_value, $this->post_id, $this );
-					}
-
-				}
-
-				do_action( "wp_data_sync_post_meta_$meta_key", $this->post_id, $meta_value, $this );
-
+				$this->save_post_meta( $meta_key, $meta_value );
 			}
 
 		}
+
+	}
+
+	/**
+	 * Save Post Meta
+	 *
+	 * @param $meta_key
+	 * @param $meta_value
+	 *
+	 * @return void
+	 */
+
+	public function save_post_meta( $meta_key, $meta_value ) {
+
+		$meta_key   = $this->post_meta_key( $meta_key, $meta_value );
+		$meta_value = $this->post_meta_value( $meta_value, $meta_key );
+
+		if ( ! in_array( $meta_key, $this->restricted_meta_keys() ) ) {
+
+			update_post_meta( $this->post_id, $meta_key, $meta_value );
+
+			if ( apply_filters( 'wp_data_sync_is_acf_field_post_meta', false, $meta_key, $this->post_id, $this ) ) {
+				do_action( 'wp_data_sync_process_acf_field_post_meta', $meta_key, $meta_value, $this->post_id, $this );
+			}
+
+		}
+
+		do_action( "wp_data_sync_post_meta_$meta_key", $this->post_id, $meta_value, $this );
 
 	}
 
@@ -869,7 +880,7 @@ class DataSync {
 	public function set_term( $term, $taxonomy, $parent_id = 0 ) {
 
 		if ( ! is_array( $term ) ) {
-			return FALSE;
+			return false;
 		}
 
 		/**
@@ -885,7 +896,7 @@ class DataSync {
 		extract( $term );
 
 		if ( ! is_string( $name ) ) {
-			return FALSE;
+			return false;
 		}
 
 		if ( ! empty( $parents ) && is_array( $parents  ) ) {
@@ -950,7 +961,7 @@ class DataSync {
 
 				Log::write( 'wp-error-term', $term );
 
-				return FALSE;
+				return false;
 
 			}
 
@@ -1014,7 +1025,7 @@ class DataSync {
 		if ( empty( $term_id ) || is_wp_error( $term_id ) ) {
 			Log::write( 'term-exists', 'Term Does Not Exist' );
 			Log::write( 'term-exists', $term_id );
-			return FALSE;
+			return false;
 		}
 
 		Log::write( 'term-exists', "Term ID: $term_id" );
@@ -1232,6 +1243,7 @@ class DataSync {
 
 		}
 
+		// FIXME: this is not updating as a filed
 		update_post_meta( $this->post_id, $gallery_key, $gallery_ids );
 
 		do_action( 'wp_data_sync_gallery_images', $this->post_id, $gallery_images, $this );
@@ -1264,13 +1276,13 @@ class DataSync {
 		Log::write( 'attachment', $image_url, 'Image URL' );
 
 		if ( empty( $image_url ) ) {
-			return FALSE;
+			return false;
 		}
 
 		require_once( ABSPATH . 'wp-admin/includes/image.php' );
 
 		if ( ! $image_url = $this->is_valid_image_url( $image_url ) ) {
-			return FALSE;
+			return false;
 		}
 
 		$basename    = $this->basename( $image_array );
@@ -1355,7 +1367,7 @@ class DataSync {
 
 		}
 
-		return FALSE;
+		return false;
 
 	}
 
@@ -1400,7 +1412,7 @@ class DataSync {
 
 		}
 
-		$file_type = FALSE;
+		$file_type = false;
 
 		if ( $type = exif_imagetype( $image_url ) ) {
 
@@ -1449,7 +1461,7 @@ class DataSync {
 
 		Log::write( 'attachment', $response, 'Response Failed' );
 
-		return FALSE;
+		return false;
 
 	}
 
@@ -1462,10 +1474,10 @@ class DataSync {
 	public function ssl_verify() {
 
 		if ( Settings::is_checked( 'wp_data_sync_allow_unsecure_images' ) ) {
-			return FALSE;
+			return false;
 		}
 
-		return TRUE;
+		return true;
 
 	}
 
@@ -1507,7 +1519,7 @@ class DataSync {
 
 		}
 
-		return FALSE;
+		return false;
 
 	}
 
@@ -1536,7 +1548,7 @@ class DataSync {
 		) );
 
 		if ( null === $attach_id || is_wp_error( $attach_id ) ) {
-			return FALSE;
+			return false;
 		}
 
 		return (int) $attach_id;

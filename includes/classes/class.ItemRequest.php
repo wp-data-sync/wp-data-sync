@@ -155,7 +155,7 @@ class ItemRequest extends Request {
 
 		$this->post_type = sanitize_text_field( $post_type );
 
-		return TRUE;
+		return true;
 
 	}
 
@@ -171,9 +171,9 @@ class ItemRequest extends Request {
 
 		$api_id = sanitize_text_field( $api_id );
 
-		$this->api_id = strstr( $api_id, '~', TRUE );
+		$this->api_id = strstr( $api_id, '~', true );
 
-		return TRUE;
+		return true;
 
 	}
 
@@ -219,7 +219,7 @@ class ItemRequest extends Request {
 
 		}
 
-		return FALSE;
+		return false;
 
 	}
 
@@ -388,7 +388,7 @@ class ItemRequest extends Request {
 		$wpdb->flush();
 
 		if ( empty( $item_ids ) || is_wp_error( $item_ids ) ) {
-			return FALSE;
+			return false;
 		}
 
 		return array_map( 'intval', $item_ids );
@@ -441,7 +441,7 @@ class ItemRequest extends Request {
 			'title'       => get_the_title( $item_id ) ?: '',
 			'description' => get_the_content( $item_id ) ?: '',
 			'caption'     => get_the_excerpt( $item_id ) ?: '',
-			'alt'         => get_post_meta( $item_id, '_wp_attachment_image_alt', TRUE ) ?: ''
+			'alt'         => get_post_meta( $item_id, '_wp_attachment_image_alt', true ) ?: ''
 		];
 
 		return apply_filters( 'wp_data_sync_item_request_featured_image', $featured_image, $item_id, $this );
@@ -463,7 +463,7 @@ class ItemRequest extends Request {
 			'title'       => get_the_title( $item_id ) ?: '',
 			'description' => get_the_content( $item_id ) ?: '',
 			'caption'     => get_the_excerpt( $item_id ) ?: '',
-			'alt'         => get_post_meta( $item_id, '_wp_attachment_image_alt', TRUE ) ?: ''
+			'alt'         => get_post_meta( $item_id, '_wp_attachment_image_alt', true ) ?: ''
 		];
 
 		return apply_filters( 'wp_data_sync_item_request_attachment', $attachment, $item_id, $this );
@@ -481,7 +481,7 @@ class ItemRequest extends Request {
 	public function taxonomies( $item_id ) {
 
 		if ( ! post_type_exists( $this->post_type ) ) {
-			return FALSE;
+			return false;
 		}
 
 		$results = [];
@@ -600,11 +600,11 @@ class ItemRequest extends Request {
 
 	public function term_thumb_url( $term ) {
 
-		if ( $attach_id = get_term_meta( $term->term_id, 'thumbnail_id', TRUE ) ) {
+		if ( $attach_id = get_term_meta( $term->term_id, 'thumbnail_id', true ) ) {
 			return wp_get_attachment_image_url( (int) $attach_id, 'full' );
 		}
 
-		return FALSE;
+		return false;
 
 	}
 
@@ -707,10 +707,10 @@ class ItemRequest extends Request {
 		) );
 
 		if ( null === $has_synced || is_wp_error( $has_synced ) ) {
-			return FALSE;
+			return false;
 		}
 
-		return TRUE;
+		return true;
 
 	}
 

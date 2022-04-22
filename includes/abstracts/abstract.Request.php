@@ -53,7 +53,7 @@ abstract class Request {
 			return $this->private_key();
 		}
 
-		return FALSE;
+		return false;
 
 	}
 
@@ -78,11 +78,11 @@ abstract class Request {
 		$access_token = sanitize_key( $param );
 
 		if ( empty( $access_token ) ) {
-			return FALSE;
+			return false;
 		}
 
 		if ( ! $local_token = get_option( $this->access_token_key ) ) {
-			return FALSE;
+			return false;
 		}
 
 		Log::write( 'request', "Access Token Provided" );
@@ -91,11 +91,11 @@ abstract class Request {
 
 			Log::write( 'request', "Access token Approved" );
 
-			return TRUE;
+			return true;
 
 		}
 
-		return FALSE;
+		return false;
 
 	}
 
@@ -110,11 +110,11 @@ abstract class Request {
 		$private_key = sanitize_key( $this->request->get_header( 'authentication' ) );
 
 		if ( empty( $private_key ) ) {
-			return FALSE;
+			return false;
 		}
 
 		if ( ! $local_token = get_option( $this->private_token_key ) ) {
-			return FALSE;
+			return false;
 		}
 
 		Log::write( 'request', "Private Token Provided" );
@@ -123,11 +123,11 @@ abstract class Request {
 
 			Log::write( 'request', "Private Token Approved" );
 
-			return TRUE;
+			return true;
 
 		}
 
-		return FALSE;
+		return false;
 
 	}
 
@@ -142,12 +142,12 @@ abstract class Request {
 		$referer = sanitize_text_field( $this->request->get_header( 'referer' ) );
 
 		if ( empty( $referer )  ) {
-			return FALSE;
+			return false;
 		}
 
 		Log::write( 'request', "Referer: $referer" );
 
-		return TRUE;
+		return true;
 
 	}
 
@@ -162,7 +162,7 @@ abstract class Request {
 		global $wpds_response;
 
 		if ( 'GET' === $this->request->get_method() ) {
-			return TRUE;
+			return true;
 		}
 
 		$json           = $this->request->get_body();
@@ -172,7 +172,7 @@ abstract class Request {
 
 			$wpds_response['content-length'] = 'Content length not provided.';
 
-			return FALSE;
+			return false;
 
 		}
 
@@ -217,7 +217,7 @@ abstract class Request {
 		Log::write( $this->log_key, 'Sync Request JSON' );
 		Log::write( $this->log_key, $json );
 
-		$raw_data = json_decode( $json, TRUE );
+		$raw_data = json_decode( $json, true );
 
 		Log::write( $this->log_key, 'Sync Request Raw Data' );
 		Log::write( $this->log_key, $raw_data );

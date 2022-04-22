@@ -138,7 +138,7 @@ class WC_Order_DataRequest extends Request {
 
 					$_order_data = $order_data->get( $order );
 
-					if ( apply_filters( 'wp_data_sync_can_sync_order', TRUE, $_order_data, $order_id, $order ) ) {
+					if ( apply_filters( 'wp_data_sync_can_sync_order', true, $_order_data, $order_id, $order ) ) {
 
 						$response[ $order_id ] = $_order_data;
 
@@ -191,7 +191,7 @@ class WC_Order_DataRequest extends Request {
 		$allowed_status = get_option( 'wp_data_sync_allowed_order_status' );
 
 		if ( empty( $allowed_status ) ) {
-			return FALSE;
+			return false;
 		}
 
 		$placeholders = join( ', ', array_fill( 0, count( $allowed_status ), '%s' ) );
@@ -220,7 +220,7 @@ class WC_Order_DataRequest extends Request {
 		) );
 
 		if ( empty( $order_ids ) || is_wp_error( $order_ids ) ) {
-			return FALSE;
+			return false;
 		}
 
 		return array_map( 'intval', $order_ids );

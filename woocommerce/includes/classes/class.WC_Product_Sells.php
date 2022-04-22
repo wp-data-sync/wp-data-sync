@@ -158,10 +158,10 @@ class WC_Product_Sells {
 		);
 
 		if ( empty( $exists ) || is_wp_error( $exists ) ) {
-			return FALSE;
+			return false;
 		}
 
-		return TRUE;
+		return true;
 
 	}
 
@@ -231,7 +231,7 @@ class WC_Product_Sells {
 		);
 
 		if ( null === $unrelated || is_wp_error( $unrelated ) ) {
-			return FALSE;
+			return false;
 		}
 
 		return $unrelated;
@@ -264,7 +264,7 @@ class WC_Product_Sells {
 		);
 
 		if ( null === $post_id || is_wp_error( $post_id ) ) {
-			return FALSE;
+			return false;
 		}
 
 		return (int) $post_id;
@@ -336,7 +336,7 @@ class WC_Product_Sells {
 		) );
 
 		if ( empty( $product_ids ) || is_wp_error( $product_ids ) ) {
-			return FALSE;
+			return false;
 		}
 
 		return $product_ids;

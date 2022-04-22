@@ -124,11 +124,11 @@ class LogRequest extends Request {
 
 			$this->callback = sanitize_text_field( $callback );
 
-			return TRUE;
+			return true;
 
 		}
 
-		return FALSE;
+		return false;
 
 	}
 

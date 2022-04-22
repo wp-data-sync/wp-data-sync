@@ -3,7 +3,7 @@
  * Plugin Name: WP Data Sync
  * Plugin URI:  https://wpdatasync.com/products/
  * Description: Sync raw data from any data source to your WordPress website
- * Version:     2.4.2
+ * Version:     2.4.3
  * Author:      WP Data Sync
  * Author URI:  https://wpdatasync.com
  * License:     GPL2
@@ -19,10 +19,14 @@
 
 namespace WP_DataSync;
 
-use WP_DataSync\App\ItemRequest;
-use WP_DataSync\App\KeyRequest;
+use WP_DataSync\App\Settings;
 use WP_DataSync\App\SyncRequest;
+use WP_DataSync\App\KeyRequest;
+use WP_DataSync\App\ItemRequest;
 use WP_DataSync\App\VersionRequest;
+use WP_DataSync\App\UserRequest;
+use WP_DataSync\App\ReportRequest;
+use WP_DataSync\App\LogRequest;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -31,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $uploads = wp_get_upload_dir();
 
 $defines = [
-	'WPDSYNC_VERSION'    => '2.4.2',
+	'WPDSYNC_VERSION'    => '2.4.3',
 	'WPDSYNC_CAP'        => 'manage_options',
 	'WPDSYNC_PLUGIN'     => plugin_basename( __FILE__ ),
 	'WPDSYNC_VIEWS'      => plugin_dir_path( __FILE__ ) . 'views/',
@@ -63,17 +67,17 @@ add_action( 'plugins_loaded', function() {
 	}
 
 	if ( is_admin() ) {
-		App\Settings::instance()->actions();
+		Settings::instance()->actions();
 	}
 
 	add_action( 'rest_api_init', function() {
-		App\SyncRequest::instance()->register_route();
-		App\KeyRequest::instance()->register_route();
-		App\ItemRequest::instance()->register_route();
-		App\VersionRequest::instance()->register_route();
-		App\UserRequest::instance()->register_route();
-		App\ReportRequest::instance()->register_route();
-		App\LogRequest::instance()->register_route();
+		SyncRequest::instance()->register_route();
+		KeyRequest::instance()->register_route();
+		ItemRequest::instance()->register_route();
+		VersionRequest::instance()->register_route();
+		UserRequest::instance()->register_route();
+		ReportRequest::instance()->register_route();
+		LogRequest::instance()->register_route();
 	} );
 
 	// Requyire woocommerce dir files
@@ -82,7 +86,7 @@ add_action( 'plugins_loaded', function() {
 	}
 
 	add_action( 'init', function() {
-		load_plugin_textdomain( 'wp-data-sync', FALSE, basename( dirname( __FILE__ ) ) . '/languages' );
+		load_plugin_textdomain( 'wp-data-sync', false, basename( dirname( __FILE__ ) ) . '/languages' );
 	} );
 
 } );

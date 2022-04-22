@@ -81,7 +81,7 @@ class WC_Order_Data {
 
 		foreach ( $order->get_items() as $i => $item ) {
 
-			if ( apply_filters( 'wp_data_sync_include_order_item', TRUE, $item, $order ) ) {
+			if ( apply_filters( 'wp_data_sync_include_order_item', true, $item, $order ) ) {
 
 				$order_items[ $i ]              = $item->get_data();
 				$order_items[ $i ]['meta_data'] = $this->format_meta( $item );

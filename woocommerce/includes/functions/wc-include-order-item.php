@@ -27,7 +27,7 @@ add_filter( 'wp_data_sync_include_order_item', function( $include, $item, $order
 	if ( $cat_ids = get_option( 'wp_data_sync_order_allowed_product_cats', [] ) ) {
 
 		if ( in_array( '-1', $cat_ids ) ) {
-			return TRUE;
+			return true;
 		}
 
 		if ( $product_id = $item->get_product_id() ) {
@@ -35,14 +35,14 @@ add_filter( 'wp_data_sync_include_order_item', function( $include, $item, $order
 			foreach ( $cat_ids as $cat_id ) {
 
 				if ( has_term( $cat_id, 'product_cat', $product_id ) ) {
-					return TRUE;
+					return true;
 				}
 
 			}
 
 		}
 
-		return FALSE;
+		return false;
 
 	}
 

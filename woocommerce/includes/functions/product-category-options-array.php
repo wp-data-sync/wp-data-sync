@@ -26,7 +26,7 @@ function get_product_category_options_array() {
 	$categories = get_categories( [
 		'taxonomy'     => 'product_cat',
 		'orderby'      => 'name',
-		'hide_empty'   => FALSE
+		'hide_empty'   => false
 	] );
 
 	$_categories     = [];

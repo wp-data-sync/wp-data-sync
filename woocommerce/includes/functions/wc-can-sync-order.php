@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 add_filter( 'wp_data_sync_can_sync_order', function( $can_sync, $order_data ) {
 
 	if ( Settings::is_checked( 'wp_data_sync_order_require_valid_product' ) && empty( $order_data['items'] ) ) {
-		return FALSE;
+		return false;
 	}
 
 	return $can_sync;

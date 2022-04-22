@@ -110,7 +110,7 @@ class ReportRequest extends Request {
 
 	public function request() {
 
-		define( 'WPDS_DOING_REPORT_REQUEST', TRUE );
+		define( 'WPDS_DOING_REPORT_REQUEST', true );
 
 		$response = Settings::instance()->report_values();
 

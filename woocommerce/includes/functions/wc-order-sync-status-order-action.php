@@ -23,7 +23,7 @@ add_filter( 'woocommerce_order_actions', function( $actions ) {
 
 	global $theorder;
 
-	if ( get_post_meta( $theorder->id, WCDSYNC_ORDER_SYNC_STATUS, TRUE ) ) {
+	if ( get_post_meta( $theorder->id, WCDSYNC_ORDER_SYNC_STATUS, true ) ) {
 		$actions['wpds_reset_order_sync_status'] = __( 'Remove order sync status', 'wp-data-sync' );
 	}
 

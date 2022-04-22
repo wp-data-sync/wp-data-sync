@@ -451,7 +451,7 @@ class Settings {
 					'key' 		=> 'wp_data_sync_access_token',
 					'label'		=> __( 'API Access Token', 'wp-data-sync' ),
 					'callback'  => 'input',
-					'no_report' => TRUE,
+					'no_report' => true,
 					'args'      => [
 						'sanitize_callback' => 'sanitize_key',
 						'basename'          => 'text-input',
@@ -464,7 +464,7 @@ class Settings {
 					'key' 		=> 'wp_data_sync_private_token',
 					'label'		=> __( 'API Private Token', 'wp-data-sync' ),
 					'callback'  => 'input',
-					'no_report' => TRUE,
+					'no_report' => true,
 					'args'      => [
 						'sanitize_callback' => 'sanitize_key',
 						'basename'          => 'text-input',
@@ -730,7 +730,7 @@ class Settings {
 					'key' 		=> 'wp_data_sync_item_request_access_token',
 					'label'		=> __( 'Item Request Access Token', 'wp-data-sync' ),
 					'callback'  => 'input',
-					'no_report' => TRUE,
+					'no_report' => true,
 					'args'      => [
 						'sanitize_callback' => 'sanitize_key',
 						'basename'          => 'text-input',
@@ -743,7 +743,7 @@ class Settings {
 					'key' 		=> 'wp_data_sync_item_request_private_token',
 					'label'		=> __( 'Item Request Private Token', 'wp-data-sync' ),
 					'callback'  => 'input',
-					'no_report' => TRUE,
+					'no_report' => true,
 					'args'      => [
 						'sanitize_callback' => 'sanitize_key',
 						'basename'          => 'text-input',
@@ -818,7 +818,7 @@ class Settings {
 					'key' 		=> Log::FILE_KEY,
 					'label'		=> __( 'Log File', 'wp-data-sync' ),
 					'callback'  => 'input',
-					'no_report' => TRUE,
+					'no_report' => true,
 					'args'      => [
 						'sanitize_callback' => 'sanitize_text_field',
 						'files'             => Log::log_files(),

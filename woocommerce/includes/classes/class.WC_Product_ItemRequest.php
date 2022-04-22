@@ -128,7 +128,7 @@ class WC_Product_ItemRequest {
 		$i          = 1;
 
 		if ( empty ( $image_ids ) ) {
-			return FALSE;
+			return false;
 		}
 
 		foreach ( $image_ids as $image_id ) {
@@ -138,7 +138,7 @@ class WC_Product_ItemRequest {
 				'title'       => get_the_title( $image_id ) ?: '',
 				'description' => get_the_content( $image_id ) ?: '',
 				'caption'     => get_the_excerpt( $image_id ) ?: '',
-				'alt'         => get_post_meta( $image_id, '_wp_attachment_image_alt', TRUE ) ?: ''
+				'alt'         => get_post_meta( $image_id, '_wp_attachment_image_alt', true ) ?: ''
 			];
 
 			$i++;
@@ -157,7 +157,7 @@ class WC_Product_ItemRequest {
 
 	public function product_attributes() {
 
-		if ( $product_attributes = get_post_meta( $this->product_id, '_product_attributes', TRUE ) ) {
+		if ( $product_attributes = get_post_meta( $this->product_id, '_product_attributes', true ) ) {
 
 			$attributes = [];
 
@@ -185,7 +185,7 @@ class WC_Product_ItemRequest {
 
 		}
 
-		return FALSE;
+		return false;
 
 	}
 
@@ -218,7 +218,7 @@ class WC_Product_ItemRequest {
 		$variation_ids = $this->product->get_children();
 
 		if ( empty( $variation_ids ) ) {
-			return FALSE;
+			return false;
 		}
 
 		foreach ( $variation_ids as $variation_id ) {
