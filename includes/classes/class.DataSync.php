@@ -760,7 +760,15 @@ class DataSync {
 			update_post_meta( $this->post_id, $meta_key, $meta_value );
 
 			if ( apply_filters( 'wp_data_sync_is_acf_field_post_meta', false, $meta_key, $this->post_id, $this ) ) {
+
+				Log::write( 'acf-field', [
+					'post_id' => $this->post_id,
+					'key'     => $meta_key,
+					'value'   => $meta_value,
+				], 'ACF Field - Post Metta' );
+
 				do_action( 'wp_data_sync_process_acf_field_post_meta', $meta_key, $meta_value, $this->post_id, $this );
+
 			}
 
 		}
@@ -1243,8 +1251,7 @@ class DataSync {
 
 		}
 
-		// FIXME: this is not updating as a filed
-		update_post_meta( $this->post_id, $gallery_key, $gallery_ids );
+		$this->save_post_meta( $gallery_key, $gallery_ids );
 
 		do_action( 'wp_data_sync_gallery_images', $this->post_id, $gallery_images, $this );
 
