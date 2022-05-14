@@ -330,6 +330,10 @@ class WC_Product_DataSync {
 
 				$variation_id = $data_sync->get_post_id();
 
+				if ( $selected_options =  $data_sync->get_selected_options() ) {
+					$this->selected_options( $selected_options, $variation_id );
+				}
+
 				// Set all missing product variation defaults
 				$_variation = new WC_Product_Variation( $variation_id );
 				$_variation->save();
@@ -339,6 +343,47 @@ class WC_Product_DataSync {
 					'Parent ID'      => $parent_id,
 					'Variation Data' => $variation
 				] );
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * Selected Options
+	 *
+	 * Selected product variation options.
+	 *
+	 * @param array $selected_options
+	 * @param int   $variation_id
+	 *
+	 * @return void
+	 */
+
+	public function selected_options( $selected_options, $variation_id ) {
+
+		if ( is_array( $selected_options ) ) {
+
+			foreach ( $selected_options as $option_name => $option_value ) {
+
+				$taxonomy = $this->attribute_taxonomy( $option_name );
+
+				$term_array = [
+					'name'        => $option_value,
+					'description' => '',
+					'thumb_url'   => '',
+					'term_meta'   => '',
+					'parents'     => ''
+				];
+
+				if( $term_id = $this->data_sync->set_term( $term_array, $taxonomy ) ) {
+
+					$term = get_term( $term_id, $taxonomy );
+
+					update_post_meta( $variation_id, "attribute_$taxonomy", $term->slug );
+
+				}
 
 			}
 

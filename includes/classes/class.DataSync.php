@@ -87,7 +87,13 @@ class DataSync {
 	 * @var array|bool
 	 */
 
-	private $attachment;
+	private $attachment = false;
+
+	/**
+	 * @var bool|array
+	 */
+
+	private $selected_options = false;
 
 	/**
 	 * @var bool|array
@@ -464,6 +470,18 @@ class DataSync {
 
 	public function get_attachment() {
 		return $this->attachment;
+	}
+
+	/**
+	 * Get selected options.
+	 *
+	 * Selected attribute options for WooCommerce variations.
+	 *
+	 * @return array|bool
+	 */
+
+	public function get_selected_options() {
+		return apply_filters( 'wp_data_sync_procudt_variation_selected_options', $this->selected_options, $this );
 	}
 
 	/**
