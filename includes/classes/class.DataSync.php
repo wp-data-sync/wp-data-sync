@@ -234,9 +234,9 @@ class DataSync {
 			'post_type' => $this->get_post_type()
 		];
 
-		$this->update_date();
-
 		do_action( 'wp_data_sync_after_process', $this->post_id, $this );
+
+		$this->update_date();
 
 		return true;
 
@@ -1665,9 +1665,7 @@ class DataSync {
 
 	public function update_date() {
 
-		global $wpdb;
-
-		wp_update_post( [ 'ID' => $this->post_id ] );
+		$post_data = [ 'ID' => $this->post_id ];
 
 		$date_keys = [
 			'post_date',
@@ -1679,16 +1677,14 @@ class DataSync {
 		foreach ( $date_keys as $date_key ) {
 
 			if ( ! empty( $this->post_data[ $date_key ] ) ) {
-
-				$wpdb->update(
-					$wpdb->posts,
-					[ $date_key => $this->post_data[ $date_key ] ],
-					$this->post_id
-				);
-
+				$post_data[ $date_key ] = $this->post_data[ $date_key ];
 			}
 
 		}
+
+		Log::write( 'post-date', $post_data, 'Update Post Dates' );
+
+		wp_update_post( $post_data );
 
 	}
 
