@@ -96,8 +96,8 @@ class ItemRequest extends Request {
 	public function register_route() {
 
 		register_rest_route(
-			'wp-data-sync/' . WPDSYNC_EP_VERSION,
-			'/get-item/(?P<access_token>\S+)/(?P<post_type>\S+)/(?P<limit>\d+)/(?P<api_id>\S+)/',
+			'wp-data-sync',
+			'/' . WPDSYNC_EP_VERSION . '/get-item/(?P<access_token>\S+)/(?P<post_type>\S+)/(?P<limit>\d+)/(?P<api_id>\S+)/',
 			[
 				'methods' => WP_REST_Server::READABLE,
 				'args'    => [
@@ -137,7 +137,10 @@ class ItemRequest extends Request {
 
 		$response = $this->get_items();
 
-		Log::write( 'data-request-response', $response );
+		Log::write( 'item-request', [
+			'api_id'   => $this->api_id,
+			'response' => $response
+		], 'Response' );
 
 		return rest_ensure_response( $response );
 
@@ -209,7 +212,10 @@ class ItemRequest extends Request {
 
 				$items[] = $item_data = $this->get_item( $item_id );
 
-				Log::write( 'item-request-item-data', $item_data );
+				Log::write( 'item-request', [
+					'item_id'   => $item_id,
+					'item_data' => $item_data
+				], 'Item Data' );
 
 				$this->insert_id( $item_id );
 
@@ -379,11 +385,12 @@ class ItemRequest extends Request {
 
 		$sql = "$select $join $where $order_by $limit";
 
-		Log::write( 'item-request-sql', $sql );
-
 		$item_ids = $wpdb->get_col( $sql );
 
-		Log::write( 'item-request-sql', $item_ids );
+		Log::write( 'item-request',[
+			'sql'      => $sql,
+			'item_ids' => $item_ids
+		], 'SQL Query' );
 
 		$wpdb->flush();
 
@@ -726,8 +733,6 @@ class ItemRequest extends Request {
 
 		$charset_collate = $wpdb->get_charset_collate();
         $table           = self::table();
-
-        $wpdb->query( "DROP TABLE IF EXISTS $table" );
 
 		$sql = "
 			CREATE TABLE IF NOT EXISTS $table (
