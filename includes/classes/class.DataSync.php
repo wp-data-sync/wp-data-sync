@@ -1234,6 +1234,7 @@ class DataSync {
 	 *
 	 * @since 1.6.0
 	 * @since 2.4.2 Moved here from WC_Product_DataSync
+	 * @since 2.4.7 Update meta using update_post_meta since WooCommerce _product_image_gallery is a restricted key.
 	 *
 	 * @return void
 	 */
@@ -1269,9 +1270,17 @@ class DataSync {
 
 		}
 
-		$this->save_post_meta( $gallery_key, $gallery_ids );
+		// We must update here since WooCommerce _product_image_gallery is a restricted key.
+		update_post_meta( $this->post_id, $gallery_key, $gallery_ids );
 
-		do_action( 'wp_data_sync_gallery_images', $this->post_id, $gallery_images, $this );
+		Log::write( 'gallery-images', [
+			'gallery_details' => $this->gallery_details,
+			'gallery_images'  => $this->gallery_images,
+			'gallery_key'     => $gallery_key,
+			'gallery_ids'     => $gallery_ids
+		], 'Process Gallery Images' );
+
+		do_action( 'wp_data_sync_gallery_images', $this->post_id, $this->gallery_images, $this );
 
 	}
 
