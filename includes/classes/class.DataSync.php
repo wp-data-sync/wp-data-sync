@@ -777,17 +777,7 @@ class DataSync {
 
 			update_post_meta( $this->post_id, $meta_key, $meta_value );
 
-			if ( apply_filters( 'wp_data_sync_is_acf_field_post_meta', false, $meta_key, $this->post_id, $this ) ) {
-
-				Log::write( 'acf-field', [
-					'post_id' => $this->post_id,
-					'key'     => $meta_key,
-					'value'   => $meta_value,
-				], 'ACF Field - Post Metta' );
-
-				do_action( 'wp_data_sync_process_acf_field_post_meta', $meta_key, $meta_value, $this->post_id, $this );
-
-			}
+			$this->process_acf( $meta_key, $meta_value );
 
 		}
 
@@ -826,6 +816,31 @@ class DataSync {
 		$meta_value = apply_filters( 'wp_data_sync_meta_value', $meta_value, $meta_key, $this->post_id, $this );
 
 		return apply_filters( "wp_data_sync_{$meta_key}_value", $meta_value, $this->post_id, $this );
+
+	}
+
+	/**
+	 * Process ACF
+	 *
+	 * @param string $meta_key
+	 * @param mixed  $meta_value
+	 *
+	 * @return void
+	 */
+
+	public function process_acf( $meta_key, $meta_value ) {
+
+		if ( apply_filters( 'wp_data_sync_is_acf_field_post_meta', false, $meta_key, $this->post_id, $this ) ) {
+
+			Log::write( 'acf-field', [
+				'post_id' => $this->post_id,
+				'key'     => $meta_key,
+				'value'   => $meta_value,
+			], 'ACF Field - Post Metta' );
+
+			do_action( 'wp_data_sync_process_acf_field_post_meta', $meta_key, $meta_value, $this->post_id, $this );
+
+		}
 
 	}
 
@@ -1272,6 +1287,8 @@ class DataSync {
 
 		// We must update here since WooCommerce _product_image_gallery is a restricted key.
 		update_post_meta( $this->post_id, $gallery_key, $gallery_ids );
+
+		$this->process_acf( $gallery_key, $gallery_ids );
 
 		Log::write( 'gallery-images', [
 			'gallery_details' => $this->gallery_details,
