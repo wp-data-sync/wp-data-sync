@@ -16,6 +16,7 @@ use WP_DataSync\App\DataSync;
 use WP_DataSync\App\Log;
 use WP_DataSync\App\Settings;
 use WC_Product_Variation;
+use Automattic\WooCommerce\Internal\ProductAttributesLookup\LookupDataStore;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -28,6 +29,12 @@ class WC_Product_DataSync {
 	 */
 
 	private $data_sync;
+
+	/**
+	 * @var \WC_Product|\WC_Product_Variable
+	 */
+
+	private $product;
 
 	/**
 	 * @var int
@@ -72,6 +79,16 @@ class WC_Product_DataSync {
 	}
 
 	/**
+	 * Set Product
+	 *
+	 * @param int $product_id
+	 */
+
+	public function set_product( $product_id ) {
+		$this->product = wc_get_product( $product_id );
+	}
+
+	/**
 	 * Set Product ID
 	 *
 	 * @param int $product_id
@@ -110,8 +127,16 @@ class WC_Product_DataSync {
 	public function wc_process() {
 
 		if ( $this->data_sync->get_attributes() ) {
+
 			$this->attributes();
 			$this->data_sync->reset_term_taxonomy_count();
+
+			// Create/update the attribute lookup tables.
+			if ( class_exists( 'Automattic\WooCommerce\Internal\ProductAttributesLookup\LookupDataStore' ) ) {
+				$data_store = new LookupDataStore();
+				$data_store->create_data_for_product( $this->product );
+			}
+
 		}
 
 		if (
@@ -133,8 +158,7 @@ class WC_Product_DataSync {
 		$this->product_type();
 
 		// Set all missing product defaults
-		$product = wc_get_product( $this->product_id );
-		$product->save();
+		$this->product->save();
 
 	}
 
