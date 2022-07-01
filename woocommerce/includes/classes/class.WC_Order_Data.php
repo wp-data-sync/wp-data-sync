@@ -87,7 +87,10 @@ class WC_Order_Data {
 				$order_items[ $i ]['meta_data'] = $this->format_meta( $item );
 
 				if ( $product = wc_get_product( $item->get_product_id() ) ) {
+
 					$order_items[ $i ]['sku'] = $product->get_sku();
+					$order_items[ $i ]  = apply_filters( 'wp_data_sync_order_items_product', $order_items[ $i ], $product->get_id() );
+
 				} else {
 					$order_items[ $i ]['sku'] = 'NA';
 				}
