@@ -29,9 +29,11 @@ function plugin_update() {
 	if ( WPDSYNC_VERSION !== $current_version ) {
 
 		ItemRequest::create_table();
+		$settings = Settings::instance();
+		$settings->set_option_defaults();
 
 		if ( version_compare( $current_version, '2.1.5', '<' ) ) {
-			Settings::delete_all_log_files();
+			$settings->delete_all_log_files();
 			Log::write( 'deleted-error-logs', 'Old Log Files Deleted' );
 		}
 

@@ -249,7 +249,7 @@ class Settings {
 			],
 		];
 
-		$settings = $this->get_options();
+		$settings = $this->get_options( true );
 
 		foreach ( $settings as $options ) {
 
@@ -329,7 +329,7 @@ class Settings {
 	 * Delete all log files
 	 */
 
-	public static function delete_all_log_files() {
+	public function delete_all_log_files() {
 
 		foreach ( glob( WPDSYNC_LOG_DIR . '*.log' ) as $file ) {
 			unlink( $file );
@@ -347,7 +347,7 @@ class Settings {
 	public function delete_log_files( $old_value, $value ) {
 
 		if ( 'checked' !== $value ) {
-			self::delete_all_log_files();
+			$this->delete_all_log_files();
 		}
 
 	}
@@ -428,10 +428,12 @@ class Settings {
 	/**
 	 * Plugin options.
 	 *
+	 * @param bool $all
+	 *
 	 * @return array
 	 */
 
-	public function get_options() {
+	public function get_options( $all = false ) {
 
 		$options = apply_filters( 'wp_data_sync_settings', [
 			'dashboard' => [
@@ -492,6 +494,7 @@ class Settings {
 					'key' 		=> 'wp_data_sync_post_title',
 					'label'		=> __( 'Default Title', 'wp-data-sync' ),
 					'callback'  => 'input',
+					'default'   => __( 'No title found', 'wp-data-sync' ),
 					'args'      => [
 						'sanitize_callback' => 'sanitize_text_field',
 						'basename'          => 'text-input',
@@ -517,6 +520,7 @@ class Settings {
 					'key' 		=> 'wp_data_sync_post_status',
 					'label'		=> __( 'Default Status', 'wp-data-sync' ),
 					'callback'  => 'input',
+					'default'   => 'draft',
 					'args'      => [
 						'sanitize_callback' => 'sanitize_text_field',
 						'basename'          => 'select',
@@ -829,11 +833,39 @@ class Settings {
 			]
 		], $this );
 
-		if ( defined( 'WPDS_DOING_REPORT_REQUEST' ) ) {
+		if ( $all ) {
 			return $options;
 		}
 
 		return $options[ $this->active_tab ];
+
+	}
+
+	/**
+	 * Set option defaults.
+	 *
+	 * @return void
+	 */
+
+	public function set_option_defaults() {
+
+		$_options = $this->get_options( true );
+
+		foreach ( $_options as $options ) {
+
+			foreach ( $options as $option ) {
+
+				if ( isset( $option['default'] ) ) {
+
+					if ( ! get_option( $option['key'] ) ) {
+						update_option( $option['key'], $option['default'] );
+					}
+
+				}
+
+			}
+
+		}
 
 	}
 
