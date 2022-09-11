@@ -19,10 +19,10 @@ add_action( 'wp_data_sync_admin_tabs', function( $tabs ) {
 
 	$tabs = array_merge( $tabs, [
 		'woocommerce' => [
-			'label' => __( 'WooCommerce' )
+			'label' => __( 'WC Products', 'wp-data-sync' )
 		],
 		'orders' => [
-			'label' => __( 'Orders', 'wp-data-sync' )
+			'label' => __( 'WC Orders', 'wp-data-sync' )
 		]
 	] );
 

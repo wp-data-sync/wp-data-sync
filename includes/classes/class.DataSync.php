@@ -552,6 +552,44 @@ class DataSync {
 	}
 
 	/**
+	 * Fetch Post IDs.
+	 *
+	 * @return bool|array
+	 */
+
+	public function fetch_post_ids() {
+
+		global $wpdb;
+
+		extract( $this->primary_id );
+
+		if ( empty( $key ) || empty( $value ) ) {
+			return false;
+		}
+
+		$post_ids = $wpdb->get_col( $wpdb->prepare(
+			"
+			SELECT p.ID 
+    		FROM $wpdb->posts p
+			INNER JOIN $wpdb->postmeta pm
+			ON p.ID = pm.post_id
+    		WHERE pm.meta_key = %s 
+      		AND pm.meta_value = %s 
+      		ORDER BY p.ID DESC
+			",
+			esc_sql( $key ),
+			esc_sql( $value )
+		) );
+
+		if ( empty( $post_ids ) || is_wp_error( $post_ids ) ) {
+			return false;
+		}
+
+		return array_map( 'intval', $post_ids );
+
+	}
+
+	/**
 	 * Insert a placeholder post.
 	 *
 	 * We insert a placeholder with WP function to insure the table columns have
@@ -752,7 +790,12 @@ class DataSync {
 		if ( is_array( $this->post_meta ) ) {
 
 			foreach( $this->post_meta as $meta_key => $meta_value ) {
-				$this->save_post_meta( $meta_key, $meta_value );
+
+				$this->save_post_meta( $this->post_id, $meta_key, $meta_value );
+
+				// We do this action here to prevent a loop when running this hook.
+				do_action( "wp_data_sync_duplicate_post_meta_$meta_key", $meta_key, $meta_value, $this );
+
 			}
 
 		}
@@ -762,25 +805,27 @@ class DataSync {
 	/**
 	 * Save Post Meta
 	 *
+	 * @param $post_id
 	 * @param $meta_key
 	 * @param $meta_value
 	 *
 	 * @return void
 	 */
 
-	public function save_post_meta( $meta_key, $meta_value ) {
+	public function save_post_meta( $post_id, $meta_key, $meta_value ) {
 
 		$meta_key   = $this->post_meta_key( $meta_key, $meta_value );
 		$meta_value = $this->post_meta_value( $meta_value, $meta_key );
 
 		if ( ! in_array( $meta_key, $this->restricted_meta_keys() ) ) {
 
-			update_post_meta( $this->post_id, $meta_key, $meta_value );
+			update_post_meta( $post_id, $meta_key, $meta_value );
 
 			$this->process_acf( $meta_key, $meta_value );
 
 		}
 
+		// We do this action here to allow it to run for every key => value pair.
 		do_action( "wp_data_sync_post_meta_$meta_key", $this->post_id, $meta_value, $this );
 
 	}
