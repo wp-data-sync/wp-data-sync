@@ -826,7 +826,7 @@ class DataSync {
 		}
 
 		// We do this action here to allow it to run for every key => value pair.
-		do_action( "wp_data_sync_post_meta_$meta_key", $this->post_id, $meta_value, $this );
+		do_action( "wp_data_sync_post_meta_$meta_key", $post_id, $meta_value, $this );
 
 	}
 
