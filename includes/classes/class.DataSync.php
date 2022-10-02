@@ -18,6 +18,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 class DataSync {
 
 	/**
+	 * @var int
+	 */
+
+	private $api_item_id;
+
+	/**
+	 * @var int
+	 */
+
+	private $source_id;
+
+	/**
+	 * @var string
+	 */
+
+	private $source_name;
+
+	/**
 	 * @var bool|array
 	 */
 
@@ -344,6 +362,32 @@ class DataSync {
 
 	public function get_is_new() {
 		return $this->is_new;
+	}
+
+	/**
+	 * Get API Item ID
+	 *
+	 * @return int
+	 */
+
+	public function get_api_item_id() {
+		return $this->api_item_id;
+	}
+
+	/**
+	 * @return int
+	 */
+
+	public function get_source_id() {
+		return $this->source_id;
+	}
+
+	/**
+	 * @return string
+	 */
+	
+	public function get_source_name() {
+		return $this->source_name;
 	}
 
 	/**
