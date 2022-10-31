@@ -272,15 +272,23 @@ class DataSync {
 
 			if ( 'post_id' === $this->primary_id['search_in'] ) {
 
-				$post_id = (int) $this->primary_id['post_id'];
+				if ( ! $post_id = $this->get_post_id_from_source_item_id() ) {
 
-				// Check to see if the post ID exists.
-				if ( ! get_post_status( $post_id ) ) {
-					$post_id = $this->insert_post_row( $post_id );
+					$_post_id = (int) $this->primary_id['post_id'];
+
+					// If the row with this post ID does not exist and/or the post type does not match.
+					if ( ! get_post_status( $_post_id ) && $this->get_post_type() !== get_post_type( $_post_id ) ) {
+						// Let's insert the row and use the post ID.
+						$post_id = $this->insert_post_row( $_post_id );
+					}
+					else {
+						// Insert a new row and get the post ID.
+						$post_id = $this->insert_placeholder();
+					}
+
 				}
 
 			}
-
 			else {
 
 				// Fetch post ID using post meta relationship.
@@ -680,19 +688,27 @@ class DataSync {
 
 		$success = $wpdb->insert(
 			$wpdb->posts,
-			[ 'ID' => $post_id ],
-			[ '%d' ]
+			[
+				'ID'                    => $post_id,
+				'post_content'          => '',
+				'post_title'            => '',
+				'post_excerpt'          => '',
+				'to_ping'               => '',
+				'pinged'                => '',
+				'post_content_filtered' => ''
+			],
+			[ '%d', '%s', '%s', '%s', '%s', '%s', '%s' ]
 		);
 
 		if ( empty( $success ) || is_wp_error( $success ) ) {
 
-			Log::write( 'wpdb-error-post_id',  $success);
+			Log::write( 'wpdb-error-insert-post-row',  $success);
 
 			return false;
 
 		}
 
-		return $post_id;
+		return $wpdb->insert_id;
 
 	}
 
@@ -1800,6 +1816,47 @@ class DataSync {
 		Log::write( 'post-date', $post_data, 'Update Post Dates' );
 
 		wp_update_post( $post_data );
+
+	}
+
+	/**
+	 * Get Post ID from Source Item ID
+	 *
+	 * Get the post ID when an item has been previously synced
+	 * and contains a postmeta meta_key named _source_item_id.
+	 *
+	 * @return false|int
+	 */
+
+	public function get_post_id_from_source_item_id() {
+
+		global $wpdb;
+
+		$post_type = $this->get_post_type();
+
+		if ( empty( $this->primary_id['post_id'] ) || empty( $post_type ) ) {
+			return false;
+		}
+
+		$post_id = $wpdb->get_var( $wpdb->prepare(
+			"
+			SELECT pm.post_id
+			FROM $wpdb->postmeta pm
+			INNER JOIN $wpdb->posts p 
+			ON p.ID = pm.post_id
+			WHERE meta_key = '_source_item_id'
+			AND meta_value = %d
+			AND p.post_type = %s
+			",
+			intval( $this->primary_id['post_id'] ),
+			esc_sql( $post_type )
+		) );
+
+		if ( empty( $post_id ) || is_wp_error( $post_id ) ) {
+			return false;
+		}
+
+		return (int) $post_id;
 
 	}
 
