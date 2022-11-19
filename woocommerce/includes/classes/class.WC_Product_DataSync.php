@@ -126,6 +126,10 @@ class WC_Product_DataSync {
 
 	public function wc_process() {
 
+		if ( $this->data_sync->get_wc_categories() ) {
+			$this->categories();
+		}
+
 		if ( $this->data_sync->get_attributes() ) {
 
 			$this->attributes();
@@ -159,6 +163,57 @@ class WC_Product_DataSync {
 
 		// Set all missing product defaults
 		$this->product->save();
+
+	}
+
+	/**
+	 * Product categories.
+	 *
+	 * @return void
+	 */
+
+	public function categories() {
+
+		$category_strings = explode( ',', $this->data_sync->get_wc_categories() );
+
+		if ( empty( $category_strings ) ) {
+			return;
+		}
+
+		$append   = Settings::is_true( 'wp_data_sync_append_terms' );
+		$term_ids = [];
+
+		foreach ( $category_strings as $category_string ) {
+
+			$parent_id = null;
+			$_terms    = array_map( 'trim', explode( '>', $category_string ) );
+			$total     = count( $_terms );
+
+			foreach ( $_terms as $index => $_term ) {
+
+				if ( $term_id = $this->data_sync->term_id( $_term, 'product_cat', $parent_id ) ) {
+
+					// Only requires assign the last category.
+					if ( ( 1 + $index ) === $total ) {
+						$term_ids[] = $term_id;
+					} else {
+						// Store parent to be able to insert or query categories based in parent ID.
+						$parent_id = $term_id;
+					}
+
+				}
+
+			}
+
+		}
+
+		Log::write( 'wc-dategories', [
+			'product_id' => $this->product_id,
+			'strings'    => $category_strings,
+			'term_ids'   => $term_ids
+		] );
+
+		wp_set_object_terms( $this->product_id, $term_ids, 'product_cat', $append );
 
 	}
 

@@ -2,7 +2,7 @@
 /**
  * WooCommerce Price
  *
- * Format WooCommerce price before insert.
+ * Format WooCommerce prices before insert.
  *
  * @since   1.0.0
  *

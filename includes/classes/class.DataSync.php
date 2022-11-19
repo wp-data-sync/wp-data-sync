@@ -11,6 +11,8 @@
 
 namespace WP_DataSync\App;
 
+use Monolog\Formatter\LogglyFormatter;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -70,6 +72,12 @@ class DataSync {
 	 */
 
 	private $taxonomies = false;
+
+	/**
+	 * @var bool|string
+	 */
+
+	private $wc_categories = false;
 
 	/**
 	 * @var bool|array
@@ -333,6 +341,18 @@ class DataSync {
 	}
 
 	/**
+	 * Set WooCommerce Categories
+	 *
+	 * @param string $wc_categories
+	 *
+	 * @return void
+	 */
+
+	public function set_wc_categories( $wc_categories ) {
+		$this->wc_categories = $wc_categories;
+	}
+
+	/**
 	 * Set featured image.
 	 *
 	 * @param $featured_image
@@ -462,6 +482,16 @@ class DataSync {
 
 	public function get_taxonomies() {
 		return $this->taxonomies;
+	}
+
+	/**
+	 * Get WooCommerce Categories
+	 *
+	 * @return string|bool
+	 */
+
+	public function get_wc_categories() {
+		return $this->wc_categories;
 	}
 
 	/**
@@ -959,6 +989,8 @@ class DataSync {
 			return;
 		}
 
+		$append = Settings::is_true( 'wp_data_sync_append_terms' );
+
 		foreach ( $this->taxonomies as $taxonomy => $terms ) {
 
 			$taxonomy = trim( wp_unslash( $taxonomy ) );
@@ -983,7 +1015,6 @@ class DataSync {
 			}
 
 			$term_ids = [];
-			$append   = Settings::is_true( 'wp_data_sync_append_terms' );
 
 			foreach ( $terms as $term ) {
 
@@ -1098,24 +1129,7 @@ class DataSync {
 		 */
 
 		$taxonomy = apply_filters( 'wp_data_sync_term_taxonomy', $taxonomy, $name, $parent_id, $this->post_id );
-
-		if ( ! $term_id = $this->term_exists( $name, $taxonomy, $parent_id ) ) {
-
-			$term = wp_insert_term( $name, $taxonomy, [ 'parent' => $parent_id ] );
-
-			if( is_wp_error( $term ) ) {
-
-				Log::write( 'wp-error-term', $term );
-
-				return false;
-
-			}
-
-			$term_id = (int) $term['term_id'];
-
-		}
-
-		Log::write( 'term-id', $term_id );
+		$term_id  = $this->term_id( $name, $taxonomy, $parent_id );
 
 		if ( isset( $description ) ) {
 			$this->term_desc( $description, $term_id, $taxonomy );
@@ -1175,6 +1189,37 @@ class DataSync {
 		}
 
 		Log::write( 'term-exists', "Term ID: $term_id" );
+
+		return (int) $term_id;
+
+	}
+
+	/**
+	 * Term ID.
+	 *
+	 * @param string $name
+	 * @param string $taxonomy
+	 * @param int $parent_id
+	 *
+	 * @return false|int
+	 */
+
+	public function term_id( $name, $taxonomy, $parent_id ) {
+
+		if ( ! $term_id = $this->term_exists( $name, $taxonomy, $parent_id ) ) {
+
+			$term = wp_insert_term( $name, $taxonomy, [ 'parent' => $parent_id ] );
+
+			if( is_wp_error( $term ) ) {
+				Log::write( 'wp-error-term', $term );
+
+				return false;
+			}
+
+			$term_id = $term['term_id'];
+		}
+
+		Log::write( 'term-id', $term_id );
 
 		return (int) $term_id;
 
