@@ -303,14 +303,20 @@ abstract class Request {
 
 	public function sanitize_callback( $key ) {
 
-		$sanitize_callback = 'string';
+		switch ( $key ) {
 
-		if ( in_array( $key, [ 'post_content', 'post_excerpt' ] ) ) {
-			$sanitize_callback = 'html';
-		}
+			case 'post_content' :
+			case 'post_excerpt'	:
+				$sanitize_callback = 'html';
+				break;
 
-		if ( 'gallery_image_' === substr( $key, 0, 14 ) ) {
-			$sanitize_callback = 'url';
+			case 'image_url' :
+				$sanitize_callback = 'url';
+				break;
+
+			default :
+				$sanitize_callback = 'string';
+
 		}
 
 		Log::write( 'sanitize-callback', "$key - $sanitize_callback" );
@@ -369,7 +375,7 @@ abstract class Request {
 				break;
 
 			case 'url':
-				$clean_value = esc_url_raw( $value );
+				$clean_value = sanitize_url( $value );
 				break;
 
 			case 'title':
