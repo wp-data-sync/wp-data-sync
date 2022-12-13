@@ -213,19 +213,15 @@ abstract class Request {
 	public function request_data() {
 
 		$json     = $this->request->get_body();
-
-		Log::write( $this->log_key, 'Sync Request JSON' );
-		Log::write( $this->log_key, $json );
-
 		$raw_data = json_decode( $json, true );
-
-		Log::write( $this->log_key, 'Sync Request Raw Data' );
-		Log::write( $this->log_key, $raw_data );
-
 		$data     = $this->sanitize_request( $raw_data );
 
-		Log::write( $this->log_key, 'Sync Request Sanitized Data' );
-		Log::write( $this->log_key, $data );
+		Log::write( $this->log_key, [
+			'Sync Request JSON Length'    => strlen( $json ),
+			'Sync Request JSON'           => $json,
+			'Sync Request Raw Data'       => $raw_data,
+			'Sync Request Sanitized Data' => $data
+		] );
 
 		return apply_filters( 'wp_data_sync_data', $data );
 
