@@ -23,7 +23,7 @@ class DataSync {
 	 * @var int
 	 */
 
-	private $api_request_item_id;
+	private $api_item_id;
 
 	/**
 	 * @var int
@@ -307,7 +307,7 @@ class DataSync {
 
 			if ( 'post_id' === $this->primary_id['search_in'] ) {
 
-				if ( ! $post_id = $this->get_post_id_from_source_request_item_id() ) {
+				if ( ! $post_id = $this->get_post_id_from_source_item_id() ) {
 
 					$_post_id = (int) $this->primary_id['post_id'];
 
@@ -425,8 +425,8 @@ class DataSync {
 	 * @return int
 	 */
 
-	public function get_api_request_item_id() {
-		return $this->api_request_item_id;
+	public function get_api_item_id() {
+		return $this->api_item_id;
 	}
 
 	/**
@@ -1895,12 +1895,12 @@ class DataSync {
 	 * Get Post ID from Source Item ID
 	 *
 	 * Get the post ID when an item has been previously synced
-	 * and contains a postmeta meta_key named _source_request_item_id.
+	 * and contains a postmeta meta_key named _source_item_id.
 	 *
 	 * @return false|int
 	 */
 
-	public function get_post_id_from_source_request_item_id() {
+	public function get_post_id_from_source_item_id() {
 
 		global $wpdb;
 
@@ -1916,7 +1916,7 @@ class DataSync {
 			FROM $wpdb->postmeta pm
 			INNER JOIN $wpdb->posts p 
 			ON p.ID = pm.post_id
-			WHERE meta_key = '_source_request_item_id'
+			WHERE meta_key = '_source_item_id'
 			AND meta_value = %d
 			AND p.post_type = %s
 			",
