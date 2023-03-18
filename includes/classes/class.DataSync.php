@@ -23,7 +23,7 @@ class DataSync {
 	 * @var int
 	 */
 
-	private $api_item_id;
+	private $api_request_item_id;
 
 	/**
 	 * @var int
@@ -185,11 +185,13 @@ class DataSync {
 
 	public function process() {
 
-		global $wpds_response;
+		global $wpds_response, $request_item_id;
+		
+		$request_item_id = $this->get_request_item_id();
 
 		// A primary ID is required!!
 		if ( empty( $this->primary_id ) ) {
-			$wpds_response['items'][]['error'] = 'Primary ID empty!!';
+			$wpds_response['items'][ $request_item_id ]['error'] = 'Primary ID empty!!';
 			return;
 		}
 
@@ -197,12 +199,20 @@ class DataSync {
 		$this->set_post_id();
 
 		if ( ! $this->post_id ) {
-			$wpds_response['items'][]['error'] = 'Post ID failed!!';
+			$wpds_response['items'][ $request_item_id ]['error'] = __( 'Post ID failed!!', 'wp-data-sync' );
+			return;
+		}
+
+		$wpds_response['items'][ $request_item_id ]['post_id'] = $this->post_id;
+
+		if ( get_post_meta( $this->post_id, WPDSYNC_SYNC_DISABLED, true ) ) {
+			$wpds_response['items'][ $request_item_id ]['error'] = __( 'Post Sync Status Disabled!!', 'wp-data-sync' );
+			$wpds_response['items'][ $request_item_id ]['status'] = 'disabled';
 			return;
 		}
 
 		if ( $this->maybe_trash_post() ) {
-			$wpds_response['items'][]['trash'] = 'Post Trashed';
+			$wpds_response['items'][ $request_item_id ]['trash'] = __( 'Post Trashed', 'wp-data-sync' );
 			return;
 		}
 
@@ -255,16 +265,33 @@ class DataSync {
 			$this->integrations();
 		}
 
-		$wpds_response['items'][] = [
-			'post_id'   => $this->post_id,
-			'post_type' => $this->get_post_type()
-		];
+		$wpds_response['items'][ $request_item_id ]['post_type'] = $this->get_post_type();
 
 		do_action( 'wp_data_sync_after_process', $this->post_id, $this );
 
 		$this->update_date();
 
 		return true;
+
+	}
+
+	/**
+	 * Get request item ID.
+	 *
+	 * @return int
+	 */
+
+	public function get_request_item_id() {
+		
+		global $request_item_id;
+		
+		if ( ! isset( $request_item_id ) ) {
+			return 1;
+		}
+
+		$request_item_id++;
+
+		return $request_item_id;
 
 	}
 
@@ -280,7 +307,7 @@ class DataSync {
 
 			if ( 'post_id' === $this->primary_id['search_in'] ) {
 
-				if ( ! $post_id = $this->get_post_id_from_source_item_id() ) {
+				if ( ! $post_id = $this->get_post_id_from_source_request_item_id() ) {
 
 					$_post_id = (int) $this->primary_id['post_id'];
 
@@ -398,8 +425,8 @@ class DataSync {
 	 * @return int
 	 */
 
-	public function get_api_item_id() {
-		return $this->api_item_id;
+	public function get_api_request_item_id() {
+		return $this->api_request_item_id;
 	}
 
 	/**
@@ -1868,12 +1895,12 @@ class DataSync {
 	 * Get Post ID from Source Item ID
 	 *
 	 * Get the post ID when an item has been previously synced
-	 * and contains a postmeta meta_key named _source_item_id.
+	 * and contains a postmeta meta_key named _source_request_item_id.
 	 *
 	 * @return false|int
 	 */
 
-	public function get_post_id_from_source_item_id() {
+	public function get_post_id_from_source_request_item_id() {
 
 		global $wpdb;
 
@@ -1889,7 +1916,7 @@ class DataSync {
 			FROM $wpdb->postmeta pm
 			INNER JOIN $wpdb->posts p 
 			ON p.ID = pm.post_id
-			WHERE meta_key = '_source_item_id'
+			WHERE meta_key = '_source_request_item_id'
 			AND meta_value = %d
 			AND p.post_type = %s
 			",

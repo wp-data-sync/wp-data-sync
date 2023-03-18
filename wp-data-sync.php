@@ -12,7 +12,7 @@
  * Domain Path: /languages
  *
  * WC requires at least: 4.0
- * WC tested up to: 7.1.0
+ * WC tested up to: 7.5.0
  *
  * Package:     WP_DataSync
 */
@@ -35,13 +35,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 $uploads = wp_get_upload_dir();
 
 $defines = [
-	'WPDSYNC_VERSION'    => '2.5.2',
-	'WPDSYNC_CAP'        => 'manage_options',
-	'WPDSYNC_PLUGIN'     => plugin_basename( __FILE__ ),
-	'WPDSYNC_VIEWS'      => plugin_dir_path( __FILE__ ) . 'views/',
-	'WPDSYNC_ASSETS'     => plugins_url( 'assets/', __FILE__ ),
-	'WPDSYNC_LOG_DIR'    => $uploads['basedir'] . '/wp-data-sync-logs/',
-	'WPDSYNC_EP_VERSION' => 'v2'
+	'WPDSYNC_VERSION'       => '2.5.2',
+	'WPDSYNC_CAP'           => 'manage_options',
+	'WPDSYNC_PLUGIN'        => plugin_basename( __FILE__ ),
+	'WPDSYNC_VIEWS'         => plugin_dir_path( __FILE__ ) . 'views/',
+	'WPDSYNC_ASSETS'        => plugins_url( 'assets/', __FILE__ ),
+	'WPDSYNC_LOG_DIR'       => $uploads['basedir'] . '/wp-data-sync-logs/',
+	'WPDSYNC_EP_VERSION'    => 'v2',
+	'WPDSYNC_SYNC_DISABLED' => 'wpds_sync_status_disabled'
 ];
 
 foreach ( $defines as $define => $value ) {

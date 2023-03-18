@@ -386,18 +386,18 @@ class WC_Product_DataSync {
 			$data_sync = DataSync::instance();
 			$parent_id = $this->product_id;
 
-			Log::write( 'variations', [
-				'parent_id' => $parent_id,
-				'count'     => count( $variations )
-			] );
-
 			foreach ( $variations as $i => $variation ) {
 
-				// Set the required post data fields.
+				// Set the post data for the variation.
 				$variation['post_data']['post_parent'] = $parent_id;
 				$variation['post_data']['post_type'] = 'product_variation';
-				$variation['post_data']['post_status'] = 'publish';
 
+				// Set the current vaiation active.
+				if ( ! isset( $variation['post_data']['post_status'] ) ) {
+					$variation['post_data']['post_status'] = 'publish';
+				}
+
+				// Set the variation menu order.
 				if ( ! isset( $variation['post_data']['menu_order'] ) ) {
 					$variation['post_data']['menu_order'] = ( $i + 1 );
 				}

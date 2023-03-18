@@ -49,3 +49,15 @@
 .column-wpds_sync_status {
 	text-align: center;
 }
+
+#post-body #edit-sync-status:before {
+	content: '';
+	width: 20px;
+	height: 20px;
+	display: inline-block;
+	margin-left: -1px;
+	margin-right: 7px;
+	padding: 0;
+	vertical-align: top;
+	background: url("/wp-content/plugins/wp-data-sync/assets/images/icon-32x32.png") no-repeat center/cover;
+}
