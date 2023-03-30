@@ -629,19 +629,28 @@ class DataSync {
 			return false;
 		}
 
-		$post_id = $wpdb->get_var( $wpdb->prepare(
+		$sql = $wpdb->prepare(
 			"
 			SELECT p.ID 
     		FROM $wpdb->posts p
 			INNER JOIN $wpdb->postmeta pm
-			ON p.ID = pm.post_id
+				ON p.ID = pm.post_id
     		WHERE pm.meta_key = %s 
-      		AND pm.meta_value = %s 
+      			AND pm.meta_value = %s 
       		ORDER BY p.ID DESC
 			",
 			esc_sql( $key ),
 			esc_sql( $value )
-		) );
+		);
+
+		$post_id = $wpdb->get_var( $sql );
+
+		Log::write( 'fetch-post-id', [
+			'is_accelerated' => $this->is_accelerated,
+			'query'          => $sql,
+			'result'         => $post_id,
+			'error'          => $wpdb->last_error
+		] );
 
 		if ( empty( $post_id ) || is_wp_error( $post_id ) ) {
 

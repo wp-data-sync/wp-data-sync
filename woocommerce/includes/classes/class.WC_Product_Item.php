@@ -1,6 +1,6 @@
 <?php
 /**
- * WC_Product_ItemRequest
+ * WC_Product_Item
  *
  * Request WooCommerce product data
  *
@@ -11,14 +11,14 @@
 
 namespace WP_DataSync\Woo;
 
-use WP_DataSync\App\ItemRequest;
 use WP_DataSync\App\Settings;
+use WP_DataSync\App\Item;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class WC_Product_ItemRequest {
+class WC_Product_Item {
 
 	/**
 	 * @var WC_Product
@@ -33,19 +33,13 @@ class WC_Product_ItemRequest {
 	private $product_id;
 
 	/**
-	 * @var ItemRequest
-	 */
-
-	private $item_request;
-
-	/**
-	 * @var WC_Product_ItemRequest
+	 * @var WC_Product_Item
 	 */
 
 	public static $instance;
 
 	/**
-	 * WC_Product_ItemRequest constructor.
+	 * WC_Product_Item constructor.
 	 */
 
 	public function __construct() {
@@ -53,7 +47,7 @@ class WC_Product_ItemRequest {
 	}
 
 	/**
-	 * @return WC_Product_ItemRequest
+	 * @return WC_Product_Item
 	 */
 
 	public static function instance() {
@@ -69,18 +63,16 @@ class WC_Product_ItemRequest {
 	/**
 	 * WC Process.
 	 *
-	 * @param $item_data
-	 * @param $product_id
-	 * @param $item_request ItemRequest
+	 * @param array $item_data
+	 * @param int $product_id
 	 *
 	 * @return mixed
 	 */
 
-	public function wc_process( $item_data, $product_id, $item_request ) {
+	public function wc_process( $item_data, $product_id ) {
 
-		$this->product_id   = $product_id;
-		$this->product      = wc_get_product( $product_id );
-		$this->item_request = $item_request;
+		$this->product_id = $product_id;
+		$this->product    = wc_get_product( $product_id );
 
 		if ( ! Settings::is_data_type_excluded( 'gallery_images' ) ) {
 
@@ -222,7 +214,10 @@ class WC_Product_ItemRequest {
 		}
 
 		foreach ( $variation_ids as $variation_id ) {
-			$variations[] = $this->item_request->get_item( $variation_id );
+
+			$item = new Item( $variation_id );
+
+			$variations[] = $item->get();
 		}
 
 		return $variations;

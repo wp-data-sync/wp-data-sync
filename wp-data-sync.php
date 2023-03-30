@@ -3,7 +3,7 @@
  * Plugin Name: WP Data Sync
  * Plugin URI:  https://wpdatasync.com/products/
  * Description: Sync raw data from any data source to your WordPress website
- * Version:     2.5.3
+ * Version:     2.6.0
  * Author:      WP Data Sync
  * Author URI:  https://wpdatasync.com
  * License:     GPL2
@@ -19,6 +19,7 @@
 
 namespace WP_DataSync;
 
+use WP_DataSync\App\ItemInfoRequest;
 use WP_DataSync\App\Settings;
 use WP_DataSync\App\SyncRequest;
 use WP_DataSync\App\KeyRequest;
@@ -35,7 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $uploads = wp_get_upload_dir();
 
 $defines = [
-	'WPDSYNC_VERSION'       => '2.5.3',
+	'WPDSYNC_VERSION'       => '2.6.0',
 	'WPDSYNC_CAP'           => 'manage_options',
 	'WPDSYNC_PLUGIN'        => plugin_basename( __FILE__ ),
 	'WPDSYNC_VIEWS'         => plugin_dir_path( __FILE__ ) . 'views/',
@@ -79,6 +80,7 @@ add_action( 'plugins_loaded', function() {
 		UserRequest::instance()->register_route();
 		ReportRequest::instance()->register_route();
 		LogRequest::instance()->register_route();
+		ItemInfoRequest::instance()->register_route();
 	} );
 
 	// Requyire woocommerce dir files

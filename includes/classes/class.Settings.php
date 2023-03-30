@@ -184,7 +184,7 @@ class Settings {
 
 	public function report_values() {
 
-		global $wp_version;
+		global $wp_version, $wpdb;
 
 		$report_values = [
 			[
@@ -214,6 +214,10 @@ class Settings {
 			[
 				'label' => __( 'PHP Version' ),
 				'value' => phpversion()
+			],
+			[
+				'label' => __( 'Database Table Prefix' ),
+				'value' => $wpdb->prefix
 			],
 			[
 				'label' => __( 'WordPress Multisite' ),
