@@ -127,6 +127,12 @@ class DataSync {
 
 	private $order_items = false;
 
+    /**
+     * @var array
+     */
+
+    private $wc_prices = [];
+
 	/**
 	 * @var bool|array
 	 */
@@ -185,7 +191,7 @@ class DataSync {
 
 	public function process() {
 
-		global $wpds_response, $request_item_id;
+		global $wpds_response, $request_item_id, $wpdb;
 		
 		$request_item_id = $this->get_request_item_id();
 
@@ -199,7 +205,13 @@ class DataSync {
 		$this->set_post_id();
 
 		if ( ! $this->post_id ) {
-			$wpds_response['items'][ $request_item_id ]['error'] = __( 'Post ID failed!!', 'wp-data-sync' );
+            $error_msg = __( 'Post ID failed!!', 'wp-data-sync' );
+
+            if ( ! empty( $wpdb->last_error ) ) {
+                $error_msg = $wpdb->last_error;
+            }
+
+			$wpds_response['items'][ $request_item_id ]['error'] = $error_msg;
 			return;
 		}
 
@@ -613,6 +625,16 @@ class DataSync {
 		return $this->integrations;
 	}
 
+    /**
+     * Get WooCommerce Prices
+     *
+     * @return array
+     */
+
+    public function get_wc_prices() {
+        return $this->wc_prices;
+    }
+
 	/**
 	 * Fetch Post ID.
 	 *
@@ -661,11 +683,11 @@ class DataSync {
 
 			$this->is_new = true;
 
-			$post_id = $this->insert_placeholder();
+			return $this->insert_placeholder();
 
 		}
 
-		return $post_id ? (int) $post_id : false;
+		return (int) $post_id;
 
 	}
 
@@ -943,7 +965,10 @@ class DataSync {
 		$meta_key   = $this->post_meta_key( $meta_key, $meta_value );
 		$meta_value = $this->post_meta_value( $meta_value, $meta_key );
 
-		if ( ! in_array( $meta_key, $this->restricted_meta_keys() ) ) {
+        if ( '_regular_price' === $meta_key || '_sale_price' === $meta_key ) {
+            $this->set_wc_prices( $meta_key, $meta_value );
+        }
+		elseif ( ! in_array( $meta_key, $this->restricted_meta_keys() ) ) {
 
 			update_post_meta( $post_id, $meta_key, $meta_value );
 
@@ -955,6 +980,19 @@ class DataSync {
 		do_action( "wp_data_sync_post_meta_$meta_key", $post_id, $meta_value, $this );
 
 	}
+
+    /**
+     * Set WooCommerce Prices
+     *
+     * @param $meta_key
+     * @param $meta_value
+     *
+     * @return void
+     */
+
+    public function set_wc_prices( $meta_key, $meta_value ) {
+        $this->wc_prices[ $meta_key ] = $meta_value;
+    }
 
 	/**
 	 * Post meta Key.

@@ -126,6 +126,10 @@ class WC_Product_DataSync {
 
 	public function wc_process() {
 
+        if ( ! empty( $this->data_sync->get_wc_prices() ) ) {
+            $this->prices();
+        }
+
 		if ( $this->data_sync->get_wc_categories() ) {
 			$this->categories();
 		}
@@ -165,6 +169,56 @@ class WC_Product_DataSync {
 		$this->product->save();
 
 	}
+
+    /**
+     * Prices
+     *
+     * @return void
+     */
+
+    public function prices() {
+
+        $prices = $this->data_sync->get_wc_prices();
+
+        extract( $prices );
+
+        // We cannot have an empty regular price.
+        if ( empty( $_regular_price ) ) {
+           $_regular_price = $this->product->get_regular_price();
+        }
+
+        /**
+         * If the sale price is provided, but empty, we can still use the empty value.
+         */
+        if ( isset( $_sale_price ) && empty( $_sale_price ) ) {
+            $_sale_price = '';
+        }
+        else {
+            $_sale_price = $this->product->get_sale_price();
+        }
+
+        /**
+         * We must set the prices before we can evalaueare WC_Product::is_on_sale().
+         */
+        $this->product->set_regular_price( $_regular_price );
+        $this->product->set_sale_price( $_sale_price );
+
+        /**
+         * Get the price based on the sale status of the product.
+         */
+        $_price = $this->product->is_on_sale() ? $_sale_price : $_regular_price;
+
+        $this->product->set_price( $_price );
+
+        Log::write( 'wc-prices', [
+            'product_id'    => $this->product->get_id(),
+            'is_on_sale'    => $this->product->is_on_sale(),
+            'regular_price' => $_regular_price,
+            'sale_price'    => $_sale_price,
+            'price'         => $_price
+        ], 'Set WC Prices' );
+
+    }
 
 	/**
 	 * Product categories.
