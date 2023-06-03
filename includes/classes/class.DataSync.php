@@ -49,6 +49,12 @@ class DataSync {
 
 	private $post_id = false;
 
+    /**
+     * @var string
+     */
+
+    private $post_type;
+
 	/**
 	 * @var bool
 	 */
@@ -191,43 +197,66 @@ class DataSync {
 
 	public function process() {
 
-		global $wpds_response, $request_item_id, $wpdb;
+		global $wpds_response, $process_id, $wpdb;
 		
-		$request_item_id = $this->get_request_item_id();
+		$process_id = $this->get_process_id();
 
 		// A primary ID is required!!
 		if ( empty( $this->primary_id ) ) {
-			$wpds_response['items'][ $request_item_id ]['error'] = 'Primary ID empty!!';
+			$wpds_response['items'][ $process_id ]['error'] = 'Primary ID empty!!';
 			return;
 		}
 
-		// Set the post_id.
+        /**
+         * Set the post ID.
+         */
 		$this->set_post_id();
 
-		if ( ! $this->post_id ) {
+		if ( empty( $this->post_id ) ) {
             $error_msg = __( 'Post ID failed!!', 'wp-data-sync' );
 
             if ( ! empty( $wpdb->last_error ) ) {
                 $error_msg = $wpdb->last_error;
             }
 
-			$wpds_response['items'][ $request_item_id ]['error'] = $error_msg;
+			$wpds_response['items'][ $process_id ]['error'] = $error_msg;
 			return;
 		}
 
-		$wpds_response['items'][ $request_item_id ]['post_id'] = $this->post_id;
+        $wpds_response['items'][ $process_id ]['post_id'] = $this->post_id;
 
+        /**
+         * Set the post type.
+         */
+        $this->set_post_type();
+
+        if ( empty( $this->post_type ) ) {
+            $wpds_response['items'][ $process_id ]['error'] = __( 'Post Type Required!!', 'wp-data-sync' );
+            return;
+        }
+
+        $wpds_response['items'][ $process_id ]['post_type'] = $this->post_type;
+
+        /**
+         * Check the post sync status.
+         */
 		if ( get_post_meta( $this->post_id, WPDSYNC_SYNC_DISABLED, true ) ) {
-			$wpds_response['items'][ $request_item_id ]['error'] = __( 'Post Sync Status Disabled!!', 'wp-data-sync' );
-			$wpds_response['items'][ $request_item_id ]['status'] = 'disabled';
+			$wpds_response['items'][ $process_id ]['error'] = __( 'Post Sync Status Disabled!!', 'wp-data-sync' );
+			$wpds_response['items'][ $process_id ]['status'] = 'disabled';
 			return;
 		}
 
+        /**
+         * Maybe trash the post.
+         */
 		if ( $this->maybe_trash_post() ) {
-			$wpds_response['items'][ $request_item_id ]['trash'] = __( 'Post Trashed', 'wp-data-sync' );
+			$wpds_response['items'][ $process_id ]['trash'] = __( 'Post Trashed', 'wp-data-sync' );
 			return;
 		}
 
+        /**
+         * Process the post data.
+         */
 		if ( $this->post_data ) {
 
 			do_action( 'wp_data_sync_before_post_data', $this->post_data, $this->post_id, $this );
@@ -277,8 +306,6 @@ class DataSync {
 			$this->integrations();
 		}
 
-		$wpds_response['items'][ $request_item_id ]['post_type'] = $this->get_post_type();
-
 		do_action( 'wp_data_sync_after_process', $this->post_id, $this );
 
 		$this->update_date();
@@ -288,22 +315,22 @@ class DataSync {
 	}
 
 	/**
-	 * Get request item ID.
-	 *
+	 * Get Process ID
+     *
 	 * @return int
 	 */
 
-	public function get_request_item_id() {
+	public function get_process_id() {
 		
-		global $request_item_id;
+		global $process_id;
 		
-		if ( ! isset( $request_item_id ) ) {
+		if ( ! isset( $process_id ) ) {
 			return 1;
 		}
 
-		$request_item_id++;
+		$process_id++;
 
-		return $request_item_id;
+		return $process_id;
 
 	}
 
@@ -348,6 +375,25 @@ class DataSync {
 		$this->post_id = $post_id;
 
 	}
+
+    /**
+     * Set Post Type
+     *
+     * @param $post_type
+     *
+     * @return viod
+     */
+
+    public function set_post_type( $post_type = false ) {
+
+        if ( ! $post_type ) {
+            $post_type = $this->_get_post_type();
+
+        }
+
+        $this->post_type = $post_type;
+
+    }
 
 	/**
 	 * Set post data.
@@ -498,19 +544,13 @@ class DataSync {
 	}
 
 	/**
-	 * Get post type.
+	 * Get Post Type
 	 *
-	 * @return mixed
+	 * @return string
 	 */
 
 	public function get_post_type() {
-
-		if ( isset( $this->post_data['post_type'] ) ) {
-			return $this->post_data['post_type'];
-		}
-
-        return get_option( 'wp_data_sync_post_type' );
-
+        return $this->post_type;
 	}
 
 	/**
@@ -1869,6 +1909,28 @@ class DataSync {
 		return apply_filters( 'wp_data_sync_image', $this->attachment, $this->post_id );
 
 	}
+
+    /**
+     * Internal Get Post Type
+     *
+     * @since  2.6.2
+     * @access private
+     * @return string|bool
+     */
+
+    private function _get_post_type() {
+
+        if ( isset( $this->post_data['post_type'] ) ) {
+           return $this->post_data['post_type'];
+        }
+
+        if ( $post_type = get_post_type( $this->post_id ) ) {
+            return $post_type;
+        }
+
+        return get_option( 'wp_data_sync_post_type' );
+        
+    }
 
 	/**
 	 * Filter Restricted Meta Keys.

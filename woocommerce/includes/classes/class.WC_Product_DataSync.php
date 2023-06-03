@@ -190,11 +190,11 @@ class WC_Product_DataSync {
         /**
          * If the sale price is provided, but empty, we can still use the empty value.
          */
-        if ( isset( $_sale_price ) && empty( $_sale_price ) ) {
-            $_sale_price = '';
+        if ( ! isset( $_sale_price ) ) {
+            $_sale_price = $this->product->get_sale_price();;
         }
-        else {
-            $_sale_price = $this->product->get_sale_price();
+        elseif ( isset( $_sale_price ) && empty( $_sale_price ) ) {
+            $_sale_price = '';
         }
 
         /**
@@ -215,7 +215,8 @@ class WC_Product_DataSync {
             'is_on_sale'    => $this->product->is_on_sale(),
             'regular_price' => $_regular_price,
             'sale_price'    => $_sale_price,
-            'price'         => $_price
+            'price'         => $_price,
+            'api_prices'    => $prices
         ], 'Set WC Prices' );
 
     }
