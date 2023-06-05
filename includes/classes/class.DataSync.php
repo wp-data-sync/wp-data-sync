@@ -672,7 +672,7 @@ class DataSync {
      */
 
     public function get_wc_prices() {
-        return $this->wc_prices;
+        return apply_filters( 'wp_data_sync_get_wc_prices', $this->wc_prices, $this->post_meta, $this );
     }
 
 	/**

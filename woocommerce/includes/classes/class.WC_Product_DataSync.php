@@ -48,34 +48,32 @@ class WC_Product_DataSync {
 
 	private $product_type = 'simple';
 
-	/**
-	 * @var WC_Product_DataSync
-	 */
+    /**
+     * WC_Product_DataSync constructor.
+     *
+     * @param int      $product_id
+     * @param DataSync $data_sync
+     */
 
-	private static $instance;
+	public function __construct(  $product_id, $data_sync ) {
 
-	/**
-	 * WC_Product_DataSync constructor.
-	 */
+        $this->set_product( $product_id );
+        $this->set_product_id( $product_id );
+        $this->set_data_sync( $data_sync );
 
-	public function __construct() {
-		self::$instance = $this;
 	}
 
 	/**
 	 * Instance.
 	 *
+     * @param int      $product_id
+     * @param DataSync $data_sync
+     *
 	 * @return WC_Product_DataSync
 	 */
 
-	public static function instance() {
-
-		if ( self::$instance === NULL ) {
-			self::$instance = new self();
-		}
-
-		return self::$instance;
-
+	public static function instance( $product_id, $data_sync ) {
+		return new self( $product_id, $data_sync );
 	}
 
 	/**
@@ -126,10 +124,6 @@ class WC_Product_DataSync {
 
 	public function wc_process() {
 
-        if ( ! empty( $this->data_sync->get_wc_prices() ) ) {
-            $this->prices();
-        }
-
 		if ( $this->data_sync->get_wc_categories() ) {
 			$this->categories();
 		}
@@ -164,9 +158,6 @@ class WC_Product_DataSync {
 		}
 
 		$this->product_type();
-
-		// Set all missing product defaults
-		$this->product->save();
 
 	}
 
@@ -605,5 +596,15 @@ class WC_Product_DataSync {
 		}
 
 	}
+
+    /**
+     * Save
+     *
+     * @return void
+     */
+
+    public function save() {
+        $this->product->save();
+    }
 
 }
