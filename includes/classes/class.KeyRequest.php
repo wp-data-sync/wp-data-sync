@@ -143,11 +143,6 @@ class KeyRequest extends Request {
 				'heading' => __( 'Meta Keys', 'wp-data-sync' ),
 				'keys'    => $this->meta_keys( $wpdb->postmeta ),
 				'type'    => 'value'
-			],
-			3  => [
-				'heading' => __( 'User Meta Keys', 'wp-data-sync' ),
-				'keys'    => $this->meta_keys( $wpdb->usermeta ),
-				'type'    => 'value'
 			]
 		];
 

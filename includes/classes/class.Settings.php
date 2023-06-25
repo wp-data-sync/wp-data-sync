@@ -114,9 +114,6 @@ class Settings {
 			'data_sync_settings' => [
 				'label' => __( 'Data Sync', 'wp-data-sync' ),
 			],
-			'user_sync_settings' => [
-				'label' => __( 'User Sync', 'wp-data-sync' ),
-			],
 			'item_request' => [
 				'label' => __( 'Item Request', 'wp-data-sync' ),
 			]
@@ -686,50 +683,6 @@ class Settings {
 						'class'		        => '',
 						'placeholder'       => '',
 						'info'              => __( 'Replace all valid full image URLs. This will make a copy of the images in this websites media library and replace the image URLs in the content.', 'wp-data-sync' )
-					]
-				]
-			],
-			'user_sync_settings' => [
-				[
-					'key' 		=> 'wp_data_sync_check_current_user_email',
-					'label'		=> __( 'Check Current User Emails', 'wp-data-sync' ),
-					'callback'  => 'input',
-					'args'      => [
-						'sanitize_callback' => 'sanitize_text_field',
-						'basename'          => 'checkbox',
-						'type'		        => '',
-						'class'		        => 'check-current-users-email',
-						'placeholder'       => '',
-						'info'              => __( 'If the primary ID search fails, check current users email to see if it exists. If it does exist, update that user. If not exists, create a new user with that email.', 'wp-data-sync' )
-					]
-				],
-				[
-					'key' 		=> 'wp_data_sync_check_current_user_login',
-					'label'		=> __( 'Check Current Usernames', 'wp-data-sync' ),
-					'callback'  => 'input',
-					'args'      => [
-						'sanitize_callback' => 'sanitize_text_field',
-						'basename'          => 'checkbox',
-						'type'		        => '',
-						'class'		        => 'check-current-usernames',
-						'placeholder'       => '',
-						'info'              => __( 'If the primary ID search fails, check current usernames to see if it exists. If it does exist, update that user. If not exists, create a new user with that username.', 'wp-data-sync' )
-					]
-				],
-				[
-					'key' 		=> 'wp_data_sync_default_user_role',
-					'label'		=> __( 'Default User Role', 'wp-data-sync' ),
-					'callback'  => 'input',
-					'args'      => [
-						'sanitize_callback' => 'sanitize_text_field',
-						'name'              => 'wp_data_sync_default_user_role',
-						'basename'          => 'select',
-						'type'		        => '',
-						'class'		        => 'default-user-role',
-						'placeholder'       => '',
-						'selected'          => get_option( 'wp_data_sync_default_user_role', '' ),
-						'info'              => __( 'Default user role applied when a new user is created.', 'wp-data-sync' ),
-						'values'            => $this->user_roles()
 					]
 				]
 			],
