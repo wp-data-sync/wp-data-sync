@@ -226,16 +226,19 @@ class WC_Product_DataSync {
 			return;
 		}
 
-		$append   = Settings::is_true( 'wp_data_sync_append_terms' );
-		$term_ids = [];
+        $term_ids  = [];
+		$append    = Settings::is_true( 'wp_data_sync_append_terms' );
+        $delimiter = apply_filters( 'wc_data_sync_category_string_delimiter', '>' );
 
 		foreach ( $category_strings as $category_string ) {
 
 			$parent_id = null;
-			$_terms    = array_map( 'trim', explode( '>', $category_string ) );
+			$_terms    = array_map( 'trim', explode( $delimiter, $category_string ) );
 			$total     = count( $_terms );
 
 			foreach ( $_terms as $index => $_term ) {
+
+                $_term = apply_filters( 'wc_data_sync_category_term', $_term );
 
 				if ( $term_id = $this->data_sync->term_id( $_term, 'product_cat', $parent_id ) ) {
 
