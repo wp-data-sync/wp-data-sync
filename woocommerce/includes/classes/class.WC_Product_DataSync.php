@@ -220,7 +220,8 @@ class WC_Product_DataSync {
 
 	public function categories() {
 
-		$category_strings = explode( ',', $this->data_sync->get_wc_categories() );
+        $separator        = apply_filters( 'wc_data_sync_category_string_separator', ',' );
+		$category_strings = explode( $separator, $this->data_sync->get_wc_categories() );
 
 		if ( empty( $category_strings ) ) {
 			return;
