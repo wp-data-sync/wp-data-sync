@@ -1607,7 +1607,7 @@ class DataSync {
 		Log::write( 'attachment', $image_title, 'Image Title' );
 
 		$attachment = [
-			'post_title'   => empty( $name ) ? $image_title : $name,
+			'post_title'   => empty( $title ) ? $image_title : $title,
 			'post_content' => $description,
 			'post_excerpt' => $caption
 		];
@@ -1880,7 +1880,12 @@ class DataSync {
 
 	public function basename( $image_array ) {
 
-		$basename = sanitize_file_name( basename( $image_array['image_url'] ) );
+        if ( Settings::is_checked( 'wp_data_sync_hash_image_basename' ) ) {
+            $basename = wp_hash( $image_array['image_url'] );
+        }
+        else {
+            $basename = sanitize_file_name( basename( $image_array['image_url'] ) );
+        }
 
 		return apply_filters( 'wp_data_sync_basename', $basename, $this->post_id, $image_array );
 

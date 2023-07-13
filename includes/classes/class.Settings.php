@@ -684,7 +684,20 @@ class Settings {
 						'placeholder'       => '',
 						'info'              => __( 'Replace all valid full image URLs. This will make a copy of the images in this websites media library and replace the image URLs in the content.', 'wp-data-sync' )
 					]
-				]
+				],
+                [
+                    'key' 		=> 'wp_data_sync_hash_image_basename',
+                    'label'		=> __( 'Hash Image Basename', 'wp-data-sync' ),
+                    'callback'  => 'input',
+                    'args'      => [
+                        'sanitize_callback' => 'sanitize_text_field',
+                        'basename'          => 'checkbox',
+                        'type'		        => '',
+                        'class'		        => '',
+                        'placeholder'       => '',
+                        'info'              => __( 'Create a unique image basename from a hash of the source image URL. Recommeneded for image URLs with common basenames.', 'wp-data-sync' )
+                    ]
+                ]
 			],
 			'item_request' => [
 				[
