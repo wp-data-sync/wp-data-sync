@@ -737,7 +737,12 @@ class DataSync {
 	/**
 	 * Fetch Post IDs.
 	 *
-	 * @return bool|array
+     * @since 1.0.0
+     *        2.7.0 Use post type to find post ID.
+     *        2.7.7 Revert and not use post type to find post ID. This is necessary
+     *               since we cannot determine a product_variation with accelerated sync.
+
+     * @return bool|array
 	 */
 
 	public function fetch_post_ids() {
@@ -752,16 +757,11 @@ class DataSync {
 
 		$post_ids = $wpdb->get_col( $wpdb->prepare(
 			"
-			SELECT p.ID 
-    		FROM $wpdb->posts p
-			INNER JOIN $wpdb->postmeta pm
-			    ON p.ID = pm.post_id
-    		WHERE p.post_type = %s
-    		    AND pm.meta_key = %s 
-      		    AND pm.meta_value = %s 
-      		ORDER BY p.ID DESC
+			SELECT post_id 
+    		FROM $wpdb->postmeta
+    		WHERE meta_key = %s 
+      		    AND meta_value = %s 
 			",
-            esc_sql( $this->post_type ),
 			esc_sql( $key ),
 			esc_sql( $value )
 		) );
