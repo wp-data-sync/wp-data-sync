@@ -210,18 +210,18 @@ class DataSync {
         /**
          * Set the post ID.
          */
-		$this->set_post_id();
+        $this->set_post_id();
 
-		if ( empty( $this->post_id ) ) {
+        if ( empty( $this->post_id ) ) {
             $error_msg = __( 'Post ID failed!!', 'wp-data-sync' );
 
             if ( ! empty( $wpdb->last_error ) ) {
                 $error_msg = $wpdb->last_error;
             }
 
-			$wpds_response['items'][ $process_id ]['error'] = $error_msg;
-			return;
-		}
+            $wpds_response['items'][ $process_id ]['error'] = $error_msg;
+            return;
+        }
 
         $wpds_response['items'][ $process_id ]['post_id'] = $this->post_id;
 
@@ -678,6 +678,11 @@ class DataSync {
 	/**
 	 * Fetch Post ID.
 	 *
+     * @since 1.0.0
+     *        2.7.0 Use post type to find post ID.
+     *        2.7.6 Revert and not use post type to find post ID. This is necessary
+     *               since we cannot determine a product_variation with accelerated sync.
+     *
 	 * @return bool|int
 	 */
 
@@ -693,13 +698,11 @@ class DataSync {
 
 		$sql = $wpdb->prepare(
 			"
-			SELECT p.ID 
-    		FROM $wpdb->posts p
-			INNER JOIN $wpdb->postmeta pm
-				ON p.ID = pm.post_id
-    		WHERE pm.meta_key = %s 
-      			AND pm.meta_value = %s 
-      		ORDER BY p.ID DESC
+			SELECT post_id 
+    		FROM $wpdb->postmeta
+    		WHERE meta_key = %s 
+      			AND meta_value = %s 
+      		ORDER BY post_id DESC
 			",
 			esc_sql( $key ),
 			esc_sql( $value )
@@ -752,11 +755,13 @@ class DataSync {
 			SELECT p.ID 
     		FROM $wpdb->posts p
 			INNER JOIN $wpdb->postmeta pm
-			ON p.ID = pm.post_id
-    		WHERE pm.meta_key = %s 
-      		AND pm.meta_value = %s 
+			    ON p.ID = pm.post_id
+    		WHERE p.post_type = %s
+    		    AND pm.meta_key = %s 
+      		    AND pm.meta_value = %s 
       		ORDER BY p.ID DESC
 			",
+            esc_sql( $this->post_type ),
 			esc_sql( $key ),
 			esc_sql( $value )
 		) );
