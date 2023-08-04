@@ -1605,11 +1605,7 @@ class DataSync {
 			'post_excerpt' => $caption
 		];
 
-		if ( $attach_id = $this->attachment_id() ) {
-			$attachment['ID'] = $attach_id;
-		}
-
-		elseif ( $attachment['ID'] = $this->attachment_exists( $image_url ) ) {
+		if ( $attachment['ID'] = $this->attachment_exists( $image_url ) ) {
 
 			Log::write( 'attachment', "{$attachment['ID']} - {$attachment['post_title']}", 'Exists' );
 
@@ -1805,29 +1801,6 @@ class DataSync {
 		}
 
 		return "{$upload_dir['basedir']}/{$basename}";
-
-	}
-
-	/**
-	 * Attachment ID.
-	 *
-	 * @return bool|false|int
-	 */
-
-	public function attachment_id() {
-
-		if ( 'post_id' === $this->primary_id['search_in'] ) {
-
-			$attach_id = (int) $this->primary_id['post_id'];
-
-			// Check to see if the post ID exists.
-			if ( get_post_status( $attach_id ) ) {
-				return $attach_id;
-			}
-
-		}
-
-		return false;
 
 	}
 
