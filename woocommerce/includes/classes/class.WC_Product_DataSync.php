@@ -440,7 +440,6 @@ class WC_Product_DataSync {
 
 				// Set the post data for the variation.
 				$variation['post_data']['post_parent'] = $parent_id;
-				$variation['post_data']['post_type'] = 'product_variation';
 
 				// Set the current vaiation active.
 				if ( ! isset( $variation['post_data']['post_status'] ) ) {
