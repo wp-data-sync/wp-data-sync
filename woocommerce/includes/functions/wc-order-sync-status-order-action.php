@@ -24,7 +24,7 @@ add_filter( 'woocommerce_order_actions', function( $actions ) {
 	global $theorder;
 
 	if ( get_post_meta( $theorder->id, WCDSYNC_ORDER_SYNC_STATUS, true ) ) {
-		$actions['wpds_reset_order_sync_status'] = __( 'Remove order sync status', 'wp-data-sync' );
+		$actions['wpds_order_sync_status'] = __( 'Reset order sync status', 'wp-data-sync' );
 	}
 
 	return $actions;
@@ -37,7 +37,7 @@ add_filter( 'woocommerce_order_actions', function( $actions ) {
  * @param \WC_Order $order
  */
 
-add_action( 'woocommerce_order_action_wpds_reset_order_sync_status', function ( $order ) {
+add_action( 'woocommerce_order_action_reset_order_sync_status', function ( $order ) {
 
 	$order->add_order_note( __( 'Manually removed order sync status.', 'wp-data-sync' ) );
 

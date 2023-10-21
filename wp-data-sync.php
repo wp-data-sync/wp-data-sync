@@ -3,7 +3,7 @@
  * Plugin Name: WP Data Sync
  * Plugin URI:  https://wpdatasync.com/products/
  * Description: Sync raw data from any data source to your WordPress website
- * Version:     2.7.8
+ * Version:     2.7.10
  * Author:      WP Data Sync
  * Author URI:  https://wpdatasync.com
  * License:     GPL2
@@ -34,8 +34,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $uploads = wp_get_upload_dir();
 
-$defines = [
-	'WPDSYNC_VERSION'       => '2.7.8',
+$constants = [
+	'WPDSYNC_VERSION'       => '2.7.10',
 	'WPDSYNC_CAP'           => 'manage_options',
 	'WPDSYNC_PLUGIN'        => plugin_basename( __FILE__ ),
 	'WPDSYNC_VIEWS'         => plugin_dir_path( __FILE__ ) . 'views/',
@@ -45,9 +45,9 @@ $defines = [
 	'WPDSYNC_SYNC_DISABLED' => 'wpds_sync_status_disabled'
 ];
 
-foreach ( $defines as $define => $value ) {
-	if ( ! defined( $define ) ) {
-		define( $define, $value );
+foreach ( $constants as $constant => $value ) {
+	if ( ! defined( $constant ) ) {
+		define( $constant, $value );
 	}
 }
 
