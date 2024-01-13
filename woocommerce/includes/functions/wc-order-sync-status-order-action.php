@@ -23,7 +23,9 @@ add_filter( 'woocommerce_order_actions', function( $actions ) {
 
 	global $theorder;
 
-	if ( get_post_meta( $theorder->id, WCDSYNC_ORDER_SYNC_STATUS, true ) ) {
+    $synced = $theorder->get_meta( WCDSYNC_ORDER_SYNC_STATUS );
+
+	if ( ! empty( $synced ) ) {
 		$actions['wpds_order_sync_status'] = __( 'Reset order sync status', 'wp-data-sync' );
 	}
 
@@ -37,10 +39,10 @@ add_filter( 'woocommerce_order_actions', function( $actions ) {
  * @param \WC_Order $order
  */
 
-add_action( 'woocommerce_order_action_reset_order_sync_status', function ( $order ) {
+add_action( 'woocommerce_order_action_wpds_order_sync_status', function ( \WC_Order $order ) {
 
 	$order->add_order_note( __( 'Manually removed order sync status.', 'wp-data-sync' ) );
-
-	delete_post_meta( $order->id, WCDSYNC_ORDER_SYNC_STATUS );
+    $order->delete_meta_data( WCDSYNC_ORDER_SYNC_STATUS );
+    $order->save();
 
 } );

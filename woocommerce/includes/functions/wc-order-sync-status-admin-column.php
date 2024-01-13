@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param array $columns
  */
 
-add_filter( 'manage_edit-shop_order_columns', function( $columns ) {
+add_filter( 'woocommerce_shop_order_list_table_columns', function( $columns ) {
 
 	if ( Settings::is_checked( 'wp_data_sync_show_order_sync_status_admin_column' ) ) {
 		$columns['wpds_sync_status'] = __( 'Sync Status', 'wp-data-sync' );
@@ -35,14 +35,17 @@ add_filter( 'manage_edit-shop_order_columns', function( $columns ) {
  * Display contents of the order sync status admin column.
  *
  * @param string $column
- * @param int    $product_id
+ * @param int    $order_id
  */
 
-add_action( 'manage_shop_order_posts_custom_column', function( $column, $product_id ) {
+add_action( 'woocommerce_shop_order_list_table_custom_column', function( $column, $order_id ) {
 
 	if ( 'wpds_sync_status' === $column ) {
 
-		if ( $value = get_post_meta( $product_id, WCDSYNC_ORDER_SYNC_STATUS, true ) ) {
+        $order  = wc_get_order( $order_id );
+        $synced = $order->get_meta( WCDSYNC_ORDER_SYNC_STATUS );
+
+		if ( $synced ) {
 
 			if ( 'no' !== $value ) {
 				printf( '<span class="wpds-order-export synced">%s</span>', esc_html( '&#10003;' ) );

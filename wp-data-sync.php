@@ -3,7 +3,7 @@
  * Plugin Name: WP Data Sync
  * Plugin URI:  https://wpdatasync.com/products/
  * Description: Sync raw data from any data source to your WordPress website
- * Version:     2.7.14
+ * Version:     2.8.0
  * Author:      WP Data Sync
  * Author URI:  https://wpdatasync.com
  * License:     GPL2
@@ -12,7 +12,7 @@
  * Domain Path: /languages
  *
  * WC requires at least: 4.0
- * WC tested up to: 8.3.1
+ * WC tested up to: 8.4.0
  *
  * Package:     WP_DataSync
 */
@@ -34,12 +34,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $uploads = wp_get_upload_dir();
 
+define( 'WPDSYNC_VERSION', '2.8.0' );
+define( 'WPDSYNC_PATH', plugin_dir_path( __FILE__ ) );
+define( 'WPDSYNC_URL', plugin_dir_url( __FILE__ ) );
+
 $constants = [
-	'WPDSYNC_VERSION'       => '2.7.14',
 	'WPDSYNC_CAP'           => 'manage_options',
 	'WPDSYNC_PLUGIN'        => plugin_basename( __FILE__ ),
-	'WPDSYNC_VIEWS'         => plugin_dir_path( __FILE__ ) . 'views/',
-	'WPDSYNC_ASSETS'        => plugins_url( 'assets/', __FILE__ ),
+    'WPDSYNC_VIEWS'         => WPDSYNC_PATH . 'views/',
+	'WPDSYNC_ASSETS'        => WPDSYNC_URL . 'assets/',
 	'WPDSYNC_LOG_DIR'       => $uploads['basedir'] . '/wp-data-sync-logs/',
 	'WPDSYNC_EP_VERSION'    => 'v2',
 	'WPDSYNC_SYNC_DISABLED' => 'wpds_sync_status_disabled'
@@ -54,17 +57,8 @@ foreach ( $constants as $constant => $value ) {
 add_action( 'plugins_loaded', function() {
 
 	// Require includes dir files
-	foreach ( glob( plugin_dir_path( __FILE__ ) . 'includes/**/*.php' ) as $file ) {
+	foreach ( glob( WPDSYNC_PATH . 'includes/**/*.php' ) as $file ) {
 		require_once $file;
-	}
-
-	// Require test dir files in development envirnment.
-	if ( defined( 'WPDS_LOCAL_DEV' ) && WPDS_LOCAL_DEV ) {
-
-		foreach ( glob( plugin_dir_path( __FILE__ ) . 'tests/*.php' ) as $file ) {
-			require_once $file;
-		}
-
 	}
 
 	if ( is_admin() ) {
@@ -83,8 +77,17 @@ add_action( 'plugins_loaded', function() {
 
 	// Requyire woocommerce dir files
 	if ( class_exists( 'woocommerce' ) ) {
-		require_once( plugin_dir_path( __FILE__ ) . 'woocommerce/wc-data-sync.php' );
+		require_once( WPDSYNC_PATH . 'woocommerce/wc-data-sync.php' );
 	}
+
+    // Require test dir files in development envirnment.
+    if ( defined( 'WPDS_LOCAL_DEV' ) && WPDS_LOCAL_DEV ) {
+
+        foreach ( glob( WPDSYNC_PATH . 'tests/*.php', GLOB_NOSORT ) as $file ) {
+            require_once $file;
+        }
+
+    }
 
 	add_action( 'init', function() {
 		load_plugin_textdomain( 'wp-data-sync', false, basename( dirname( __FILE__ ) ) . '/languages' );

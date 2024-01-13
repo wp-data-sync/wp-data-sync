@@ -77,8 +77,8 @@ class WC_Order_DataRequest extends Request {
 	public function register_route() {
 
 		register_rest_route(
-			'wp-data-sync/' . WPDSYNC_EP_VERSION,
-			'/order-request/(?P<access_token>\S+)/(?P<min_date>\S+)/(?P<limit>\d+)/(?P<cache_buster>\S+)',
+			'wp-data-sync',
+            '/' . WPDSYNC_EP_VERSION . '/order-request/(?P<access_token>\S+)/(?P<min_date>\S+)/(?P<limit>\d+)/(?P<cache_buster>\S+)',
 			[
 				'methods' => WP_REST_Server::READABLE,
 				'args'    => [
@@ -122,46 +122,60 @@ class WC_Order_DataRequest extends Request {
 
 	public function request( WP_REST_Request $request ) {
 
-		$order_data = WC_Order_Data::instance();
-
 		$min_date = $request->get_param( 'min_date' );
 		$limit    = $request->get_param( 'limit' );
-		$response = [];
+		$response = $this->get_response( $min_date, $limit );
 
-		if ( $order_ids = $this->fetch_order_ids( $min_date, $limit ) ) {
-
-			foreach ( $order_ids as $order_id ) {
-
-				$status = 'no';
-
-				if ( $order = wc_get_order( $order_id ) ) {
-
-					$_order_data = $order_data->get( $order );
-
-					if ( apply_filters( 'wp_data_sync_can_sync_order', true, $_order_data, $order_id, $order ) ) {
-
-						$response[ $order_id ] = $_order_data;
-
-						$order->add_order_note( __( 'Order synced to WP Data Sync API', 'wp-data-sync' ) );
-
-						$status = current_time( 'mysql' );
-
-					}
-
-				}
-
-				update_post_meta( $order_id, WCDSYNC_ORDER_SYNC_STATUS, $status );
-
-			}
-
-		}
-
-		Log::write( 'order-request', $request->get_url_params() );
-		Log::write( 'order-request', $response );
+		Log::write( 'order-request', [
+            'params'   => $request->get_url_params(),
+            'response' => $response
+        ] );
 
 		return rest_ensure_response( $response );
 
 	}
+
+    /**
+     * Get Response
+     *
+     * @param string $min_date
+     * @param int $limit
+     *
+     * @return array
+     */
+
+    public function get_response( $min_date, $limit ) {
+
+        $order_data = WC_Order_Data::instance();
+        $response   = [];
+
+        if ( $orders = $this->fetch_orders( $min_date, $limit ) ) {
+
+            foreach ( $orders as $order ) {
+
+                $status      = 'no';
+                $_order_data = $order_data->get( $order );
+
+                if ( apply_filters( 'wp_data_sync_can_sync_order', true, $_order_data, $order->get_id(), $order ) ) {
+
+                    $response[ $order->get_id() ] = $_order_data;
+
+                    $order->add_order_note( __( 'Order synced to WP Data Sync API', 'wp-data-sync' ) );
+
+                    $status = current_time( 'mysql' );
+
+                }
+
+                $order->update_meta_data( WCDSYNC_ORDER_SYNC_STATUS, $status );
+                $order->save();
+
+            }
+
+        }
+
+        return $response;
+
+    }
 
 	/**
 	 * Format min date.
@@ -176,15 +190,15 @@ class WC_Order_DataRequest extends Request {
 	}
 
 	/**
-	 * Fetch order ids.
+	 * Fetch orders.
 	 *
-	 * @param $min_date
-	 * @param $limit
+	 * @param string $min_date
+	 * @param int $limit
 	 *
 	 * @return array|bool
 	 */
 
-	public function fetch_order_ids( $min_date, $limit ) {
+	public function fetch_orders( $min_date, $limit ) {
 
 		global $wpdb;
 
@@ -194,36 +208,20 @@ class WC_Order_DataRequest extends Request {
 			return false;
 		}
 
-		$placeholders = join( ', ', array_fill( 0, count( $allowed_status ), '%s' ) );
-		$values       = array_merge(
-			[ $this->format_min_date( $min_date ) ],
-			array_map( 'esc_sql', $allowed_status ),
-			[ esc_sql( WCDSYNC_ORDER_SYNC_STATUS ) ],
-			[ intval( $limit ) ]
-		);
+        $orders = wc_get_orders( [
+            'limit'      => $limit,
+            'status'     => array_map( 'esc_sql', $allowed_status ),
+            'date_after' => $this->format_min_date( $min_date ),
+            'order'      => 'ASC',
+            'meta_key' => WCDSYNC_ORDER_SYNC_STATUS,
+            'meta_compare'  => 'NOT EXISTS'
+        ] );
 
-		$order_ids = $wpdb->get_col( $wpdb->prepare(
-			"
-			SELECT p.ID
-			FROM $wpdb->posts p
-			WHERE p.post_type = 'shop_order'
-			AND p.post_date > %s
-			AND p.post_status IN ($placeholders)
-			AND NOT EXISTS (
-			    SELECT * FROM $wpdb->postmeta pm
-                WHERE pm.meta_key = %s
-                AND pm.post_id = p.ID
-			)
-			LIMIT %d
-			",
-			$values
-		) );
-
-		if ( empty( $order_ids ) || is_wp_error( $order_ids ) ) {
+		if ( empty( $orders ) || is_wp_error( $orders ) ) {
 			return false;
 		}
 
-		return array_map( 'intval', $order_ids );
+		return $orders;
 
 	}
 

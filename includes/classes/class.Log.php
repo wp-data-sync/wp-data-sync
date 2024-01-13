@@ -145,7 +145,7 @@ class Log {
 
 	public static function log_files() {
 
-		$files = glob( WPDSYNC_LOG_DIR . '*.log' );
+		$files = glob( WPDSYNC_LOG_DIR . '*.log', GLOB_NOSORT );
 
 		if ( is_array( $files ) && ! empty( $files ) ) {
 			return array_map( 'basename', $files );

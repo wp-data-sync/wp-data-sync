@@ -332,7 +332,7 @@ class Settings {
 
 	public function delete_all_log_files() {
 
-		foreach ( glob( WPDSYNC_LOG_DIR . '*.log' ) as $file ) {
+		foreach ( glob( WPDSYNC_LOG_DIR . '*.log', GLOB_NOSORT ) as $file ) {
 			unlink( $file );
 		}
 
