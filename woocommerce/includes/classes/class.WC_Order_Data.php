@@ -96,6 +96,10 @@ class WC_Order_Data {
 					$order_item['sku'] = 'NA';
 				}
 
+                foreach ( $this->extended_item_keys() as $key ) {
+                    $order_item[ $key ] = $item->get_meta( "_$key" );
+                }
+
                 $order_items[ $i ] = $order_item;
                 $i++;
 
@@ -204,5 +208,31 @@ class WC_Order_Data {
 		return apply_filters( 'wp_data_sync_order_shipping', $order_shipping, $order );
 
 	}
+
+    /**
+     * Extended Item Keys
+     *
+     * @return mixed|null
+     */
+
+    public function extended_item_keys() {
+
+        return apply_filters( 'wp_data_sync_order_item_keys', [
+            'upc',
+            'mpn',
+            'gtin8',
+            'isbn',
+            'price',
+            'sale_price',
+            'regular_price',
+            'sku',
+            'height',
+            'length',
+            'width',
+            'weight',
+            'shipping_class'
+        ] );
+
+    }
 
 }

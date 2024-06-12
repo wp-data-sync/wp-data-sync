@@ -1581,8 +1581,6 @@ class DataSync {
 		 */
 		extract( $image_array );
 
-		Log::write( 'attachment', $image_url, 'Image URL' );
-
 		if ( empty( $image_url ) ) {
 			return false;
 		}
@@ -1596,8 +1594,11 @@ class DataSync {
 		$basename    = $this->basename( $image_array );
 		$image_title = preg_replace( '/\.[^.]+$/', '', $basename );
 
-		Log::write( 'attachment', $basename, 'Basename' );
-		Log::write( 'attachment', $image_title, 'Image Title' );
+		Log::write( 'attachment', [
+			'Basename'    => $basename,
+			'Image Title' => $image_title,
+			'Image URL'   => $image_url
+		], 'Before Create Image' );
 
 		$attachment = [
 			'post_title'   => empty( $title ) ? $image_title : $title,

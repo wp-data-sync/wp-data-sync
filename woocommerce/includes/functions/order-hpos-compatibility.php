@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 add_action( 'before_woocommerce_init', function(){
 
     if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
-        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', WPDSYNC_PATH, true );
+        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', WPDSYNC_PLUGIN );
     }
 
 });
