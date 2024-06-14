@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return array
  */
 
-function get_product_category_options_array() {
+function product_get_category_options_array() {
 
 	$categories = get_categories( [
 		'taxonomy'     => 'product_cat',

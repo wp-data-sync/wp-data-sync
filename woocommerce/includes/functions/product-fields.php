@@ -23,30 +23,30 @@ add_action( 'woocommerce_product_options_general_product_data', function() {
 
 	woocommerce_wp_text_input([
 		'id'          => '_upc',
-		'label'       => __( 'UPC', 'wp-data-sync-woocommerce' ),
+		'label'       => __( 'UPC', 'wp-data-sync' ),
 		'desc_tip'    => true,
-		'description' => __( 'Universal Product Code', 'wp-data-sync-woocommerce' )
+		'description' => __( 'Universal Product Code', 'wp-data-sync' )
 	]);
 
 	woocommerce_wp_text_input([
 		'id'          => '_mpn',
-		'label'       => __( 'MPN', 'wp-data-sync-woocommerce' ),
+		'label'       => __( 'MPN', 'wp-data-sync' ),
 		'desc_tip'    => true,
-		'description' => __( 'Manufacturer Part Number', 'wp-data-sync-woocommerce' )
+		'description' => __( 'Manufacturer Part Number', 'wp-data-sync' )
 	]);
 
 	woocommerce_wp_text_input([
 		'id'          => '_gtin8',
-		'label'       => __( 'GTIN', 'wp-data-sync-woocommerce' ),
+		'label'       => __( 'GTIN', 'wp-data-sync' ),
 		'desc_tip'    => true,
-		'description' => __( 'Global Trade Item Number', 'wp-data-sync-woocommerce' )
+		'description' => __( 'Global Trade Item Number', 'wp-data-sync' )
 	]);
 
 	woocommerce_wp_text_input([
 		'id'          => '_isbn',
-		'label'       => __( 'ISBN', 'wp-data-sync-woocommerce' ),
+		'label'       => __( 'ISBN', 'wp-data-sync' ),
 		'desc_tip'    => true,
-		'description' => __( 'International Standard Book Number', 'wp-data-sync-woocommerce' )
+		'description' => __( 'International Standard Book Number', 'wp-data-sync' )
 	]);
 
 } );
@@ -83,37 +83,37 @@ add_action( 'woocommerce_variation_options_pricing', function( $loop, $variation
 
 	woocommerce_wp_text_input([
 		'id'          => "_upc[$loop]",
-		'label'       => __( 'UPC', 'wp-data-sync-woocommerce' ),
+		'label'       => __( 'UPC', 'wp-data-sync' ),
 		'desc_tip'    => true,
 		'wrapper_class' => 'form-row form-row-first',
-		'description' => __( 'Universal Product Code', 'wp-data-sync-woocommerce' ),
+		'description' => __( 'Universal Product Code', 'wp-data-sync' ),
 		'value'       => get_post_meta( $variation->ID, '_upc', true )
 	]);
 
 	woocommerce_wp_text_input([
 		'id'          => "_mpn[$loop]",
-		'label'       => __( 'MPN', 'wp-data-sync-woocommerce' ),
+		'label'       => __( 'MPN', 'wp-data-sync' ),
 		'desc_tip'    => true,
 		'wrapper_class' => 'form-row form-row-last',
-		'description' => __( 'Manufacturer Part Number', 'wp-data-sync-woocommerce' ),
+		'description' => __( 'Manufacturer Part Number', 'wp-data-sync' ),
 		'value'       => get_post_meta( $variation->ID, '_mpn', true )
 	]);
 
 	woocommerce_wp_text_input([
 		'id'          => "_gtin8[$loop]",
-		'label'       => __( 'GTIN', 'wp-data-sync-woocommerce' ),
+		'label'       => __( 'GTIN', 'wp-data-sync' ),
 		'desc_tip'    => true,
 		'wrapper_class' => 'form-row form-row-first',
-		'description' => __( 'Global Trade Item Number', 'wp-data-sync-woocommerce' ),
+		'description' => __( 'Global Trade Item Number', 'wp-data-sync' ),
 		'value'       => get_post_meta( $variation->ID, '_gtin8', true )
 	]);
 
 	woocommerce_wp_text_input([
 		'id'          => "_isbn[$loop]",
-		'label'       => __( 'ISBN', 'wp-data-sync-woocommerce' ),
+		'label'       => __( 'ISBN', 'wp-data-sync' ),
 		'desc_tip'    => true,
 		'wrapper_class' => 'form-row form-row-last',
-		'description' => __( 'International Standard Book Number', 'wp-data-sync-woocommerce' ),
+		'description' => __( 'International Standard Book Number', 'wp-data-sync' ),
 		'value'       => get_post_meta( $variation->ID, '_isbn', true )
 	]);
 

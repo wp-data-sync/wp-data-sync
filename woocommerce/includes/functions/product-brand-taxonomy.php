@@ -12,60 +12,43 @@
 namespace WP_DataSync\Woo\App;
 
 use Walker_Category_Checklist;
+use WP_DataSync\App\Settings;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-add_action( 'init', function() {
+add_action( 'init', function () {
 
-	$args = apply_filters( 'wp_data_sync_brand_taxonomy_args', [
-		'labels'             => brand_taxonomy_labels(),
-		'hierarchical'       => true,
-		'show_in_nav_menus'	 => false,
-		'query_var'          => true,
-		'public' 			 => true,
-		'show_tagcloud'		 => false,
-		'show_in_quick_edit' => true
-	] );
+    if ( ! Settings::is_checked( 'wp_data_sync_product_brand_taxonomy' ) ) {
+        return;
+    }
 
-	register_taxonomy( brand_taxonomy_key(), 'product', $args );
+    $args = apply_filters( 'wp_data_sync_brand_taxonomy_args', [
+        'labels'             => apply_filters( 'wp_data_sync_brand_taxonomy_labels', [
+            'name'              => _x( 'Brands', 'Brands', 'wp-data-sync' ),
+            'singular_name'     => _x( 'Brand', 'Brand', 'wp-data-sync' ),
+            'search_items'      => __( 'Search Brands', 'wp-data-sync' ),
+            'all_items'         => __( 'All Brands', 'wp-data-sync' ),
+            'parent_item'       => __( 'Parent Brand', 'wp-data-sync' ),
+            'parent_item_colon' => __( 'Parent Brand:', 'wp-data-sync' ),
+            'edit_item'         => __( 'View Brand', 'wp-data-sync' ),
+            'update_item'       => __( 'Update Brand', 'wp-data-sync' ),
+            'add_new_item'      => __( 'Add New Brand', 'wp-data-sync' ),
+            'new_item_name'     => __( 'New Brand Name', 'wp-data-sync' ),
+            'menu_name'         => __( 'Brands', 'wp-data-sync' ),
+        ] ),
+        'hierarchical'       => true,
+        'show_in_nav_menus'  => false,
+        'query_var'          => true,
+        'public'             => true,
+        'show_tagcloud'      => false,
+        'show_in_quick_edit' => true
+    ] );
+
+    register_taxonomy( product_brand_taxonomy_key(), 'product', $args );
 
 }, 1 );
-
-/**
- * Brand taxonomy key.
- * 
- * @return mixed|void
- */
-
-function brand_taxonomy_key() {
-	return apply_filters( 'wp_data_sync_brand_taxonomy_key', 'brand' );
-}
-
-/**
- * Taxonomy labels.
- *
- * @return array
- */
-
-function brand_taxonomy_labels() {
-
-	return apply_filters( 'wp_data_sync_brand_taxonomy_labels', [
-		'name'              => _x( 'Brands', 'Brands', 'wp-data-sync-woocommerce' ),
-		'singular_name'     => _x( 'Brand', 'Brand', 'wp-data-sync-woocommerce' ),
-		'search_items'      => __( 'Search Brands', 'wp-data-sync-woocommerce' ),
-		'all_items'         => __( 'All Brands', 'wp-data-sync-woocommerce' ),
-		'parent_item'       => __( 'Parent Brand', 'wp-data-sync-woocommerce' ),
-		'parent_item_colon' => __( 'Parent Brand:', 'wp-data-sync-woocommerce' ),
-		'edit_item'         => __( 'View Brand', 'wp-data-sync-woocommerce' ),
-		'update_item'       => __( 'Update Brand', 'wp-data-sync-woocommerce' ),
-		'add_new_item'      => __( 'Add New Brand', 'wp-data-sync-woocommerce' ),
-		'new_item_name'     => __( 'New Brand Name', 'wp-data-sync-woocommerce' ),
-		'menu_name'         => __( 'Brands', 'wp-data-sync-woocommerce' ),
-	] );
-
-}
 
 /**
  * Brand taxonomy radio buttons.
@@ -76,28 +59,32 @@ function brand_taxonomy_labels() {
  * @return mixed
  */
 
-add_filter( 'wp_terms_checklist_args', function( $args, $product_id ) {
+add_filter( 'wp_terms_checklist_args', function ( $args, $product_id ) {
 
-    if ( ! empty( $args['taxonomy'] ) &&  brand_taxonomy_key() === $args['taxonomy'] ) {
+    if ( ! Settings::is_checked( 'wp_data_sync_product_brand_taxonomy' ) ) {
+        return;
+    }
+
+    if ( ! empty( $args['taxonomy'] ) && product_brand_taxonomy_key() === $args['taxonomy'] ) {
 
         // Don't override 3rd party walkers.
         if ( empty( $args['walker'] ) || is_a( $args['walker'], 'Walker' ) ) {
 
             class WPDS_Category_Radio extends Walker_Category_Checklist {
 
-                public function start_el( &$output, $category, $depth = 0, $args = [], $id = 0 ) {
+                public function start_el( &$output, $data_object, $depth = 0, $args = [], $current_object_id = 0 ) {
 
                     $output .= sprintf(
                         '<li id="%s-%s"><label class="selectit"><input value="%s" type="radio" name="tax_input[%s][]" id="in-%s-%s" %s %s/> %s</label></li>',
                         esc_attr( $args['taxonomy'] ),
-                        esc_attr( $category->term_id ),
-                        esc_attr( $category->term_id ),
+                        esc_attr( $data_object->term_id ),
+                        esc_attr( $data_object->term_id ),
                         esc_attr( $args['taxonomy'] ),
                         esc_attr( $args['taxonomy'] ),
-                        esc_attr( $category->term_id ),
-                        esc_attr( checked( in_array( $category->term_id, $args['selected_cats'] ), true, false ) ),
+                        esc_attr( $data_object->term_id ),
+                        esc_attr( checked( in_array( $data_object->term_id, $args['selected_cats'] ), true, false ) ),
                         esc_attr( disabled( empty( $args['disabled'] ), false, false ) ),
-                        esc_html( apply_filters( 'the_category', $category->name ) )
+                        esc_html( apply_filters( 'the_category', $data_object->name ) )
                     );
 
                 }
@@ -118,7 +105,11 @@ add_filter( 'wp_terms_checklist_args', function( $args, $product_id ) {
  * Remove Genesis category checklist toggle from brand taxonomy.
  */
 
-add_action( 'admin_enqueue_scripts', function() {
+add_action( 'admin_enqueue_scripts', function () {
+
+    if ( ! Settings::is_checked( 'wp_data_sync_product_brand_taxonomy' ) ) {
+        return;
+    }
 
     $theme = wp_get_theme();
     if ( 'genesis' !== $theme->get_template() ) {
@@ -142,3 +133,13 @@ add_action( 'admin_enqueue_scripts', function() {
     }
 
 }, 999 );
+
+/**
+ * Product Brand Taxonomy Key
+ *
+ * @return string
+ */
+
+function product_brand_taxonomy_key() {
+    return apply_filters( 'wp_data_sync_brand_taxonomy_key', 'brand' );
+}

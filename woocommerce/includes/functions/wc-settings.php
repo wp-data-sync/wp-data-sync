@@ -56,6 +56,20 @@ add_filter( 'wp_data_sync_settings', function ( $settings, $_settings ) {
     ];
 
     $settings['woocommerce'][] = [
+        'key'      => 'wp_data_sync_product_brand_taxonomy',
+        'label'    => __( 'Product Brand Taxonomy', 'wp-data-sync' ),
+        'callback' => 'input',
+        'args'     => [
+            'sanitize_callback' => 'sanitize_text_field',
+            'basename'          => 'checkbox',
+            'type'              => '',
+            'class'             => '',
+            'placeholder'       => '',
+            'info'              => __( 'Activate brand taxonomy on WooCommerce products.', 'wp-data-sync' )
+        ]
+    ];
+
+    $settings['woocommerce'][] = [
         'key'      => 'wp_data_sync_process__crosssell_ids',
         'label'    => __( 'Process Cross Sells', 'wp-data-sync' ),
         'callback' => 'input',
@@ -85,7 +99,7 @@ add_filter( 'wp_data_sync_settings', function ( $settings, $_settings ) {
 
     $settings['woocommerce'][] = [
         'key'      => 'wp_data_sync_allow_duplicate_sku',
-        'label'    => __( 'Allow Duplicate SKU', 'wp-data-sync-woocommerce' ),
+        'label'    => __( 'Allow Duplicate SKU', 'wp-data-sync' ),
         'callback' => 'input',
         'args'     => [
             'sanitize_callback' => 'sanitize_text_field',
@@ -93,7 +107,7 @@ add_filter( 'wp_data_sync_settings', function ( $settings, $_settings ) {
             'type'              => '',
             'class'             => 'allow-duplicate-sku',
             'placeholder'       => '',
-            'info'              => __( 'Allow WooCommerce to use the same SKU for multiple products or variations. This can cause issues with some functionality. Proceed at your own risk.', 'wp-data-sync-woocommerce' )
+            'info'              => __( 'Allow WooCommerce to use the same SKU for multiple products or variations. This can cause issues with some functionality. Proceed at your own risk.', 'wp-data-sync' )
         ]
     ];
 
@@ -128,7 +142,7 @@ add_filter( 'wp_data_sync_settings', function ( $settings, $_settings ) {
 
     $settings['woocommerce'][] = [
         'key'      => 'wp_data_sync_manage_backorder_status',
-        'label'    => __( 'Manage Backorder Status', 'wp-data-sync-woocommerce' ),
+        'label'    => __( 'Manage Backorder Status', 'wp-data-sync' ),
         'callback' => 'input',
         'args'     => [
             'sanitize_callback' => 'sanitize_text_field',
@@ -136,13 +150,13 @@ add_filter( 'wp_data_sync_settings', function ( $settings, $_settings ) {
             'type'              => '',
             'class'             => '',
             'placeholder'       => '',
-            'info'              => __( 'Set backorder status based on stock quantity. NOTE: Allow backorders must be set for each product.', 'wp-data-sync-woocommerce' )
+            'info'              => __( 'Set backorder status based on stock quantity. NOTE: Allow backorders must be set for each product.', 'wp-data-sync' )
         ]
     ];
 
     $settings['woocommerce'][] = [
         'key'      => 'wp_data_sync_convert_product_weight',
-        'label'    => __( 'Convert Product Weight', 'wp-data-sync-woocommerce' ),
+        'label'    => __( 'Convert Product Weight', 'wp-data-sync' ),
         'callback' => 'input',
         'args'     => [
             'sanitize_callback' => 'sanitize_text_field',
@@ -150,20 +164,20 @@ add_filter( 'wp_data_sync_settings', function ( $settings, $_settings ) {
             'selected'          => get_option( 'wp_data_sync_convert_product_weight' ),
             'name'              => 'wp_data_sync_convert_product_weight',
             'class'             => 'convert-product-weight widefat',
-            'info'              => __( 'Convert the product weight. If you do not see the conversion you need. Please contact our support team to have it added.', 'wp-data-sync-woocommerce' ),
+            'info'              => __( 'Convert the product weight. If you do not see the conversion you need. Please contact our support team to have it added.', 'wp-data-sync' ),
             'values'            => [
-                '0'               => __( 'Do Not Convert Weight', 'wp-data-sync-woocommerce' ),
-                'grams_kilograms' => __( 'Grams to Kilograms', 'wp-data-sync-woocommerce' ),
-                'kilograms_grams' => __( 'Kilograms to Grams', 'wp-data-sync-woocommerce' ),
-                'ounces_pounds'   => __( 'Pounds to Ounces', 'wp-data-sync-woocommerce' ),
-                'pounds_ounces'   => __( 'Ounces to Pounds', 'wp-data-sync-woocommerce' ),
+                '0'               => __( 'Do Not Convert Weight', 'wp-data-sync' ),
+                'grams_kilograms' => __( 'Grams to Kilograms', 'wp-data-sync' ),
+                'kilograms_grams' => __( 'Kilograms to Grams', 'wp-data-sync' ),
+                'ounces_pounds'   => __( 'Pounds to Ounces', 'wp-data-sync' ),
+                'pounds_ounces'   => __( 'Ounces to Pounds', 'wp-data-sync' ),
             ]
         ]
     ];
 
     $settings['woocommerce'][] = [
         'key'      => 'wp_data_sync_regular_price_adjustment',
-        'label'    => __( 'Regular Price Adjustment (%)', 'wp-data-sync-woocommerce' ),
+        'label'    => __( 'Regular Price Adjustment (%)', 'wp-data-sync' ),
         'callback' => 'input',
         'args'     => [
             'sanitize_callback' => 'floatval',
@@ -171,13 +185,13 @@ add_filter( 'wp_data_sync_settings', function ( $settings, $_settings ) {
             'type'              => 'number',
             'class'             => 'regular-price-adjustment',
             'placeholder'       => '',
-            'info'              => __( 'Multiply price to add/subtract price adjustment.', 'wp-data-sync-woocommerce' )
+            'info'              => __( 'Multiply price to add/subtract price adjustment.', 'wp-data-sync' )
         ]
     ];
 
     $settings['woocommerce'][] = [
         'key'      => 'wp_data_sync_sale_price_adjustment',
-        'label'    => __( 'Sale Price Adjustment (%)', 'wp-data-sync-woocommerce' ),
+        'label'    => __( 'Sale Price Adjustment (%)', 'wp-data-sync' ),
         'callback' => 'input',
         'args'     => [
             'sanitize_callback' => 'floatval',
@@ -185,7 +199,7 @@ add_filter( 'wp_data_sync_settings', function ( $settings, $_settings ) {
             'type'              => 'number',
             'class'             => 'sale-price-adjustment',
             'placeholder'       => '',
-            'info'              => __( 'Multiply price to add/subtract price adjustment.', 'wp-data-sync-woocommerce' )
+            'info'              => __( 'Multiply price to add/subtract price adjustment.', 'wp-data-sync' )
         ]
     ];
 
@@ -242,7 +256,7 @@ add_filter( 'wp_data_sync_settings', function ( $settings, $_settings ) {
             'placeholder'       => '',
             'selected'          => get_option( 'wp_data_sync_order_allowed_product_cats', [] ),
             'info'              => __( 'Include products with selected categories in order sync.', 'wp-data-sync' ),
-            'options'           => get_product_category_options_array()
+            'options'           => product_get_category_options_array()
         ]
     ];
 
