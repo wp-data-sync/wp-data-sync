@@ -62,7 +62,7 @@ add_action( 'init', function () {
 add_filter( 'wp_terms_checklist_args', function ( $args, $product_id ) {
 
     if ( ! Settings::is_checked( 'wp_data_sync_product_brand_taxonomy' ) ) {
-        return;
+        return $args;
     }
 
     if ( ! empty( $args['taxonomy'] ) && product_brand_taxonomy_key() === $args['taxonomy'] ) {
