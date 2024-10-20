@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Used to handle WooCommerce integration versions.
-define( 'WCDSYNC_VERSION', '2.2.0' );
+define( 'WCDSYNC_VERSION', '2.3.0' );
 define( 'WCDSYNC_ORDER_SYNC_STATUS', '_wpds_order_synced' );
 
 // Load WooCommerce scripts
@@ -47,24 +47,28 @@ add_action( 'wp_data_sync_after_process', function( $product_id, $data_sync ) {
 
 	if ( 'product' === $data_sync->get_post_type() || 'product_variation' === $data_sync->get_post_type() ) {
 
-        $wc_product_data_sync = WC_Product_DataSync::instance( $product_id, $data_sync );
+        if ( $product = wc_get_product( $product_id ) ) {
 
-        if ( ! empty( $data_sync->get_wc_prices() ) ) {
-            $wc_product_data_sync->prices();
+            $wc_product_data_sync = new WC_Product_DataSync( $product, $data_sync );
+
+            if ( ! empty( $data_sync->get_wc_prices() ) ) {
+                $wc_product_data_sync->prices();
+            }
+
+            if ( 'product' === $data_sync->get_post_type() ) {
+                $wc_product_data_sync->wc_process();
+            }
+
+            $wc_product_data_sync->save();
+
         }
-
-        if ( 'product' === $data_sync->get_post_type() ) {
-            $wc_product_data_sync->wc_process();
-        }
-
-        $wc_product_data_sync->save();
 
 	}
 
 }, 10, 2 );
 
 /**
- * Process WooCommece Cross Sells.
+ * Process WooCommece Cross-Sells.
  */
 
 add_action( 'wp_data_sync_integration_woo_cross_sells', function( $product_id, $values ) {
@@ -83,7 +87,7 @@ add_action( 'wp_data_sync_integration_woo_cross_sells', function( $product_id, $
 }, 10, 2 );
 
 /**
- * Process WooCommece Cross Sells.
+ * Process WooCommece Up-Sells.
  */
 
 add_action( 'wp_data_sync_integration_woo_up_sells', function( $product_id, $values ) {

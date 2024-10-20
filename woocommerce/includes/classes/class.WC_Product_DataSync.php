@@ -15,8 +15,9 @@ use WP_DataSync\Api\App\Data;
 use WP_DataSync\App\DataSync;
 use WP_DataSync\App\Log;
 use WP_DataSync\App\Settings;
+use WC_Product;
 use WC_Product_Variation;
-use Automattic\WooCommerce\Internal\ProductAttributesLookup\LookupDataStore;
+use WC_Product_Attribute;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -31,81 +32,31 @@ class WC_Product_DataSync {
 	private $data_sync;
 
 	/**
-	 * @var \WC_Product|\WC_Product_Variable
+	 * @var WC_Product
 	 */
 
 	private $product;
 
-	/**
-	 * @var int
-	 */
-
-	private $product_id;
-
-	/**
-	 * @var string
-	 */
-
-	private $product_type = 'simple';
-
     /**
      * WC_Product_DataSync constructor.
      *
-     * @param int      $product_id
-     * @param DataSync $data_sync
+     * @param WC_Product $product
+     * @param DataSync   $data_sync
      */
 
-	public function __construct(  $product_id, $data_sync ) {
-
-        $this->set_product( $product_id );
-        $this->set_product_id( $product_id );
+	public function __construct( $product, $data_sync ) {
+        $this->set_product( $product );
         $this->set_data_sync( $data_sync );
-
-	}
-
-	/**
-	 * Instance.
-	 *
-     * @param int      $product_id
-     * @param DataSync $data_sync
-     *
-	 * @return WC_Product_DataSync
-	 */
-
-	public static function instance( $product_id, $data_sync ) {
-		return new self( $product_id, $data_sync );
 	}
 
 	/**
 	 * Set Product
 	 *
-	 * @param int $product_id
+	 * @param WC_Product $product
 	 */
 
-	public function set_product( $product_id ) {
-		$this->product = wc_get_product( $product_id );
-	}
-
-	/**
-	 * Set Product ID
-	 *
-	 * @param int $product_id
-	 */
-
-	public function set_product_id( $product_id ) {
-		$this->product_id = (int) $product_id;
-	}
-
-	/**
-	 * Set product type.
-	 *
-	 * @param $product_type
-	 *
-	 * @return void
-	 */
-
-	public function set_product_type( $product_type ) {
-		$this->product_type = $product_type;
+	public function set_product( $product ) {
+		$this->product = $product;
 	}
 
 	/**
@@ -124,40 +75,25 @@ class WC_Product_DataSync {
 
 	public function wc_process() {
 
+        if ( $this->data_sync->get_taxonomies() ) {
+            $this->product_visibility();
+        }
+
 		if ( $this->data_sync->get_wc_categories() ) {
 			$this->categories();
 		}
 
 		if ( $this->data_sync->get_attributes() ) {
-
 			$this->attributes();
-			$this->data_sync->reset_term_taxonomy_count();
-
-			// Create/update the attribute lookup tables.
-			if ( class_exists( 'Automattic\WooCommerce\Internal\ProductAttributesLookup\LookupDataStore' ) ) {
-				$data_store = new LookupDataStore();
-				$data_store->create_data_for_product( $this->product );
-			}
-
 		}
 
-		if (
-			has_term( 'variable', 'product_type', $this->product_id )
-			||
-			has_term( 'variable-subscription', 'product_type', $this->product_id )
-		) {
-			$this->set_variations_inactive();
-		}
+        if ( $this->product->is_type( 'variable' ) || $this->product->is_type( 'variable-subscription' ) ) {
+            $this->set_variations_inactive();
 
-		if ( $this->data_sync->get_variations() ) {
-			$this->variations();
-		}
-
-		if ( $this->data_sync->get_taxonomies() ) {
-			$this->product_visibility();
-		}
-
-		$this->product_type();
+            if ( $this->data_sync->get_variations() ) {
+                $this->variations();
+            }
+        }
 
 	}
 
@@ -173,40 +109,20 @@ class WC_Product_DataSync {
 
         extract( $prices );
 
-        // We cannot have an empty regular price.
-        if ( empty( $_regular_price ) ) {
-           $_regular_price = $this->product->get_regular_price();
+        if ( isset( $_regular_price ) ) {
+            $this->product->set_regular_price( $_regular_price );
         }
 
-        /**
-         * If the sale price is provided, but empty, we can still use the empty value.
-         */
-        if ( ! isset( $_sale_price ) ) {
-            $_sale_price = $this->product->get_sale_price();;
+        if ( isset( $_sale_price ) ) {
+            $this->product->set_sale_price( $_sale_price );
         }
-        elseif ( isset( $_sale_price ) && empty( $_sale_price ) ) {
-            $_sale_price = '';
-        }
-
-        /**
-         * We must set the prices before we can evalaueare WC_Product::is_on_sale().
-         */
-        $this->product->set_regular_price( $_regular_price );
-        $this->product->set_sale_price( $_sale_price );
-
-        /**
-         * Get the price based on the sale status of the product.
-         */
-        $_price = $this->product->is_on_sale() ? $_sale_price : $_regular_price;
-
-        $this->product->set_price( $_price );
 
         Log::write( 'wc-prices', [
             'product_id'    => $this->product->get_id(),
             'is_on_sale'    => $this->product->is_on_sale(),
-            'regular_price' => $_regular_price,
-            'sale_price'    => $_sale_price,
-            'price'         => $_price,
+            'price'         => $this->product->get_price(),
+            'regular_price' => $this->product->get_regular_price(),
+            'sale_price'    => $this->product->get_sale_price(),
             'api_prices'    => $prices
         ], 'Set WC Prices' );
 
@@ -258,12 +174,12 @@ class WC_Product_DataSync {
 		}
 
 		Log::write( 'wc-dategories', [
-			'product_id' => $this->product_id,
+			'product_id' => $this->product->get_id(),
 			'strings'    => $category_strings,
 			'term_ids'   => $term_ids
 		] );
 
-		wp_set_object_terms( $this->product_id, $term_ids, 'product_cat', $append );
+        $this->product->set_category_ids( $term_ids );
 
 	}
 
@@ -273,202 +189,150 @@ class WC_Product_DataSync {
 
 	public function attributes() {
 
-		$attributes = $this->data_sync->get_attributes();
+        if ( empty( $this->data_sync->get_attributes() ) ) {
+            return;
+        }
 
-		if ( empty( $attributes ) ) {
-			return;
-		}
+        $_attributes = [];
+        $position    = 1;
 
-		$product_attributes = [];
+        foreach ( $this->data_sync->get_attributes() as $args ) {
 
-		foreach ( $attributes as $position => $attribute ) {
+            extract( $args );
 
-			if ( is_array( $attribute ) ) {
+            $attribute = new WC_Product_Attribute();
+            $taxonomy_id = 0;
 
-				extract( $attribute );
+            if ( $is_taxonomy ) {
+                extract( $this->get_attribute( $name ) );
+            }
 
-				if ( $is_taxonomy ) {
+            $attribute->set_id( $taxonomy_id );
+            $attribute->set_name( $name );
+            $attribute->set_position( $position );
+            $attribute->set_visible( $is_visible );
+            $attribute->set_variation( $is_variation );
+            $attribute->set_options( $values );
 
-					$taxonomy = $this->attribute_taxonomy( $name );
-					$term_ids = $this->attribute_term_ids( $taxonomy, $attribute );
+            $_attributes[] = $attribute;
+            $position ++;
 
-					wp_set_object_terms( $this->product_id, $term_ids, $taxonomy );
+        }
 
-				}
-
-				$product_attributes[ $is_taxonomy ? $taxonomy : $name ] = [
-					'name'         => $is_taxonomy ? $taxonomy : $name,
-					'value'        => join( '|', $values ),
-					'position'     => $position,
-					'is_visible'   => (int) $is_visible,
-					'is_variation' => (int) $is_variation,
-					'is_taxonomy'  => (int) $is_taxonomy
-				];
-
-			}
-
-		}
-
-		update_post_meta( $this->product_id, '_product_attributes', $product_attributes );
-
-		do_action( 'wp_data_sync_attributes', $this->product_id, $product_attributes );
+        $this->product->set_attributes( $_attributes );
 
 	}
 
-	/**
-	 * Get the attribute term ids.
-	 *
-	 * @param $taxonomy
-	 * @param $attribute
-	 *
-	 * @return array
-	 */
+    /**
+     * Attribute taxonomy.
+     *
+     * @param $raw_name
+     *
+     * @return array
+     */
 
-	public function attribute_term_ids( $taxonomy, $attribute ) {
+    public function get_attribute( $raw_name ) {
 
-		extract( $attribute );
+        // These are exported as labels, so convert the label to a name if possible first.
+        $attribute_labels = wp_list_pluck( wc_get_attribute_taxonomies(), 'attribute_label', 'attribute_name' );
+        $attribute_name   = array_search( $raw_name, $attribute_labels, true );
 
-		$term_ids = [];
+        if ( ! $attribute_name ) {
+            $attribute_name = wc_sanitize_taxonomy_name( $raw_name );
+        }
 
-		foreach ( $values as $value ) {
+        $taxonomy_id   = wc_attribute_taxonomy_id_by_name( $attribute_name );
+        $taxonomy_name = wc_attribute_taxonomy_name( $attribute_name );
 
-			if ( ! empty( $value ) ) {
+        if ( $taxonomy_id ) {
+            return [
+                'taxonomy_id' => $taxonomy_id,
+                'name'        => $taxonomy_name,
+            ];
+        }
 
-				if( $term_id = $this->data_sync->set_term( [ 'name' => $value ], $taxonomy ) ) {
-					$term_ids[] = $term_id;
-				}
+        // If the attribute does not exist, create it.
+        $taxonomy_id = wc_create_attribute( [
+            'name'         => $raw_name,
+            'slug'         => $attribute_name,
+            'type'         => 'select',
+            'order_by'     => 'menu_order',
+            'has_archives' => false,
+        ] );
 
-			}
+        // Register as taxonomy while importing.
+        register_taxonomy(
+            $taxonomy_name,
+            apply_filters( 'woocommerce_taxonomy_objects_' . $taxonomy_name, [ 'product' ] ),
+            apply_filters( 'woocommerce_taxonomy_args_' . $taxonomy_name, [
+                'labels'       => [
+                    'name' => $raw_name,
+                ],
+                'hierarchical' => true,
+                'show_ui'      => false,
+                'query_var'    => true,
+                'rewrite'      => false,
+            ] )
+        );
 
-		}
+        return [
+            'taxonomy_id' => $taxonomy_id,
+            'name'        => $taxonomy_name,
+        ];;
 
-		return $term_ids;
-
-	}
-
-	/**
-	 * Attribute taxonomy.
-	 *
-	 * @param $raw_name
-	 *
-	 * @return string
-	 */
-
-	public function attribute_taxonomy( $raw_name ) {
-
-		// These are exported as labels, so convert the label to a name if possible first.
-		$attribute_labels = wp_list_pluck( wc_get_attribute_taxonomies(), 'attribute_label', 'attribute_name' );
-		$attribute_name   = array_search( $raw_name, $attribute_labels, true );
-
-		if ( ! $attribute_name ) {
-			$attribute_name = wc_sanitize_taxonomy_name( $raw_name );
-		}
-
-		$attribute_id  = wc_attribute_taxonomy_id_by_name( $attribute_name );
-		$taxonomy_name = wc_attribute_taxonomy_name( $attribute_name );
-
-		if ( $attribute_id ) {
-			return $taxonomy_name;
-		}
-
-		// If the attribute does not exist, create it.
-		$attribute_id = wc_create_attribute( [
-			'name'         => $raw_name,
-			'slug'         => $attribute_name,
-			'type'         => 'select',
-			'order_by'     => 'menu_order',
-			'has_archives' => false,
-		] );
-
-		// Register as taxonomy while importing.
-		register_taxonomy(
-			$taxonomy_name,
-			apply_filters( 'woocommerce_taxonomy_objects_' . $taxonomy_name, [ 'product' ] ),
-			apply_filters( 'woocommerce_taxonomy_args_' . $taxonomy_name, [
-				'labels'       => [
-					'name' => $raw_name,
-				],
-				'hierarchical' => true,
-				'show_ui'      => false,
-				'query_var'    => true,
-				'rewrite'      => false,
-			] )
-		);
-
-		return $taxonomy_name;
-
-	}
+    }
 
 	/**
-	 * Set variations inactive.
+	 * Variations
 	 *
-	 * We want to set all variations inactive.
-	 * Later when variations are updated,
-	 * we will set only current variations active.
-	 */
-
-	public function set_variations_inactive() {
-
-		global $wpdb;
-
-		$wpdb->update(
-			$wpdb->posts,
-			[ 'post_status' => 'private' ],
-			[ 'post_parent' => $this->product_id ]
-		);
-
-	}
-
-	/**
-	 * Variations.
-	 *
-	 * @link https://woocommerce.github.io/code-reference/classes/WC-Product-Variation.html
-	 *
-	 * @throws \WC_Data_Exception
+	 * @return viod
 	 */
 
 	public function variations() {
 
-		$variations = $this->data_sync->get_variations();
+		$_variations = $this->data_sync->get_variations();
 
-		if ( is_array( $variations ) ) {
+		if ( is_array( $_variations ) ) {
 
 			$data_sync = DataSync::instance();
-			$parent_id = $this->product_id;
 
-			foreach ( $variations as $i => $variation ) {
+			foreach ( $_variations as $i => $values ) {
 
-				// Set the post data for the variation.
-				$variation['post_data']['post_parent'] = $parent_id;
+                $values['post_data']['post_parent'] = $this->product->get_id();
 
-				// Set the current vaiation active.
-				if ( ! isset( $variation['post_data']['post_status'] ) ) {
-					$variation['post_data']['post_status'] = 'publish';
-				}
+                $data_sync->set_properties( $values );
+                $data_sync->process();
 
-				// Set the variation menu order.
-				if ( ! isset( $variation['post_data']['menu_order'] ) ) {
-					$variation['post_data']['menu_order'] = ( $i + 1 );
-				}
+                $variation_id = $data_sync->get_post_id();
 
-				$data_sync->set_properties( $variation );
-				$data_sync->process();
+                $variation = new WC_Product_Variation();
 
-				$variation_id = $data_sync->get_post_id();
+                $variation->set_id( $variation_id );
+                $variation->set_parent_id( $this->product->get_id() );
+                $variation->set_status( 'publish' );
+                $variation->set_menu_order( $i + 1 );
 
 				if ( $selected_options =  $data_sync->get_selected_options() ) {
-					$this->selected_options( $selected_options, $variation_id );
+
+                    $attributes = [];
+
+                    foreach ( $selected_options as $name => $value ) {
+
+                        if ( $this->is_attribute_taxonomy( $name ) ) {
+                            $name = wc_sanitize_taxonomy_name( $name );
+                            $name = wc_attribute_taxonomy_name( $name );
+                            $value = sanitize_title( $value );
+                        }
+
+                        $attributes['attribute_' . $name  ] = $value;
+
+                    }
+
+                    $variation->set_attributes( $attributes );
+
 				}
 
-				// Set all missing product variation defaults
-				$_variation = new WC_Product_Variation( $variation_id );
-				$_variation->save();
-
-				Log::write( 'variation', [
-					'Variation ID'   => $variation_id,
-					'Parent ID'      => $parent_id,
-					'Variation Data' => $variation
-				] );
+                $variation->save();
 
 			}
 
@@ -476,46 +340,31 @@ class WC_Product_DataSync {
 
 	}
 
-	/**
-	 * Selected Options
-	 *
-	 * Selected product variation options.
-	 *
-	 * @param array $selected_options
-	 * @param int   $variation_id
-	 *
-	 * @return void
-	 */
+    /**
+     * Is Attribute Taxonomy
+     *
+     * @param $name
+     *
+     * @return false|mixed
+     */
 
-	public function selected_options( $selected_options, $variation_id ) {
+    public function is_attribute_taxonomy( $name ) {
 
-		if ( is_array( $selected_options ) ) {
+        $attributes = $this->data_sync->get_attributes();
 
-			foreach ( $selected_options as $option_name => $option_value ) {
+        if ( empty( $attributes ) ) {
+            return false;
+        }
 
-				$taxonomy = $this->attribute_taxonomy( $option_name );
+        $i = array_search( $name, array_column( $attributes, 'name' ) );
 
-				$term_array = [
-					'name'        => $option_value,
-					'description' => '',
-					'thumb_url'   => '',
-					'term_meta'   => '',
-					'parents'     => ''
-				];
+        if ( false !== $i ) {
+            return $attributes[ $i ]['is_taxonomy'];
+        }
 
-				if( $term_id = $this->data_sync->set_term( $term_array, $taxonomy ) ) {
+        return false;
 
-					$term = get_term( $term_id, $taxonomy );
-
-					update_post_meta( $variation_id, "attribute_$taxonomy", $term->slug );
-
-				}
-
-			}
-
-		}
-
-	}
+    }
 
 	/**
 	 * Product visibility.
@@ -530,12 +379,7 @@ class WC_Product_DataSync {
 		 * Should we preserve the current product visibility?
 		 */
 		if ( Settings::is_checked( 'wp_data_sync_use_current_product_visibility' ) ) {
-
-			// Check for any product visibility.
-			if ( has_term( '', 'product_visibility', $this->product_id ) ) {
-				return;
-			}
-
+            return;
 		}
 
 		$term       = NULL;
@@ -549,56 +393,39 @@ class WC_Product_DataSync {
 
 		}
 
-		Log::write( 'product-visibility', "API Term: $term " );
-
 		if ( empty( $term ) ) {
-
 			$term = get_option( 'wp_data_sync_product_visibility', 'visible' );
-
-			Log::write( 'product-visibility', "Default Term: $term " );
-
 		}
 
-		wp_set_object_terms( $this->product_id, $term, 'product_visibility' );
+        $allowed_terms = wc_get_product_visibility_options();
+
+        if ( empty( $term ) || ! array_key_exists( $term, $allowed_terms ) ) {
+            $term = 'visible';
+        }
+
+        $this->product->set_catalog_visibility( $term );
 
 	}
 
-	/**
-	 * Product type.
-	 *
-	 * @since 2.1.21
-	 */
+    /**
+     * Set variations inactive.
+     *
+     * We want to set all variations inactive.
+     * Later when variations are updated,
+     * we will set only current variations active.
+     */
 
-	public function product_type() {
+    public function set_variations_inactive() {
 
-		if ( $taxonomies = $this->data_sync->get_taxonomies() ) {
+        global $wpdb;
 
-			if ( ! empty( $taxonomies['product_type'] ) && is_array( $taxonomies['product_type'] ) ) {
+        $wpdb->update(
+            $wpdb->posts,
+            [ 'post_status' => 'private' ],
+            [ 'post_parent' => $this->product->get_id() ]
+        );
 
-				foreach( $taxonomies['product_type'] as $term ) {
-
-					if ( ! empty( $term['name'] ) ) {
-						$this->set_product_type( $term['name'] );
-					}
-
-				}
-
-			}
-
-		}
-
-		Log::write( 'product-type', [
-			'product_id' => $this->product_id,
-			'product_type' => $this->product_type
-		], 'Product Type' );
-
-		$result = wp_set_object_terms( $this->product_id, [ $this->product_type ], 'product_type' );
-
-		if ( is_wp_error( $result ) ) {
-			Log::write( 'wp-error', $result, 'Product Type' );
-		}
-
-	}
+    }
 
     /**
      * Save
