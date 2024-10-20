@@ -278,7 +278,7 @@ class WC_Product_DataSync {
         return [
             'taxonomy_id' => $taxonomy_id,
             'name'        => $taxonomy_name,
-        ];;
+        ];
 
     }
 
