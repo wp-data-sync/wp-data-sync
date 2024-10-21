@@ -319,9 +319,12 @@ class WC_Product_DataSync {
                     foreach ( $selected_options as $name => $value ) {
 
                         if ( $this->is_attribute_taxonomy( $name ) ) {
-                            $name = wc_sanitize_taxonomy_name( $name );
-                            $name = wc_attribute_taxonomy_name( $name );
+                            $name  = wc_sanitize_taxonomy_name( $name );
+                            $name  = wc_attribute_taxonomy_name( $name );
                             $value = sanitize_title( $value );
+                        }
+                        else {
+                            $name  = wc_sanitize_taxonomy_name( $name );
                         }
 
                         $attributes['attribute_' . $name  ] = $value;
