@@ -686,11 +686,13 @@ class DataSync {
 
 		$sql = $wpdb->prepare(
 			"
-			SELECT post_id 
-    		FROM $wpdb->postmeta
-    		WHERE meta_key = %s 
-      			AND meta_value = %s 
-      		ORDER BY post_id DESC
+			SELECT p.ID 
+    		FROM $wpdb->posts p
+    		INNER JOIN $wpdb->postmeta pm
+    		    ON pm.post_id = p.ID
+    		WHERE pm.meta_key = %s 
+      			AND pm.meta_value = %s 
+      		ORDER BY p.ID DESC
 			",
 			esc_sql( $key ),
 			esc_sql( $value )
@@ -745,13 +747,16 @@ class DataSync {
 
 		$post_ids = $wpdb->get_col( $wpdb->prepare(
 			"
-			SELECT post_id 
-    		FROM $wpdb->postmeta
-    		WHERE meta_key = %s 
-      		    AND meta_value = %s 
+			SELECT p.ID 
+    		FROM $wpdb->posts p
+    		INNER JOIN $wpdb->postmeta pm
+    		    ON pm.post_id = p.ID
+    		WHERE pm.meta_key = %s 
+      			AND pm.meta_value = %s 
+      		ORDER BY p.ID DESC
 			",
-			esc_sql( $key ),
-			esc_sql( $value )
+            esc_sql( $key ),
+            esc_sql( $value )
 		) );
 
 		if ( empty( $post_ids ) || is_wp_error( $post_ids ) ) {
