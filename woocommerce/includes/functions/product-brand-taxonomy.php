@@ -120,7 +120,7 @@ add_action( 'admin_enqueue_scripts', function () {
 
     if ( 'product' === $screen->id ) {
 
-        $taxonomy_key = brand_taxonomy_key();
+        $taxonomy_key = product_brand_taxonomy_key();
 
         wp_add_inline_script( 'jquery',
             "
