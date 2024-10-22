@@ -2,32 +2,36 @@
 # This file is distributed under the GPL2.
 msgid ""
 msgstr ""
-"Project-Id-Version: WP Data Sync 2.9.1\n"
+"Project-Id-Version: WP Data Sync 2.11.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wp-data-sync\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-06-14T17:01:21+00:00\n"
+"POT-Creation-Date: 2024-10-22T18:20:46+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.9.0\n"
+"X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: wp-data-sync\n"
 
 #. Plugin Name of the plugin
 #. Author of the plugin
+#: wp-data-sync.php
 msgid "WP Data Sync"
 msgstr ""
 
 #. Plugin URI of the plugin
+#: wp-data-sync.php
 msgid "https://wpdatasync.com/products/"
 msgstr ""
 
 #. Description of the plugin
+#: wp-data-sync.php
 msgid "Sync raw data from any data source to your WordPress website"
 msgstr ""
 
 #. Author URI of the plugin
+#: wp-data-sync.php
 msgid "https://wpdatasync.com"
 msgstr ""
 
@@ -52,7 +56,7 @@ msgstr ""
 msgid "Post Trashed"
 msgstr ""
 
-#: includes/classes/class.DataSync.php:779
+#: includes/classes/class.DataSync.php:784
 msgid "WP Data Sync Placeholder"
 msgstr ""
 
@@ -502,7 +506,7 @@ msgid "Activate brand taxonomy on WooCommerce products."
 msgstr ""
 
 #: woocommerce/includes/functions/wc-settings.php:74
-msgid "Process Cross Sells"
+msgid "Defined Cross-Sells"
 msgstr ""
 
 #: woocommerce/includes/functions/wc-settings.php:82
@@ -511,107 +515,139 @@ msgid "This relates the IDs from your data source with the IDs from your website
 msgstr ""
 
 #: woocommerce/includes/functions/wc-settings.php:88
-msgid "Process Up Sells"
+msgid "Defined Up-Sells"
 msgstr ""
 
 #: woocommerce/includes/functions/wc-settings.php:102
-msgid "Allow Duplicate SKU"
+msgid "Dynamic Product Cross-Sells"
 msgstr ""
 
 #: woocommerce/includes/functions/wc-settings.php:110
-msgid "Allow WooCommerce to use the same SKU for multiple products or variations. This can cause issues with some functionality. Proceed at your own risk."
+msgid "Dynamically display cross-sell products on the product pages. Please note: your theme must support cross-sells for products."
 msgstr ""
 
 #: woocommerce/includes/functions/wc-settings.php:116
+msgid "Dynamic Product Cross-Sells Quantity"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:156
+msgid "Dynamic Product Cross-Sells Sort Order"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:178
+msgid "Dynamic Product Up-Sells"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:186
+msgid "Dynamically display up-sell products on the product pages. Please note: your theme must support up-sells for products."
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:192
+msgid "Dynamic Product Up-Sells Quantity"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:232
+msgid "Dynamic Product Up-Sells Sort Order"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:254
+msgid "Allow Duplicate SKU"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:262
+msgid "Allow WooCommerce to use the same SKU for multiple products or variations. This can cause issues with some functionality. Proceed at your own risk."
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:268
 msgid "Update Duplicate Fields"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:125
+#: woocommerce/includes/functions/wc-settings.php:277
 msgid "When multiple products use the same indetifier, update the selected fields for all products with a duplicate indetifier value."
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:145
+#: woocommerce/includes/functions/wc-settings.php:297
 msgid "Manage Backorder Status"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:153
+#: woocommerce/includes/functions/wc-settings.php:305
 msgid "Set backorder status based on stock quantity. NOTE: Allow backorders must be set for each product."
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:159
+#: woocommerce/includes/functions/wc-settings.php:311
 msgid "Convert Product Weight"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:167
+#: woocommerce/includes/functions/wc-settings.php:319
 msgid "Convert the product weight. If you do not see the conversion you need. Please contact our support team to have it added."
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:169
+#: woocommerce/includes/functions/wc-settings.php:321
 msgid "Do Not Convert Weight"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:170
+#: woocommerce/includes/functions/wc-settings.php:322
 msgid "Grams to Kilograms"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:171
+#: woocommerce/includes/functions/wc-settings.php:323
 msgid "Kilograms to Grams"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:172
+#: woocommerce/includes/functions/wc-settings.php:324
 msgid "Pounds to Ounces"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:173
+#: woocommerce/includes/functions/wc-settings.php:325
 msgid "Ounces to Pounds"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:180
+#: woocommerce/includes/functions/wc-settings.php:332
 msgid "Regular Price Adjustment (%)"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:188
-#: woocommerce/includes/functions/wc-settings.php:202
+#: woocommerce/includes/functions/wc-settings.php:340
+#: woocommerce/includes/functions/wc-settings.php:354
 msgid "Multiply price to add/subtract price adjustment."
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:194
+#: woocommerce/includes/functions/wc-settings.php:346
 msgid "Sale Price Adjustment (%)"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:212
+#: woocommerce/includes/functions/wc-settings.php:364
 msgid "Allow Order Sync"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:220
+#: woocommerce/includes/functions/wc-settings.php:372
 msgid "Allow order details to sync with the WP Data Sync API."
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:226
+#: woocommerce/includes/functions/wc-settings.php:378
 msgid "Allowed Order Status"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:248
+#: woocommerce/includes/functions/wc-settings.php:400
 msgid "Allowed Product Categories"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:258
+#: woocommerce/includes/functions/wc-settings.php:410
 msgid "Include products with selected categories in order sync."
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:265
+#: woocommerce/includes/functions/wc-settings.php:417
 msgid "Require Valid Product"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:273
+#: woocommerce/includes/functions/wc-settings.php:425
 msgid "Require a valid poroduct in the order."
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:279
+#: woocommerce/includes/functions/wc-settings.php:431
 msgid "Show Order Sync Status Admin Column"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:287
+#: woocommerce/includes/functions/wc-settings.php:439
 msgid "Show admin column for order export status on Orders list."
 msgstr ""
 

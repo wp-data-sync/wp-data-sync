@@ -303,14 +303,22 @@ class WC_Product_DataSync {
                 $data_sync->set_properties( $values );
                 $data_sync->process();
 
-                $variation_id = $data_sync->get_post_id();
-
                 $variation = new WC_Product_Variation();
 
-                $variation->set_id( $variation_id );
+                $variation->set_id( $data_sync->get_post_id() );
                 $variation->set_parent_id( $this->product->get_id() );
                 $variation->set_status( 'publish' );
                 $variation->set_menu_order( $i + 1 );
+
+                extract( $data_sync->get_wc_prices() );
+
+                if ( isset( $_regular_price ) ) {
+                    $variation->set_regular_price( $_regular_price );
+                }
+
+                if ( isset( $_sale_price ) ) {
+                    $variation->set_sale_price( $_sale_price );
+                }
 
 				if ( $selected_options =  $data_sync->get_selected_options() ) {
 

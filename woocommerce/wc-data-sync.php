@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Used to handle WooCommerce integration versions.
-define( 'WCDSYNC_VERSION', '2.3.0' );
+define( 'WCDSYNC_VERSION', '2.4.0' );
 define( 'WCDSYNC_ORDER_SYNC_STATUS', '_wpds_order_synced' );
 
 // Load WooCommerce scripts

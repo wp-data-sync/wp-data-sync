@@ -71,7 +71,7 @@ add_filter( 'wp_data_sync_settings', function ( $settings, $_settings ) {
 
     $settings['woocommerce'][] = [
         'key'      => 'wp_data_sync_process__crosssell_ids',
-        'label'    => __( 'Process Cross Sells', 'wp-data-sync' ),
+        'label'    => __( 'Defined Cross-Sells', 'wp-data-sync' ),
         'callback' => 'input',
         'args'     => [
             'sanitize_callback' => 'sanitize_text_field',
@@ -85,7 +85,7 @@ add_filter( 'wp_data_sync_settings', function ( $settings, $_settings ) {
 
     $settings['woocommerce'][] = [
         'key'      => 'wp_data_sync_process__upsell_ids',
-        'label'    => __( 'Process Up Sells', 'wp-data-sync' ),
+        'label'    => __( 'Defined Up-Sells', 'wp-data-sync' ),
         'callback' => 'input',
         'args'     => [
             'sanitize_callback' => 'sanitize_text_field',
@@ -94,6 +94,158 @@ add_filter( 'wp_data_sync_settings', function ( $settings, $_settings ) {
             'class'             => '',
             'placeholder'       => '',
             'info'              => __( 'This relates the IDs from your data source with the IDs from your website. Please note, if the related product does not exist, this system will relate the product when it is created in the data sync.', 'wp-data-sync' )
+        ]
+    ];
+
+    $settings['woocommerce'][] = [
+        'key'      => 'wp_data_sync_dynamic_cross_sells_is_active',
+        'label'    => __( 'Dynamic Product Cross-Sells', 'wp-data-sync' ),
+        'callback' => 'input',
+        'args'     => [
+            'sanitize_callback' => 'sanitize_text_field',
+            'basename'          => 'checkbox',
+            'type'              => '',
+            'class'             => '',
+            'placeholder'       => '',
+            'info'              => __( 'Dynamically display cross-sell products on the product pages. Please note: your theme must support cross-sells for products.', 'wp-data-sync' )
+        ]
+    ];
+
+    $settings['woocommerce'][] = [
+        'key'      => 'wp_data_sync_dynamic_cross_sells_quantity',
+        'label'    => __( 'Dynamic Product Cross-Sells Quantity', 'wp-data-sync' ),
+        'callback' => 'input',
+        'args'     => [
+            'sanitize_callback' => 'sanitize_text_field',
+            'basename'          => 'select',
+            'selected'          => get_option( 'wp_data_sync_dynamic_cross_sells_quantity' ),
+            'name'              => 'wp_data_sync_dynamic_cross_sells_quantity',
+            'id'                => 'wp_data_sync_dynamic_cross_sells_quantity',
+            'type'              => '',
+            'class'             => 'regular-text',
+            'placeholder'       => '',
+            'info'              => __( '', 'wp-data-sync' ),
+            'values' =>[
+                'all' => 'All',
+                '1' => '1',
+                '2' => '2',
+                '3' => '3',
+                '4' => '4',
+                '5' => '5',
+                '6' => '6',
+                '7' => '7',
+                '8' => '8',
+                '9' => '9',
+                '10' => '10',
+                '11' => '11',
+                '12' => '12',
+                '13' => '13',
+                '14' => '14',
+                '15' => '15',
+                '16' => '16',
+                '17' => '17',
+                '18' => '18',
+                '19' => '19',
+                '20' => '20'
+            ]
+        ]
+    ];
+
+    $settings['woocommerce'][] = [
+        'key'      => 'wp_data_sync_dynamic_cross_sells_sort_order',
+        'label'    => __( 'Dynamic Product Cross-Sells Sort Order', 'wp-data-sync' ),
+        'callback' => 'input',
+        'args'     => [
+            'sanitize_callback' => 'sanitize_text_field',
+            'basename'          => 'select',
+            'selected'          => get_option( 'wp_data_sync_dynamic_cross_sells_sort_order' ),
+            'name'              => 'wp_data_sync_dynamic_cross_sells_sort_order',
+            'id'                => 'wp_data_sync_dynamic_cross_sells_sort_order',
+            'type'              => '',
+            'class'             => 'regular-text',
+            'placeholder'       => '',
+            'info'              => __( '', 'wp-data-sync' ),
+            'values' =>[
+                'random' => __( 'Random', 'wp-daya-sync' ),
+                'oldest' => __( 'Oldest', 'wp-daya-sync' ),
+                'newest' => __( 'Newest', 'wp-daya-sync' )
+            ]
+        ]
+    ];
+
+    $settings['woocommerce'][] = [
+        'key'      => 'wp_data_sync_dynamic_up_sells_is_active',
+        'label'    => __( 'Dynamic Product Up-Sells', 'wp-data-sync' ),
+        'callback' => 'input',
+        'args'     => [
+            'sanitize_callback' => 'sanitize_text_field',
+            'basename'          => 'checkbox',
+            'type'              => '',
+            'class'             => '',
+            'placeholder'       => '',
+            'info'              => __( 'Dynamically display up-sell products on the product pages. Please note: your theme must support up-sells for products.', 'wp-data-sync' )
+        ]
+    ];
+
+    $settings['woocommerce'][] = [
+        'key'      => 'wp_data_sync_dynamic_up_sells_quantity',
+        'label'    => __( 'Dynamic Product Up-Sells Quantity', 'wp-data-sync' ),
+        'callback' => 'input',
+        'args'     => [
+            'sanitize_callback' => 'sanitize_text_field',
+            'basename'          => 'select',
+            'selected'          => get_option( 'wp_data_sync_dynamic_up_sells_quantity' ),
+            'name'              => 'wp_data_sync_dynamic_up_sells_quantity',
+            'id'                => 'wp_data_sync_dynamic_up_sells_quantity',
+            'type'              => '',
+            'class'             => 'regular-text',
+            'placeholder'       => '',
+            'info'              => __( '', 'wp-data-sync' ),
+            'values' =>[
+                'all' => 'All',
+                '1' => '1',
+                '2' => '2',
+                '3' => '3',
+                '4' => '4',
+                '5' => '5',
+                '6' => '6',
+                '7' => '7',
+                '8' => '8',
+                '9' => '9',
+                '10' => '10',
+                '11' => '11',
+                '12' => '12',
+                '13' => '13',
+                '14' => '14',
+                '15' => '15',
+                '16' => '16',
+                '17' => '17',
+                '18' => '18',
+                '19' => '19',
+                '20' => '20'
+            ]
+        ]
+    ];
+
+    $settings['woocommerce'][] = [
+        'key'      => 'wp_data_sync_dynamic_up_sells_sort_order',
+        'label'    => __( 'Dynamic Product Up-Sells Sort Order', 'wp-data-sync' ),
+        'callback' => 'input',
+        'args'     => [
+            'sanitize_callback' => 'sanitize_text_field',
+            'basename'          => 'select',
+            'selected'          => get_option( 'wp_data_sync_dynamic_up_sells_sort_order' ),
+            'name'              => 'wp_data_sync_dynamic_up_sells_sort_order',
+            'id'                => 'wp_data_sync_dynamic_up_sells_sort_order',
+            'type'              => '',
+            'class'             => 'regular-text',
+            'placeholder'       => '',
+            'info'              => __( '', 'wp-data-sync' ),
+            'values' =>[
+                'random' => __( 'Random', 'wp-daya-sync' ),
+                'oldest' => __( 'Oldest', 'wp-daya-sync' ),
+                'newest' => __( 'Newest', 'wp-daya-sync' )
+            ]
         ]
     ];
 

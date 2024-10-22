@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<?php foreach( $values as $value => $label ) { ?>
 
-		<?php $choice = $selected === $value ? 'selected' : ''; ?>
+		<?php $choice = $selected == $value ? 'selected' : ''; ?>
 
 		<option
 			value="<?php esc_attr_e( $value ); ?>"
