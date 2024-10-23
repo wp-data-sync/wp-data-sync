@@ -103,6 +103,12 @@ class DataSync {
 
 	private $variations = false;
 
+    /**
+     * @var string
+     */
+
+    private $product_type = 'simple';
+
 	/**
 	 * @var bool|array
 	 */
@@ -590,6 +596,16 @@ class DataSync {
 	public function get_variations() {
 		return apply_filters( 'wp_data_sync_product_variations', $this->variations, $this );
 	}
+
+    /**
+     * Get Product Type
+     *
+     * @return mixed|null
+     */
+
+    public function get_product_type() {
+        return apply_filters( 'wp_data_sync_product_type', $this->product_type, $this );
+    }
 
 	/**
 	 * Get gallery images.

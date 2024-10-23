@@ -47,6 +47,10 @@ add_action( 'wp_data_sync_after_process', function( $product_id, $data_sync ) {
 
 	if ( 'product' === $data_sync->get_post_type() || 'product_variation' === $data_sync->get_post_type() ) {
 
+        add_filter( 'woocommerce_product_type_query', function() use( $data_sync ) {
+            return $data_sync->get_product_type();
+        }, PHP_INT_MAX );
+
         if ( $product = wc_get_product( $product_id ) ) {
 
             $wc_product_data_sync = new WC_Product_DataSync( $product, $data_sync );
