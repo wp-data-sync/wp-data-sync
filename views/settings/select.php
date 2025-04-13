@@ -16,21 +16,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 } ?>
 
 <select
-	name="<?php esc_attr_e( $name ); ?>"
-	id="<?php esc_attr_e( $name ); ?>"
-	class="<?php esc_attr_e( $class ); ?>"
+	name="<?php echo esc_attr( $name ); ?>"
+	id="<?php echo esc_attr( $name ); ?>"
+	class="<?php echo esc_attr( $class ); ?>"
 >
 
-	<option value="-1"><?php _e( 'Select One', 'wp-data-sync' ); ?></option>
+	<option value="-1"><?php esc_html_e( 'Select One', 'wp-data-sync' ); ?></option>
 
 	<?php foreach( $values as $value => $label ) { ?>
 
 		<?php $choice = $selected == $value ? 'selected' : ''; ?>
 
 		<option
-			value="<?php esc_attr_e( $value ); ?>"
-			<?php esc_attr_e( $choice ); ?>
-		><?php esc_html_e( $label ); ?></option>
+			value="<?php echo esc_attr( $value ); ?>"
+			<?php echo esc_attr( $choice ); ?>
+		><?php echo esc_html( $label ); ?></option>
 
 	<?php } ?>
 

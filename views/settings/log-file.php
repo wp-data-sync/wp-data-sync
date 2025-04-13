@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! $files ) {
 
-	printf( '%s', esc_html( __( 'Allow logging for log files to be created.', 'wp-data-sync' ) ) );
+	printf( '<div>%s</div>', esc_html__( 'Allow logging for log files to be created.', 'wp-data-sync' ) );
 
 	return;
 
@@ -26,7 +26,7 @@ if ( ! $files ) {
 $file_name = get_option( Log::FILE_KEY ); ?>
 
 <p>
-	<select name="<?php esc_attr_e( Log::FILE_KEY );?>" id="log-file-select" class="log-file-select">
+	<select name="<?php echo esc_attr( Log::FILE_KEY );?>" id="log-file-select" class="log-file-select">
 		<?php printf( '<option value="-1">%s</option>', esc_html( 'Select One' ) ); ?>
 		<?php foreach ( $files as $file ) { ?>
 
@@ -37,7 +37,7 @@ $file_name = get_option( Log::FILE_KEY ); ?>
 	</select>
 </p>
 
-<p><textarea class="widefat wpds-log-content" rows="20"><?php esc_html_e( $log ); ?></textarea></p>
+<p><textarea class="widefat wpds-log-content" rows="20"><?php echo esc_html( $log ); ?></textarea></p>
 
 <script>
 	jQuery(document).ready( function($) {

@@ -12,42 +12,44 @@
 namespace WP_DataSync\App;
 
 use Monolog\Formatter\LogglyFormatter;
+use WP_Error;
+use WP_Post;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+    exit;
 }
 
 class DataSync {
 
-	/**
-	 * @var int
-	 */
+    /**
+     * @var int
+     */
 
-	private $api_item_id;
+    private $api_item_id;
 
-	/**
-	 * @var int
-	 */
+    /**
+     * @var int
+     */
 
-	private $source_id;
+    private $source_id;
 
-	/**
-	 * @var string
-	 */
+    /**
+     * @var string
+     */
 
-	private $source_name;
+    private $source_name;
 
-	/**
-	 * @var bool|array
-	 */
+    /**
+     * @var bool|array
+     */
 
-	private $primary_id = false;
+    private $primary_id = false;
 
-	/**
-	 * @var bool|int
-	 */
+    /**
+     * @var bool|int
+     */
 
-	private $post_id = false;
+    private $post_id = false;
 
     /**
      * @var string
@@ -55,53 +57,53 @@ class DataSync {
 
     private $post_type;
 
-	/**
-	 * @var bool
-	 */
+    /**
+     * @var bool
+     */
 
-	private $is_accelerated = false;
+    private $is_accelerated = false;
 
-	/**
-	 * @var bool|array
-	 */
+    /**
+     * @var bool|array
+     */
 
-	private $post_data = false;
+    private $post_data = false;
 
-	/**
-	 * @var bool|array
-	 */
+    /**
+     * @var bool|array
+     */
 
-	private $post_meta = false;
+    private $post_meta = false;
 
-	/**
-	 * @var bool|array
-	 */
+    /**
+     * @var bool|array
+     */
 
-	private $taxonomies = false;
+    private $taxonomies = false;
 
-	/**
-	 * @var bool|string
-	 */
+    /**
+     * @var bool|string
+     */
 
-	private $wc_categories = false;
+    private $wc_categories = false;
 
-	/**
-	 * @var bool|array
-	 */
+    /**
+     * @var bool|array
+     */
 
-	private $featured_image = false;
+    private $featured_image = false;
 
-	/**
-	 * @var bool|array
-	 */
+    /**
+     * @var bool|array
+     */
 
-	private $attributes = false;
+    private $attributes = false;
 
-	/**
-	 * @var bool|array
-	 */
+    /**
+     * @var bool|array
+     */
 
-	private $variations = false;
+    private $variations = false;
 
     /**
      * @var string
@@ -109,35 +111,35 @@ class DataSync {
 
     private $product_type = 'simple';
 
-	/**
-	 * @var bool|array
-	 */
+    /**
+     * @var bool|array
+     */
 
-	private $gallery_images = false;
+    private $gallery_images = false;
 
-	/**
-	 * @var bool|array
-	 */
+    /**
+     * @var bool|array
+     */
 
-	private $gallery_details = false;
+    private $gallery_details = false;
 
-	/**
-	 * @var array|bool
-	 */
+    /**
+     * @var array|bool
+     */
 
-	private $attachment = false;
+    private $attachment = false;
 
-	/**
-	 * @var bool|array
-	 */
+    /**
+     * @var bool|array
+     */
 
-	private $selected_options = false;
+    private $selected_options = false;
 
-	/**
-	 * @var bool|array
-	 */
+    /**
+     * @var bool|array
+     */
 
-	private $order_items = false;
+    private $order_items = false;
 
     /**
      * @var array
@@ -145,73 +147,74 @@ class DataSync {
 
     private $wc_prices = [];
 
-	/**
-	 * @var bool|array
-	 */
+    /**
+     * @var bool|array
+     */
 
-	private $integrations = false;
+    private $integrations = false;
 
-	/**
-	 * @var bool
-	 */
+    /**
+     * @var bool
+     */
 
-	private $is_new = false;
+    private $is_new = false;
 
-	/**
-	 * DataSync constructor.
-	 */
+    /**
+     * DataSync constructor.
+     */
 
-	public function __construct() {
-		// Empty construct
-	}
+    public function __construct() {
+        // Empty construct
+    }
 
-	/**
-	 * Instance.
-	 *
-	 * @return DataSync
-	 */
+    /**
+     * Instance.
+     *
+     * @return DataSync
+     */
 
-	public static function instance() {
-		return new self();
-	}
+    public static function instance() {
+        return new self();
+    }
 
-	/**
-	 * Set Properties
-	 *
-	 * Set property values.
-	 *
-	 * @param $data
-	 */
+    /**
+     * Set Properties
+     *
+     * Set property values.
+     *
+     * @param $data
+     */
 
-	public function set_properties( $data ) {
+    public function set_properties( $data ) {
 
-		if ( is_array( $data ) ) {
+        if ( is_array( $data ) ) {
 
-			foreach ( $data as $key => $value ) {
-				$this->$key = apply_filters( "wp_data_sync_set_property_$key", $value );
-			}
+            foreach ( $data as $key => $value ) {
+                $this->$key = apply_filters( "wp_data_sync_set_property_$key", $value );
+            }
 
-		}
+        }
 
     }
 
-	/**
-	 * Process request data.
-	 *
-	 * @return mixed
-	 */
+    /**
+     * Process request data.
+     *
+     * @return mixed
+     */
 
-	public function process() {
+    public function process() {
 
-		global $wpds_response, $process_id, $wpdb;
-		
-		$process_id = $this->get_process_id();
+        global $wpds_response, $process_id, $wpdb;
 
-		// A primary ID is required!!
-		if ( empty( $this->primary_id ) ) {
-			$wpds_response['items'][ $process_id ]['error'] = 'Primary ID empty!!';
-			return;
-		}
+        $process_id = $this->get_process_id();
+
+        // A primary ID is required!!
+        if ( empty( $this->primary_id ) ) {
+            $wpds_response['items'][ $process_id ]['error'] = 'Primary ID empty!!';
+
+            return;
+        }
 
         /**
          * Set the post ID.
@@ -226,6 +229,7 @@ class DataSync {
             }
 
             $wpds_response['items'][ $process_id ]['error'] = $error_msg;
+
             return;
         }
 
@@ -251,115 +255,117 @@ class DataSync {
         /**
          * Check the post sync status.
          */
-		if ( get_post_meta( $this->post_id, WPDSYNC_SYNC_DISABLED, true ) ) {
-			$wpds_response['items'][ $process_id ]['error'] = __( 'Post Sync Status Disabled!!', 'wp-data-sync' );
-			$wpds_response['items'][ $process_id ]['status'] = 'disabled';
-			return;
-		}
+        if ( get_post_meta( $this->post_id, wpds_sync_status_disabled, true ) ) {
+            $wpds_response['items'][ $process_id ]['error']  = __( 'Post Sync Status Disabled!!', 'wp-data-sync' );
+            $wpds_response['items'][ $process_id ]['status'] = 'disabled';
+
+            return;
+        }
 
         /**
          * Maybe trash the post.
          */
-		if ( $this->maybe_trash_post() ) {
-			$wpds_response['items'][ $process_id ]['trash'] = __( 'Post Trashed', 'wp-data-sync' );
-			return;
-		}
+        if ( $this->maybe_trash_post() ) {
+            $wpds_response['items'][ $process_id ]['trash'] = __( 'Post Trashed', 'wp-data-sync' );
+
+            return;
+        }
 
         /**
          * Process the post data.
          */
-		if ( $this->post_data ) {
+        if ( $this->post_data ) {
 
-			do_action( 'wp_data_sync_before_post_data', $this->post_data, $this->post_id, $this );
+            do_action( 'wp_data_sync_before_post_data', $this->post_data, $this->post_id, $this );
 
-			$this->post_data();
+            $this->post_data();
 
-			do_action( 'wp_data_sync_after_post_data', $this->post_data, $this->post_id, $this );
+            do_action( 'wp_data_sync_after_post_data', $this->post_data, $this->post_id, $this );
 
-		}
+        }
 
-		if ( $this->post_meta ) {
+        if ( $this->post_meta ) {
 
-			$this->post_meta();
+            $this->post_meta();
 
-			do_action( 'wp_data_sync_post_meta', $this->post_id, $this->post_meta, $this );
+            do_action( 'wp_data_sync_post_meta', $this->post_id, $this->post_meta, $this );
 
-		}
+        }
 
-		if ( $this->taxonomies ) {
+        if ( $this->taxonomies ) {
 
-			$this->taxonomy();
+            $this->taxonomy();
 
-			do_action( 'wp_data_sync_taxonomies', $this->post_id, $this->taxonomies, $this );
+            do_action( 'wp_data_sync_taxonomies', $this->post_id, $this->taxonomies, $this );
 
-			$this->reset_term_taxonomy_count();
+            $this->reset_term_taxonomy_count();
 
-		}
+        }
 
-		if ( $this->featured_image ) {
+        if ( $this->featured_image ) {
 
-			$this->set_attachment( $this->featured_image  );
-			$this->featured_image();
+            $this->set_attachment( $this->featured_image );
+            $this->featured_image();
 
-			do_action( 'wp_data_sync_featured_image', $this->post_id, $this->featured_image, $this );
+            do_action( 'wp_data_sync_featured_image', $this->post_id, $this->featured_image, $this );
 
-		}
+        }
 
-		if ( $this->gallery_images ) {
-			$this->gallery_images();
-		}
+        if ( $this->gallery_images ) {
+            $this->gallery_images();
+        }
 
-		if ( $this->attachment ) {
-			$this->attachment();
-		}
+        if ( $this->attachment ) {
+            $this->attachment();
+        }
 
-		if ( $this->integrations ) {
-			$this->integrations();
-		}
+        if ( $this->integrations ) {
+            $this->integrations();
+        }
 
-		do_action( 'wp_data_sync_after_process', $this->post_id, $this );
+        do_action( 'wp_data_sync_after_process', $this->post_id, $this );
 
-		$this->update_date();
+        $this->update_date();
 
-		return true;
+        return true;
 
-	}
+    }
 
-	/**
-	 * Get Process ID
+    /**
+     * Get Process ID
      *
-	 * @return int
-	 */
+     * @return int
+     */
 
-	public function get_process_id() {
-		
-		global $process_id;
-		
-		if ( ! isset( $process_id ) ) {
-			return 1;
-		}
+    public function get_process_id() {
 
-		$process_id++;
+        global $process_id;
 
-		return $process_id;
+        if ( ! isset( $process_id ) ) {
+            return 1;
+        }
 
-	}
+        $process_id ++;
 
-	/**
-	 * Set post id.
-	 *
-	 * @param bool $post_id
-	 */
+        return $process_id;
 
-	public function set_post_id( $post_id = false ) {
+    }
 
-		if ( ! $post_id ) {
+    /**
+     * Set post id.
+     *
+     * @param bool $post_id
+     */
+
+    public function set_post_id( $post_id = false ) {
+
+        if ( ! $post_id ) {
             $post_id = $this->fetch_post_id();
-		}
+        }
 
-		$this->post_id = $post_id;
+        $this->post_id = $post_id;
 
-	}
+    }
 
     /**
      * Set Post Type
@@ -379,161 +385,161 @@ class DataSync {
 
     }
 
-	/**
-	 * Set post data.
-	 *
-	 * @param $post_data
-	 */
+    /**
+     * Set post data.
+     *
+     * @param $post_data
+     */
 
-	public function set_post_data( $post_data ) {
-		$this->post_data = $post_data;
-	}
+    public function set_post_data( $post_data ) {
+        $this->post_data = $post_data;
+    }
 
-	/**
-	 * Set post meta.
-	 *
-	 * @param $post_meta
-	 */
+    /**
+     * Set post meta.
+     *
+     * @param $post_meta
+     */
 
-	public function set_post_meta( $post_meta ) {
-		$this->post_meta = $post_meta;
-	}
+    public function set_post_meta( $post_meta ) {
+        $this->post_meta = $post_meta;
+    }
 
-	/**
-	 * Set taxonomies.
-	 *
-	 * @param $taxonomies
-	 */
+    /**
+     * Set taxonomies.
+     *
+     * @param $taxonomies
+     */
 
-	public function set_taxonomies( $taxonomies ) {
-		$this->taxonomies = $taxonomies;
-	}
+    public function set_taxonomies( $taxonomies ) {
+        $this->taxonomies = $taxonomies;
+    }
 
-	/**
-	 * Set WooCommerce Categories
-	 *
-	 * @param string $wc_categories
-	 *
-	 * @return void
-	 */
+    /**
+     * Set WooCommerce Categories
+     *
+     * @param string $wc_categories
+     *
+     * @return void
+     */
 
-	public function set_wc_categories( $wc_categories ) {
-		$this->wc_categories = $wc_categories;
-	}
+    public function set_wc_categories( $wc_categories ) {
+        $this->wc_categories = $wc_categories;
+    }
 
-	/**
-	 * Set featured image.
-	 *
-	 * @param $featured_image
-	 */
+    /**
+     * Set featured image.
+     *
+     * @param $featured_image
+     */
 
-	public function set_featured_image( $featured_image ) {
-		$this->featured_image = $featured_image;
-	}
+    public function set_featured_image( $featured_image ) {
+        $this->featured_image = $featured_image;
+    }
 
-	/**
-	 * Set attachment.
-	 *
-	 * @param $attachment
-	 */
+    /**
+     * Set attachment.
+     *
+     * @param $attachment
+     */
 
-	public function set_attachment( $attachment ) {
-		$this->attachment = $attachment;
-	}
+    public function set_attachment( $attachment ) {
+        $this->attachment = $attachment;
+    }
 
-	/**
-	 * Set order items.
-	 *
-	 * @param $order_items
-	 */
+    /**
+     * Set order items.
+     *
+     * @param $order_items
+     */
 
-	public function set_order_items( $order_items ) {
-		$this->order_items = $order_items;
-	}
+    public function set_order_items( $order_items ) {
+        $this->order_items = $order_items;
+    }
 
-	/**
-	 * Is new.
-	 *
-	 * @return bool
-	 */
+    /**
+     * Is new.
+     *
+     * @return bool
+     */
 
-	public function get_is_new() {
-		return $this->is_new;
-	}
+    public function get_is_new() {
+        return $this->is_new;
+    }
 
-	/**
-	 * Get API Item ID
-	 *
-	 * @return int
-	 */
+    /**
+     * Get API Item ID
+     *
+     * @return int
+     */
 
-	public function get_api_item_id() {
-		return $this->api_item_id;
-	}
+    public function get_api_item_id() {
+        return $this->api_item_id;
+    }
 
-	/**
-	 * @return int
-	 */
+    /**
+     * @return int
+     */
 
-	public function get_source_id() {
-		return $this->source_id;
-	}
+    public function get_source_id() {
+        return $this->source_id;
+    }
 
-	/**
-	 * @return string
-	 */
-	
-	public function get_source_name() {
-		return $this->source_name;
-	}
+    /**
+     * @return string
+     */
 
-	/**
-	 * Get the primary ID.
-	 *
-	 * @return int|bool
-	 */
+    public function get_source_name() {
+        return $this->source_name;
+    }
 
-	public function get_primary_id() {
-		return $this->primary_id;
-	}
+    /**
+     * Get the primary ID.
+     *
+     * @return int|bool
+     */
 
-	/**
-	 * Get the post ID.
-	 *
-	 * @return int|bool
-	 */
+    public function get_primary_id() {
+        return $this->primary_id;
+    }
 
-	public function get_post_id() {
-		return $this->post_id;
-	}
+    /**
+     * Get the post ID.
+     *
+     * @return int|bool
+     */
 
-	/**
-	 * Get the post object.
-	 *
-	 * @return array|bool
-	 */
+    public function get_post_id() {
+        return $this->post_id;
+    }
 
-	public function get_post_data() {
-		return $this->post_data;
-	}
+    /**
+     * Get the post object.
+     *
+     * @return array|bool
+     */
 
-	/**
-	 * Get the post meta.
-	 *
-	 * @return array|bool
-	 */
+    public function get_post_data() {
+        return $this->post_data;
+    }
 
-	public function get_post_meta() {
-		return $this->post_meta;
-	}
+    /**
+     * Get the post meta.
+     *
+     * @return array|bool
+     */
 
-	/**
-	 * Get Post Type
-	 *
-	 * @return string
-	 */
+    public function get_post_meta() {
+        return $this->post_meta;
+    }
 
-	public function get_post_type() {
+    /**
+     * Get Post Type
+     *
+     * @return string
+     */
+
+    public function get_post_type() {
 
         if ( ! empty( $this->post_type ) ) {
             return $this->post_type;
@@ -545,57 +551,57 @@ class DataSync {
 
         return get_option( 'wp_data_sync_post_type', 'post' );
 
-	}
+    }
 
-	/**
-	 * Get the taxonomies.
-	 *
-	 * @return array|bool
-	 */
+    /**
+     * Get the taxonomies.
+     *
+     * @return array|bool
+     */
 
-	public function get_taxonomies() {
-		return $this->taxonomies;
-	}
+    public function get_taxonomies() {
+        return $this->taxonomies;
+    }
 
-	/**
-	 * Get WooCommerce Categories
-	 *
-	 * @return string|bool
-	 */
+    /**
+     * Get WooCommerce Categories
+     *
+     * @return string|bool
+     */
 
-	public function get_wc_categories() {
-		return $this->wc_categories;
-	}
+    public function get_wc_categories() {
+        return $this->wc_categories;
+    }
 
-	/**
-	 * Get featured image.
-	 *
-	 * @return array|bool
-	 */
+    /**
+     * Get featured image.
+     *
+     * @return array|bool
+     */
 
-	public function get_featured_image() {
-		return $this->featured_image;
-	}
+    public function get_featured_image() {
+        return $this->featured_image;
+    }
 
-	/**
-	 * Get the attributes.
-	 *
-	 * @return array|bool
-	 */
+    /**
+     * Get the attributes.
+     *
+     * @return array|bool
+     */
 
-	public function get_attributes() {
-		return apply_filters( 'wp_data_sync_product_attributes', $this->attributes, $this );
-	}
+    public function get_attributes() {
+        return apply_filters( 'wp_data_sync_product_attributes', $this->attributes, $this );
+    }
 
-	/**
-	 * Get variations.
-	 *
-	 * @return mixed|bool
-	 */
+    /**
+     * Get variations.
+     *
+     * @return mixed|bool
+     */
 
-	public function get_variations() {
-		return apply_filters( 'wp_data_sync_product_variations', $this->variations, $this );
-	}
+    public function get_variations() {
+        return apply_filters( 'wp_data_sync_product_variations', $this->variations, $this );
+    }
 
     /**
      * Get Product Type
@@ -607,67 +613,67 @@ class DataSync {
         return apply_filters( 'wp_data_sync_product_type', $this->product_type, $this );
     }
 
-	/**
-	 * Get gallery images.
-	 *
-	 * @return array|bool
-	 */
+    /**
+     * Get gallery images.
+     *
+     * @return array|bool
+     */
 
-	public function get_gallery_images() {
-		return apply_filters( 'wp_data_sync_product_gallery_images', $this->gallery_images, $this );
-	}
+    public function get_gallery_images() {
+        return apply_filters( 'wp_data_sync_product_gallery_images', $this->gallery_images, $this );
+    }
 
-	/**
-	 * Get gallery details.
-	 *
-	 * @return mixed|void
-	 */
+    /**
+     * Get gallery details.
+     *
+     * @return mixed|void
+     */
 
-	public function get_gallery_details() {
-		return apply_filters( 'wp_data_sync_product_gallery_details', $this->gallery_details, $this );
-	}
+    public function get_gallery_details() {
+        return apply_filters( 'wp_data_sync_product_gallery_details', $this->gallery_details, $this );
+    }
 
-	/**
-	 * Get the attachment.
-	 *
-	 * @return bool|string
-	 */
+    /**
+     * Get the attachment.
+     *
+     * @return bool|string
+     */
 
-	public function get_attachment() {
-		return $this->attachment;
-	}
+    public function get_attachment() {
+        return $this->attachment;
+    }
 
-	/**
-	 * Get selected options.
-	 *
-	 * Selected attribute options for WooCommerce variations.
-	 *
-	 * @return array|bool
-	 */
+    /**
+     * Get selected options.
+     *
+     * Selected attribute options for WooCommerce variations.
+     *
+     * @return array|bool
+     */
 
-	public function get_selected_options() {
-		return apply_filters( 'wp_data_sync_procudt_variation_selected_options', $this->selected_options, $this );
-	}
+    public function get_selected_options() {
+        return apply_filters( 'wp_data_sync_procudt_variation_selected_options', $this->selected_options, $this );
+    }
 
-	/**
-	 * Get order items.
-	 *
-	 * @return array|bool
-	 */
+    /**
+     * Get order items.
+     *
+     * @return array|bool
+     */
 
-	public function get_order_items() {
-		return $this->order_items;
-	}
+    public function get_order_items() {
+        return $this->order_items;
+    }
 
-	/**
-	 * Get Integrations.
-	 *
-	 * @return array|bool
-	 */
+    /**
+     * Get Integrations.
+     *
+     * @return array|bool
+     */
 
-	public function get_integrations() {
-		return $this->integrations;
-	}
+    public function get_integrations() {
+        return $this->integrations;
+    }
 
     /**
      * Get WooCommerce Prices
@@ -679,90 +685,29 @@ class DataSync {
         return apply_filters( 'wp_data_sync_get_wc_prices', $this->wc_prices, $this->post_meta, $this );
     }
 
-	/**
-	 * Fetch Post ID.
-	 *
+    /**
+     * Fetch Post ID.
+     *
+     * @return bool|int
      * @since 1.0.0
      *        2.7.0 Use post type to find post ID.
      *        2.7.6 Revert and not use post type to find post ID. This is necessary
      *               since we cannot determine a product_variation with accelerated sync.
      *
-	 * @return bool|int
-	 */
+     */
 
-	public function fetch_post_id() {
+    public function fetch_post_id() {
 
-		global $wpdb;
+        global $wpdb;
 
-		extract( $this->primary_id );
+        extract( $this->primary_id );
 
-		if ( empty( $key ) || empty( $value ) ) {
-			return false;
-		}
+        if ( empty( $key ) || empty( $value ) ) {
+            return false;
+        }
 
-		$sql = $wpdb->prepare(
-			"
-			SELECT p.ID 
-    		FROM $wpdb->posts p
-    		INNER JOIN $wpdb->postmeta pm
-    		    ON pm.post_id = p.ID
-    		WHERE pm.meta_key = %s 
-      			AND pm.meta_value = %s 
-      		ORDER BY p.ID DESC
-			",
-			esc_sql( $key ),
-			esc_sql( $value )
-		);
-
-		$post_id = $wpdb->get_var( $sql );
-
-		Log::write( 'fetch-post-id', [
-			'is_accelerated' => $this->is_accelerated,
-			'query'          => $sql,
-			'result'         => $post_id,
-			'error'          => $wpdb->last_error
-		] );
-
-		if ( empty( $post_id ) || is_wp_error( $post_id ) ) {
-
-			// Do not create a new post if accelerated sync.
-			if ( $this->is_accelerated ) {
-				return false;
-			}
-
-			$this->is_new = true;
-
-			return $this->insert_placeholder();
-
-		}
-
-		return (int) $post_id;
-
-	}
-
-	/**
-	 * Fetch Post IDs.
-	 *
-     * @since 1.0.0
-     *        2.7.0 Use post type to find post ID.
-     *        2.7.7 Revert and not use post type to find post ID. This is necessary
-     *               since we cannot determine a product_variation with accelerated sync.
-
-     * @return bool|array
-	 */
-
-	public function fetch_post_ids() {
-
-		global $wpdb;
-
-		extract( $this->primary_id );
-
-		if ( empty( $key ) || empty( $value ) ) {
-			return false;
-		}
-
-		$post_ids = $wpdb->get_col( $wpdb->prepare(
-			"
+        $post_id = $wpdb->get_var( $wpdb->prepare(
+            "
 			SELECT p.ID 
     		FROM $wpdb->posts p
     		INNER JOIN $wpdb->postmeta pm
@@ -773,267 +718,324 @@ class DataSync {
 			",
             esc_sql( $key ),
             esc_sql( $value )
-		) );
+        ) );
+
+        Log::write( 'fetch-post-id', [
+            'is_accelerated' => $this->is_accelerated,
+            'query'          => $wpdb->last_query,
+            'result'         => $post_id,
+            'error'          => $wpdb->last_error
+        ] );
+
+        if ( empty( $post_id ) || is_wp_error( $post_id ) ) {
+
+            // Do not create a new post if accelerated sync.
+            if ( $this->is_accelerated ) {
+                return false;
+            }
+
+            $this->is_new = true;
+
+            return $this->insert_placeholder();
+
+        }
+
+        return (int) $post_id;
+
+    }
+
+    /**
+     * Fetch Post IDs.
+     *
+     * @return bool|array
+     * @since 1.0.0
+     *        2.7.0 Use post type to find post ID.
+     *        2.7.7 Revert and not use post type to find post ID. This is necessary
+     *               since we cannot determine a product_variation with accelerated sync.
+     */
+
+    public function fetch_post_ids() {
+
+        global $wpdb;
 
-		if ( empty( $post_ids ) || is_wp_error( $post_ids ) ) {
-			return false;
-		}
+        extract( $this->primary_id );
+
+        if ( empty( $key ) || empty( $value ) ) {
+            return false;
+        }
 
-		return array_map( 'intval', $post_ids );
+        $post_ids = $wpdb->get_col( $wpdb->prepare(
+            "
+			SELECT p.ID 
+    		FROM $wpdb->posts p
+    		INNER JOIN $wpdb->postmeta pm
+    		    ON pm.post_id = p.ID
+    		WHERE pm.meta_key = %s 
+      			AND pm.meta_value = %s 
+      		ORDER BY p.ID DESC
+			",
+            esc_sql( $key ),
+            esc_sql( $value )
+        ) );
 
-	}
+        if ( empty( $post_ids ) || is_wp_error( $post_ids ) ) {
+            return false;
+        }
 
-	/**
-	 * Insert a placeholder post.
-	 *
-	 * We insert a placeholder with WP function to insure the table columns have
-	 * vaild values. Then we can update the values later if they are provided from the API.
-	 *
-	 * @return int|bool
-	 *
-	 * @since 1.10.0
-	 */
+        return array_map( 'intval', $post_ids );
 
-	public function insert_placeholder() {
+    }
 
-		$post_id = wp_insert_post( [
-			'post_title'  => __( 'WP Data Sync Placeholder', 'wp-data-sync' ),
-			'post_type'   => $this->get_post_type(),
-			'post_status' => 'draft'
-		] );
+    /**
+     * Insert a placeholder post.
+     *
+     * We insert a placeholder with WP function to insure the table columns have
+     * vaild values. Then we can update the values later if they are provided from the API.
+     *
+     * @return int|bool
+     *
+     * @since 1.10.0
+     */
 
-		if ( empty( $post_id ) || is_wp_error( $post_id ) ) {
-			return false;
-		}
+    public function insert_placeholder() {
 
-		// Set the primary ID for the placeholder early in case request fails.
-		update_post_meta( $post_id, $this->primary_id['key'], $this->primary_id['value'] );
+        $post_id = wp_insert_post( [
+            'post_title'  => __( 'WP Data Sync Placeholder', 'wp-data-sync' ),
+            'post_type'   => $this->get_post_type(),
+            'post_status' => 'draft'
+        ] );
 
-		return $post_id;
+        if ( empty( $post_id ) || is_wp_error( $post_id ) ) {
+            return false;
+        }
 
-	}
+        // Set the primary ID for the placeholder early in case request fails.
+        update_post_meta( $post_id, $this->primary_id['key'], $this->primary_id['value'] );
 
-	/**
-	 * Insert Post Row.
-	 *
-	 * Insert a row with a specific ID that
-	 * does not already exist in the posts table.
-	 *
-	 * @param $post_id
-	 *
-	 * @return bool|false|int
-	 */
+        return $post_id;
 
-	public function insert_post_row( $post_id ) {
+    }
 
-		global $wpdb;
+    /**
+     * Insert Post Row.
+     *
+     * Insert a row with a specific ID that
+     * does not already exist in the posts table.
+     *
+     * @param $post_id
+     *
+     * @return bool|false|int
+     */
 
-		$success = $wpdb->insert(
-			$wpdb->posts,
-			[
-				'ID'                    => $post_id,
-				'post_content'          => '',
-				'post_title'            => '',
-				'post_excerpt'          => '',
-				'to_ping'               => '',
-				'pinged'                => '',
-				'post_content_filtered' => ''
-			],
-			[ '%d', '%s', '%s', '%s', '%s', '%s', '%s' ]
-		);
+    public function insert_post_row( $post_id ) {
 
-		if ( empty( $success ) || is_wp_error( $success ) ) {
+        global $wpdb;
 
-			Log::write( 'wpdb-error-insert-post-row',  $success);
+        $success = $wpdb->insert(
+            $wpdb->posts,
+            [
+                'ID'                    => $post_id,
+                'post_content'          => '',
+                'post_title'            => '',
+                'post_excerpt'          => '',
+                'to_ping'               => '',
+                'pinged'                => '',
+                'post_content_filtered' => ''
+            ],
+            [ '%d', '%s', '%s', '%s', '%s', '%s', '%s' ]
+        );
 
-			return false;
+        if ( empty( $success ) || is_wp_error( $success ) ) {
 
-		}
+            Log::write( 'wpdb-error-insert-post-row', $success );
 
-		return $wpdb->insert_id;
+            return false;
 
-	}
+        }
 
-	/**
-	 * Get the default value for a post object key.
-	 */
+        return $wpdb->insert_id;
 
-	public function post_data_defaults() {
+    }
 
-		$keys = $this->post_data_keys();
+    /**
+     * Get the default value for a post object key.
+     */
 
-		foreach ( $keys as $key ) {
+    public function post_data_defaults() {
 
-			if ( ! isset( $this->post_data[ $key ] ) ) {
-				$this->post_data[ $key ] = get_option( "wp_data_sync_$key" );
-			}
+        $keys = $this->post_data_keys();
 
-		}
+        foreach ( $keys as $key ) {
 
-	}
+            if ( ! isset( $this->post_data[ $key ] ) ) {
+                $this->post_data[ $key ] = get_option( "wp_data_sync_$key" );
+            }
 
-	/**
-	 * Post data apply filter
-	 *
-	 * @since 1.9.10
-	 */
+        }
 
-	public function post_data_apply_filters() {
+    }
 
-		$keys = $this->post_data_keys();
+    /**
+     * Post data apply filter
+     *
+     * @since 1.9.10
+     */
 
-		foreach ( $keys as $key ) {
+    public function post_data_apply_filters() {
 
-			$value = false;
+        $keys = $this->post_data_keys();
 
-			if ( isset( $this->post_data[ $key ] ) ) {
-				$value = $this->post_data[ $key ];
-			}
+        foreach ( $keys as $key ) {
 
-			$this->post_data[ $key ] = apply_filters( "wp_data_sync_{$key}", $value, $this->post_id, $this );
+            $value = false;
 
-		}
+            if ( isset( $this->post_data[ $key ] ) ) {
+                $value = $this->post_data[ $key ];
+            }
 
-		// Remove the false values.
-		$this->post_data = array_filter( $this->post_data );
+            $this->post_data[ $key ] = apply_filters( "wp_data_sync_{$key}", $value, $this->post_id, $this );
 
-	}
+        }
 
-	/**
-	 * Post object keys.
-	 *
-	 * @return array
-	 */
+        // Remove the false values.
+        $this->post_data = array_filter( $this->post_data );
 
-	public function post_data_keys() {
+    }
 
-		$post_data_keys = [
-			'post_title',
-			'post_status',
-			'post_author',
-			'post_type',
-			'post_date',
-			'post_content',
-			'post_excerpt',
-			'post_password',
-			'post_parent',
-			'ping_status',
-			'comment_status'
-		];
+    /**
+     * Post object keys.
+     *
+     * @return array
+     */
 
-		return apply_filters( 'wp_data_sync_post_data_keys', $post_data_keys );
+    public function post_data_keys() {
 
-	}
+        $post_data_keys = [
+            'post_title',
+            'post_status',
+            'post_author',
+            'post_type',
+            'post_date',
+            'post_content',
+            'post_excerpt',
+            'post_password',
+            'post_parent',
+            'ping_status',
+            'comment_status'
+        ];
 
-	/**
-	 * Trash post.
-	 *
-	 * @return bool
-	 */
+        return apply_filters( 'wp_data_sync_post_data_keys', $post_data_keys );
 
-	public function maybe_trash_post() {
+    }
 
-		if ( ! isset( $this->post_data['post_status'] ) ) {
-			return false;
-		}
+    /**
+     * Trash post.
+     *
+     * @return bool
+     */
 
-		if ( 0 < $this->post_id && 'trash' === $this->post_data['post_status'] ) {
+    public function maybe_trash_post() {
 
-			if ( Settings::is_checked( 'wp_data_sync_force_delete' ) ) {
+        if ( ! isset( $this->post_data['post_status'] ) ) {
+            return false;
+        }
 
-				if ( wp_delete_post( $this->post_id, true ) ) {
-					return true;
-				}
+        if ( 0 < $this->post_id && 'trash' === $this->post_data['post_status'] ) {
 
-			}
+            if ( Settings::is_checked( 'wp_data_sync_force_delete' ) ) {
 
-			if ( wp_trash_post( $this->post_id ) ) {
-				return true;
-			}
+                if ( wp_delete_post( $this->post_id, true ) ) {
+                    return true;
+                }
 
-		}
+            }
 
-		return false;
+            if ( wp_trash_post( $this->post_id ) ) {
+                return true;
+            }
 
-	}
+        }
 
-	/**
-	 * Post data.
-	 *
-	 * @return int|\WP_Error
-	 *
-	 * @since 1.0
-	 */
+        return false;
 
-	public function post_data() {
+    }
 
-		if ( $this->is_new ) {
-			$this->post_data_defaults();
-		}
+    /**
+     * Post data.
+     *
+     * @return int|WP_Error
+     *
+     * @since 1.0
+     */
 
-		$this->post_data_apply_filters();
+    public function post_data() {
 
-		$this->post_data['ID'] = $this->post_id;
+        if ( $this->is_new ) {
+            $this->post_data_defaults();
+        }
 
-		$result = wp_update_post( $this->post_data );
+        $this->post_data_apply_filters();
 
-		if ( is_wp_error( $result ) ) {
-			Log::write( 'wp-error-update-post-data', $result );
-		}
+        $this->post_data['ID'] = $this->post_id;
 
-	}
+        $result = wp_update_post( $this->post_data );
 
-	/**
-	 * Post meta.
-	 */
+        if ( is_wp_error( $result ) ) {
+            Log::write( 'wp-error-update-post-data', $result );
+        }
 
-	public function post_meta() {
+    }
 
-		if ( is_array( $this->post_meta ) ) {
+    /**
+     * Post meta.
+     */
 
-			foreach( $this->post_meta as $meta_key => $meta_value ) {
+    public function post_meta() {
 
-				$this->save_post_meta( $this->post_id, $meta_key, $meta_value );
+        if ( is_array( $this->post_meta ) ) {
 
-				// We do this action here to prevent a loop when running this hook.
-				do_action( "wp_data_sync_duplicate_post_meta_$meta_key", $meta_key, $meta_value, $this );
+            foreach ( $this->post_meta as $meta_key => $meta_value ) {
 
-			}
+                $this->save_post_meta( $this->post_id, $meta_key, $meta_value );
 
-		}
+                // We do this action here to prevent a loop when running this hook.
+                do_action( "wp_data_sync_duplicate_post_meta_$meta_key", $meta_key, $meta_value, $this );
 
-	}
+            }
 
-	/**
-	 * Save Post Meta
-	 *
-	 * @param $post_id
-	 * @param $meta_key
-	 * @param $meta_value
-	 *
-	 * @return void
-	 */
+        }
 
-	public function save_post_meta( $post_id, $meta_key, $meta_value ) {
+    }
 
-		$meta_key   = $this->post_meta_key( $meta_key, $meta_value );
-		$meta_value = $this->post_meta_value( $meta_value, $meta_key );
+    /**
+     * Save Post Meta
+     *
+     * @param $post_id
+     * @param $meta_key
+     * @param $meta_value
+     *
+     * @return void
+     */
+
+    public function save_post_meta( $post_id, $meta_key, $meta_value ) {
+
+        $meta_key   = $this->post_meta_key( $meta_key, $meta_value );
+        $meta_value = $this->post_meta_value( $meta_value, $meta_key );
 
         if ( '_regular_price' === $meta_key || '_sale_price' === $meta_key ) {
             $this->set_wc_prices( $meta_key, $meta_value );
+        } elseif ( ! in_array( $meta_key, $this->restricted_meta_keys() ) ) {
+
+            update_post_meta( $post_id, $meta_key, $meta_value );
+
+            $this->process_acf( $meta_key, $meta_value );
+
         }
-		elseif ( ! in_array( $meta_key, $this->restricted_meta_keys() ) ) {
 
-			update_post_meta( $post_id, $meta_key, $meta_value );
+        // We do this action here to allow it to run for every key => value pair.
+        do_action( "wp_data_sync_post_meta_$meta_key", $post_id, $meta_value, $this );
 
-			$this->process_acf( $meta_key, $meta_value );
-
-		}
-
-		// We do this action here to allow it to run for every key => value pair.
-		do_action( "wp_data_sync_post_meta_$meta_key", $post_id, $meta_value, $this );
-
-	}
+    }
 
     /**
      * Set WooCommerce Prices
@@ -1048,451 +1050,482 @@ class DataSync {
         $this->wc_prices[ $meta_key ] = $meta_value;
     }
 
-	/**
-	 * Post meta Key.
-	 *
-	 * @param $meta_key
-	 * @param $meta_value
-	 * @param $post_id
-	 *
-	 * @return mixed|void
-	 */
+    /**
+     * Post meta Key.
+     *
+     * @param $meta_key
+     * @param $meta_value
+     * @param $post_id
+     *
+     * @return mixed|void
+     */
 
-	public function post_meta_key( $meta_key, $meta_value ) {
-		return apply_filters( 'wp_data_sync_meta_key', $meta_key, $meta_value, $this->post_id, $this );
-	}
+    public function post_meta_key( $meta_key, $meta_value ) {
+        return apply_filters( 'wp_data_sync_meta_key', $meta_key, $meta_value, $this->post_id, $this );
+    }
 
-	/**
-	 * Post meta value.
-	 *
-	 * @since 1.6.26
-	 *        Add meta key specific filter.
-	 *
-	 * @param $meta_value
-	 * @param $meta_key
-	 *
-	 * @return mixed|void
-	 */
+    /**
+     * Post meta value.
+     *
+     * @param $meta_value
+     * @param $meta_key
+     *
+     * @return mixed|void
+     * @since 1.6.26
+     *        Add meta key specific filter.
+     *
+     */
 
-	public function post_meta_value( $meta_value, $meta_key ) {
+    public function post_meta_value( $meta_value, $meta_key ) {
 
-		$meta_value = apply_filters( 'wp_data_sync_meta_value', $meta_value, $meta_key, $this->post_id, $this );
+        $meta_value = apply_filters( 'wp_data_sync_meta_value', $meta_value, $meta_key, $this->post_id, $this );
 
-		return apply_filters( "wp_data_sync_{$meta_key}_value", $meta_value, $this->post_id, $this );
+        return apply_filters( "wp_data_sync_{$meta_key}_value", $meta_value, $this->post_id, $this );
 
-	}
+    }
 
-	/**
-	 * Process ACF
-	 *
-	 * @param string $meta_key
-	 * @param mixed  $meta_value
-	 *
-	 * @return void
-	 */
+    /**
+     * Process ACF
+     *
+     * @param string $meta_key
+     * @param mixed $meta_value
+     *
+     * @return void
+     */
 
-	public function process_acf( $meta_key, $meta_value ) {
+    public function process_acf( $meta_key, $meta_value ) {
 
-		if ( apply_filters( 'wp_data_sync_is_acf_field_post_meta', false, $meta_key, $this->post_id, $this ) ) {
+        if ( apply_filters( 'wp_data_sync_is_acf_field_post_meta', false, $meta_key, $this->post_id, $this ) ) {
 
-			Log::write( 'acf-field', [
-				'post_id' => $this->post_id,
-				'key'     => $meta_key,
-				'value'   => $meta_value,
-			], 'ACF Field - Post Metta' );
+            Log::write( 'acf-field', [
+                'post_id' => $this->post_id,
+                'key'     => $meta_key,
+                'value'   => $meta_value,
+            ], 'ACF Field - Post Metta' );
 
-			do_action( 'wp_data_sync_process_acf_field_post_meta', $meta_key, $meta_value, $this->post_id, $this );
+            do_action( 'wp_data_sync_process_acf_field_post_meta', $meta_key, $meta_value, $this->post_id, $this );
 
-		}
+        }
 
-	}
+    }
 
-	/**
-	 * Taxonomies.
-	 */
+    /**
+     * Taxonomies.
+     */
 
-	public function taxonomy() {
+    public function taxonomy() {
 
-		if ( ! is_array( $this->taxonomies ) ) {
-			return;
-		}
+        if ( ! is_array( $this->taxonomies ) ) {
+            return;
+        }
 
-		$append = Settings::is_true( 'wp_data_sync_append_terms' );
+        $append = Settings::is_true( 'wp_data_sync_append_terms' );
 
-		foreach ( $this->taxonomies as $taxonomy => $terms ) {
+        foreach ( $this->taxonomies as $taxonomy => $terms ) {
 
-			$taxonomy = trim( wp_unslash( $taxonomy ) );
+            $taxonomy = trim( wp_unslash( $taxonomy ) );
 
-			/**
-			 * Filter: wp_data_sync_taxonomy
-			 *
-			 * @param string $taxonomy
-			 * @param int    $post_id
-			 *
-			 * @since 2.0.3
-			 */
+            /**
+             * Filter: wp_data_sync_taxonomy
+             *
+             * @param string $taxonomy
+             * @param int $post_id
+             *
+             * @since 2.0.3
+             */
 
-			$taxonomy = apply_filters( 'wp_data_sync_taxonomy', $taxonomy, $this->post_id );
+            $taxonomy = apply_filters( 'wp_data_sync_taxonomy', $taxonomy, $this->post_id );
 
-			if ( empty( $taxonomy ) || ! taxonomy_exists( $taxonomy ) ) {
+            if ( empty( $taxonomy ) || ! taxonomy_exists( $taxonomy ) ) {
 
-				Log::write( 'invalid-taxonomy', $taxonomy );
+                Log::write( 'invalid-taxonomy', $taxonomy );
 
-				continue;
+                continue;
 
-			}
+            }
 
-			$term_ids = [];
+            $term_ids = [];
 
-			foreach ( $terms as $term ) {
+            foreach ( $terms as $term ) {
 
-				/**
-				 * Filter: wp_data_sync_term
-				 *
-				 * @param array  $term
-				 * @param string $taxonomy
-				 * @param int    $post_id
-				 *
-				 * @since 2.0.3
-				 */
+                /**
+                 * Filter: wp_data_sync_term
+                 *
+                 * @param array $term
+                 * @param string $taxonomy
+                 * @param int $post_id
+                 *
+                 * @since 2.0.3
+                 */
 
-				$term = apply_filters( 'wp_data_sync_term', $term, $taxonomy, $this->post_id );
+                $term = apply_filters( 'wp_data_sync_term', $term, $taxonomy, $this->post_id );
 
-				if( $term_id = $this->set_term( $term, $taxonomy ) ) {
-					$term_ids[] = $term_id;
-				}
+                if ( $term_id = $this->set_term( $term, $taxonomy ) ) {
+                    $term_ids[] = $term_id;
+                }
 
-			}
+            }
 
-			Log::write( 'term-id', $term_ids );
+            Log::write( 'term-id', $term_ids );
 
-			wp_set_object_terms( $this->post_id, $term_ids, $taxonomy, $append );
+            wp_set_object_terms( $this->post_id, $term_ids, $taxonomy, $append );
 
-		}
+        }
 
-	}
+    }
 
-	/**
-	 * Set term..
-	 *
-	 * @param array  $term
-	 * @param string $taxonomy
-	 * @param int    $parent_id
-	 *
-	 * @return int|bool
-	 */
+    /**
+     * Set term..
+     *
+     * @param array $term
+     * @param string $taxonomy
+     * @param int $parent_id
+     *
+     * @return int|bool
+     */
 
-	public function set_term( $term, $taxonomy, $parent_id = 0 ) {
+    public function set_term( $term, $taxonomy, $parent_id = 0 ) {
 
-		if ( ! is_array( $term ) ) {
-			return false;
-		}
+        if ( ! is_array( $term ) ) {
+            return false;
+        }
 
-		/**
-		 * Extract $term
-		 *
-		 * $name
-		 * $description
-		 * $thumb_url
-		 * $term_meta
-		 * $parents
-		 */
+        /**
+         * Extract $term
+         *
+         * $name
+         * $description
+         * $thumb_url
+         * $term_meta
+         * $parents
+         */
 
-		extract( $term );
+        extract( $term );
 
-		if ( ! is_string( $name ) ) {
-			return false;
-		}
+        if ( ! is_string( $name ) ) {
+            return false;
+        }
 
-		if ( ! empty( $parents ) && is_array( $parents  ) ) {
+        if ( ! empty( $parents ) && is_array( $parents ) ) {
 
-			/**
-			 * Filter: wp_data_sync_term_parents
-			 *
-			 * @param array  $parents
-			 * @param array  $term
-			 * @param string $taxonomy
-			 * @param int    $post_id
-			 *
-			 * @since 2.0.2
-			 *        2.0.3 Add $post_id to args.
-			 */
+            /**
+             * Filter: wp_data_sync_term_parents
+             *
+             * @param array $parents
+             * @param array $term
+             * @param string $taxonomy
+             * @param int $post_id
+             *
+             * @since 2.0.2
+             *        2.0.3 Add $post_id to args.
+             */
 
-			$parents = apply_filters( 'wp_data_sync_term_parents', $parents, $term, $taxonomy, $this->post_id );
+            $parents = apply_filters( 'wp_data_sync_term_parents', $parents, $term, $taxonomy, $this->post_id );
 
-			foreach ( $parents as $parent ) {
-				$parent_id = $this->set_term( $parent, $taxonomy, $parent_id );
-			}
+            foreach ( $parents as $parent ) {
+                $parent_id = $this->set_term( $parent, $taxonomy, $parent_id );
+            }
 
-		}
+        }
 
-		$name = trim( wp_unslash( $name ) );
+        $name = trim( wp_unslash( $name ) );
 
-		Log::write( 'term-id', "$name - $taxonomy - $parent_id" );
+        Log::write( 'term-id', "$name - $taxonomy - $parent_id" );
 
-		/**
-		 * Filter: wp_data_sync_term_name
-		 *
-		 * @param string $name
-		 * @param string $taxonomy
-		 * @param int    $parent_id
-		 * @param int    $post_id
-		 *
-		 * @since 1.0.0
-		 *        2.0.3 Add $post_id to args.
-		 */
+        /**
+         * Filter: wp_data_sync_term_name
+         *
+         * @param string $name
+         * @param string $taxonomy
+         * @param int $parent_id
+         * @param int $post_id
+         *
+         * @since 1.0.0
+         *        2.0.3 Add $post_id to args.
+         */
 
-		$name = apply_filters( 'wp_data_sync_term_name', $name, $taxonomy, $parent_id, $this->post_id );
+        $name = apply_filters( 'wp_data_sync_term_name', $name, $taxonomy, $parent_id, $this->post_id );
 
-		/**
-		 * Filter: wp_data_sync_term_taxonomy
-		 *
-		 * @param string $taxonomy
-		 * @param string $name
-		 * @param int    $parent_id
-		 * @param int    $post_id
-		 *
-		 * @since 1.0.0
-		 *        2.0.3 Add $post_id to args.
-		 */
+        /**
+         * Filter: wp_data_sync_term_taxonomy
+         *
+         * @param string $taxonomy
+         * @param string $name
+         * @param int $parent_id
+         * @param int $post_id
+         *
+         * @since 1.0.0
+         *        2.0.3 Add $post_id to args.
+         */
 
-		$taxonomy = apply_filters( 'wp_data_sync_term_taxonomy', $taxonomy, $name, $parent_id, $this->post_id );
-		$term_id  = $this->term_id( $name, $taxonomy, $parent_id );
+        $taxonomy = apply_filters( 'wp_data_sync_term_taxonomy', $taxonomy, $name, $parent_id, $this->post_id );
+        $term_id  = $this->term_id( $name, $taxonomy, $parent_id );
 
-		if ( isset( $description ) ) {
-			$this->term_desc( $description, $term_id, $taxonomy );
-		}
+        if ( isset( $description ) ) {
+            $this->term_desc( $description, $term_id, $taxonomy );
+        }
 
-		if ( isset( $thumb_url ) ) {
-			$this->term_thumb( $thumb_url, $term_id );
-		}
+        if ( isset( $thumb_url ) ) {
+            $this->term_thumb( $thumb_url, $term_id );
+        }
 
-		if ( isset( $term_meta ) ) {
-			$this->term_meta( $term_meta, $term_id );
-		}
+        if ( isset( $term_meta ) ) {
+            $this->term_meta( $term_meta, $term_id );
+        }
 
-		return $term_id;
+        return $term_id;
 
-	}
+    }
 
-	/**
-	 * Term exists.
-	 *
-	 * @param $name
-	 * @param $taxonomy
-	 * @param $parent_id
-	 *
-	 * @return bool|int
-	 */
+    /**
+     * Term exists.
+     *
+     * @param $name
+     * @param $taxonomy
+     * @param $parent_id
+     *
+     * @return bool|int
+     */
 
-	public function term_exists( $name, $taxonomy, $parent_id ) {
+    public function term_exists( $name, $taxonomy, $parent_id ) {
 
-		global $wpdb;
+        $slug    = sanitize_title( $name );
+        $term_id = $this->_term_exists( $name, $slug, $taxonomy, $parent_id );
 
-		Log::write( 'term-exists', "Name: $name - Taxonomy: $taxonomy - Parent ID: $parent_id" );
+        Log::write( 'term-exists', [
+            'name'     => $name,
+            'slug'     => $slug,
+            'taxonomy' => $taxonomy,
+            'parent'   => $parent_id,
+            'term_id'  => $term_id
+        ] );
 
-		$sql = $wpdb->prepare(
-			"
+        return $term_id;
+
+    }
+
+    /**
+     * Private - Term Exists
+     *
+     * @param string $name
+     * @param string $slug
+     * @param string $taxonomy
+     * @param int $parent_id
+     *
+     * @return int
+     */
+
+    private function _term_exists( string $name, string $slug, string $taxonomy, int $parent_id ): int {
+
+        global $wpdb;
+
+        if ( $term = get_term_by( 'name', $name, $taxonomy ) ) {
+            return $term->term_id;
+        }
+
+        if ( $term = get_term_by( 'slug', $slug, $taxonomy ) ) {
+            return $term->term_id;
+        }
+
+        $result = $wpdb->get_var( $wpdb->prepare(
+            "
 			SELECT SQL_NO_CACHE t.term_id
 			FROM $wpdb->terms t
 			INNER JOIN $wpdb->term_taxonomy tt
-			ON tt.term_id = t.term_id
-			WHERE t.name = %s
-			AND tt.taxonomy = %s
-			AND tt.parent = %d
+			    ON tt.term_id = t.term_id
+			WHERE (t.name LIKE %s OR t.slug LIKE %s)
+			    AND tt.taxonomy = %s
+			    AND tt.parent = %d
 			",
-			esc_sql( $name ),
-			esc_sql( $taxonomy ),
-			intval( $parent_id )
-		);
+            esc_sql( $name ),
+            esc_sql( $slug ),
+            esc_sql( $taxonomy ),
+            intval( $parent_id )
+        ) );
 
-		Log::write( 'term-exists', $sql );
+        Log::write( 'term-exists', [
+            'sql'    => $wpdb->last_query,
+            'result' => $result
+        ] );
 
-		$term_id = $wpdb->get_var( $sql );
 
-		if ( empty( $term_id ) || is_wp_error( $term_id ) ) {
-			Log::write( 'term-exists', 'Term Does Not Exist' );
-			Log::write( 'term-exists', $term_id );
-			return false;
-		}
+        if ( empty( $result ) || is_wp_error( $result ) ) {
+            return 0;
+        }
 
-		Log::write( 'term-exists', "Term ID: $term_id" );
+        return (int) $result;
 
-		return (int) $term_id;
+    }
 
-	}
+    /**
+     * Term ID.
+     *
+     * @param string $name
+     * @param string $taxonomy
+     * @param int $parent_id
+     *
+     * @return false|int
+     */
 
-	/**
-	 * Term ID.
-	 *
-	 * @param string $name
-	 * @param string $taxonomy
-	 * @param int $parent_id
-	 *
-	 * @return false|int
-	 */
+    public function term_id( $name, $taxonomy, $parent_id ) {
 
-	public function term_id( $name, $taxonomy, $parent_id ) {
+        if ( ! $term_id = $this->term_exists( $name, $taxonomy, $parent_id ) ) {
 
-		if ( ! $term_id = $this->term_exists( $name, $taxonomy, $parent_id ) ) {
+            $term = wp_insert_term( $name, $taxonomy, [ 'parent' => $parent_id ] );
 
-			$term = wp_insert_term( $name, $taxonomy, [ 'parent' => $parent_id ] );
+            if ( is_wp_error( $term ) ) {
+                Log::write( 'wp-error-term', $term );
 
-			if( is_wp_error( $term ) ) {
-				Log::write( 'wp-error-term', $term );
+                return false;
+            }
 
-				return false;
-			}
+            $term_id = $term['term_id'];
+        }
 
-			$term_id = $term['term_id'];
-		}
+        Log::write( 'term-id', $term_id );
 
-		Log::write( 'term-id', $term_id );
+        return (int) $term_id;
 
-		return (int) $term_id;
+    }
 
-	}
+    /**
+     * Term description.
+     *
+     * @param $description string
+     * @param $term_id     int
+     * @param $taxonomy    string
+     */
 
-	/**
-	 * Term description.
-	 *
-	 * @param $description string
-	 * @param $term_id     int
-	 * @param $taxonomy    string
-	 */
+    public function term_desc( $description, $term_id, $taxonomy ) {
 
-	public function term_desc( $description, $term_id, $taxonomy ) {
+        $option = 'sync_term_desc';
 
-		$option = 'sync_term_desc';
+        if ( ! Settings::is_set( $option ) ) {
+            return;
+        }
 
-		if ( ! Settings::is_set( $option ) ) {
-			return;
-		}
+        if ( Settings::is_equal( $option, '-1' ) ) {
+            return;
+        }
 
-		if ( Settings::is_equal( $option, '-1' ) ) {
-			return;
-		}
+        if ( Settings::is_equal( $option, 'false' ) ) {
+            return;
+        }
 
-		if ( Settings::is_equal( $option, 'false' ) ) {
-			return;
-		}
+        if ( empty( $description ) ) {
 
-		if ( empty( $description ) ) {
+            if ( Settings::is_equal( $option, 'skip_empty' ) ) {
+                return;
+            }
 
-			if ( Settings::is_equal( $option, 'skip_empty' ) ) {
-				return;
-			}
+            $description = '';
 
-			$description = '';
+        }
 
-		}
+        $args = [ 'description' => $description ];
 
-		$args = [ 'description' => $description ];
+        wp_update_term( $term_id, $taxonomy, $args );
 
-		wp_update_term( $term_id, $taxonomy, $args );
+    }
 
-	}
+    /**
+     * term thumb.
+     *
+     * @param $thumb_url
+     * @param $term_id
+     */
 
-	/**
-	 * term thumb.
-	 *
-	 * @param $thumb_url
-	 * @param $term_id
-	 */
+    public function term_thumb( $thumb_url, $term_id ) {
 
-	public function term_thumb( $thumb_url, $term_id ) {
+        $option = 'sync_term_thumb';
 
-		$option = 'sync_term_thumb';
+        if ( ! Settings::is_set( $option ) ) {
+            return;
+        }
 
-		if ( ! Settings::is_set( $option ) ) {
-			return;
-		}
+        if ( Settings::is_equal( $option, '-1' ) ) {
+            return;
+        }
 
-		if ( Settings::is_equal( $option, '-1' ) ) {
-			return;
-		}
+        if ( Settings::is_equal( $option, 'false' ) ) {
+            return;
+        }
 
-		if ( Settings::is_equal( $option, 'false' ) ) {
-			return;
-		}
+        if ( empty( $thumb_url ) ) {
 
-		if ( empty( $thumb_url ) ) {
+            if ( Settings::is_equal( $option, 'skip_empty' ) ) {
+                return;
+            }
 
-			if ( Settings::is_equal( $option, 'skip_empty' ) ) {
-				return;
-			}
+            $attach_id = '';
 
-			$attach_id = '';
+        } else {
 
-		}
+            $this->set_attachment( $thumb_url );
 
-		else {
+            if ( ! $attach_id = $this->attachment() ) {
+                $attach_id = '';
+            }
 
-			$this->set_attachment( $thumb_url );
+        }
 
-			if ( ! $attach_id = $this->attachment() ) {
-				$attach_id = '';
-			}
+        update_term_meta( $term_id, 'thumbnail_id', $attach_id );
 
-		}
+    }
 
-		update_term_meta( $term_id, 'thumbnail_id', $attach_id );
+    /**
+     * Term meta.
+     *
+     * @param $term_meta
+     * @param $term_id
+     */
 
-	}
+    public function term_meta( $term_meta, $term_id ) {
 
-	/**
-	 * Term meta.
-	 *
-	 * @param $term_meta
-	 * @param $term_id
-	 */
+        $option = 'sync_term_meta';
 
-	public function term_meta( $term_meta, $term_id ) {
+        if ( ! Settings::is_set( $option ) ) {
+            return;
+        }
 
-		$option = 'sync_term_meta';
+        if ( Settings::is_equal( $option, '-1' ) ) {
+            return;
+        }
 
-		if ( ! Settings::is_set( $option ) ) {
-			return;
-		}
+        if ( Settings::is_equal( $option, 'false' ) ) {
+            return;
+        }
 
-		if ( Settings::is_equal( $option, '-1' ) ) {
-			return;
-		}
+        if ( is_array( $term_meta ) && ! empty( $term_meta ) ) {
 
-		if ( Settings::is_equal( $option, 'false' ) ) {
-			return;
-		}
+            $restricted_meta_keys = $this->restricted_meta_keys();
 
-		if ( is_array( $term_meta ) && ! empty( $term_meta ) ) {
+            foreach ( $term_meta as $meta_key => $value ) {
 
-			$restricted_meta_keys = $this->restricted_meta_keys();
+                if ( ! in_array( $meta_key, $restricted_meta_keys ) ) {
+                    update_term_meta( $term_id, $meta_key, $value );
+                }
 
-			foreach ( $term_meta as $meta_key => $value ) {
+            }
 
-				if ( ! in_array( $meta_key, $restricted_meta_keys ) ) {
-					update_term_meta( $term_id, $meta_key, $value );
-				}
+        }
 
-			}
+    }
 
-		}
+    /**
+     * Reset the term taxonomy count.
+     *
+     * @since 1.4.22
+     *
+     * @link https://stackoverflow.com/questions/18669256/how-to-update-wordpress-taxonomiescategories-tags-count-field-after-bulk-impo
+     */
 
-	}
+    public function reset_term_taxonomy_count() {
 
-	/**
-	 * Reset the term taxonomy count.
-	 *
-	 * @since 1.4.22
-	 *
-	 * @link https://stackoverflow.com/questions/18669256/how-to-update-wordpress-taxonomiescategories-tags-count-field-after-bulk-impo
-	 */
+        global $wpdb;
 
-	public function reset_term_taxonomy_count() {
-
-		global $wpdb;
-
-		$wpdb->query(
-			"
+        $wpdb->query(
+            "
 			UPDATE $wpdb->term_taxonomy tt SET count = (
 				SELECT COUNT(*) FROM $wpdb->term_relationships tr 
     			LEFT JOIN $wpdb->posts p ON (p.ID = tr.object_id) 
@@ -1504,471 +1537,470 @@ class DataSync {
         		p.post_status IN ('publish', 'future')
 			)
 			"
-		);
+        );
 
-	}
+    }
 
-	/**
-	 * Featured image.
-	 *
-	 * @since 1.6.0
-	 */
+    /**
+     * Featured image.
+     *
+     * @since 1.6.0
+     */
 
-	public function featured_image() {
+    public function featured_image() {
 
-		if ( $attach_id = $this->attachment() ) {
-			set_post_thumbnail( $this->post_id, $attach_id );
-		}
+        if ( $attach_id = $this->attachment() ) {
+            set_post_thumbnail( $this->post_id, $attach_id );
+        }
 
-	}
+    }
 
-	/**
-	 * Gallery Images
-	 *
-	 * @since 1.6.0
-	 * @since 2.4.2 Moved here from WC_Product_DataSync
-	 * @since 2.4.7 Update meta using update_post_meta since WooCommerce _product_image_gallery is a restricted key.
-	 *
-	 * @return void
-	 */
+    /**
+     * Gallery Images
+     *
+     * @return void
+     * @since 2.4.2 Moved here from WC_Product_DataSync
+     * @since 2.4.7 Update meta using update_post_meta since WooCommerce _product_image_gallery is a restricted key.
+     *
+     * @since 1.6.0
+     */
 
-	public function gallery_images() {
+    public function gallery_images() {
 
-		if ( empty( $this->gallery_details ) ) {
-			return;
-		}
+        if ( empty( $this->gallery_details ) ) {
+            return;
+        }
 
-		$attach_ids = [];
+        $attach_ids = [];
 
-		foreach ( $this->gallery_images as $image ) {
+        foreach ( $this->gallery_images as $image ) {
 
-			$image = apply_filters( 'wp_data_sync_product_gallery_image', $image, $this->post_id, $this );
+            $image = apply_filters( 'wp_data_sync_product_gallery_image', $image, $this->post_id, $this );
 
-			$this->set_attachment( $image );
+            $this->set_attachment( $image );
 
-			if ( $attach_id = $this->attachment() ) {
-				$attach_ids[] = $attach_id;
-			}
+            if ( $attach_id = $this->attachment() ) {
+                $attach_ids[] = $attach_id;
+            }
 
-		}
+        }
 
-		$gallery_ids = apply_filters( 'wp_data_sync_gallery_image_ids', $attach_ids, $this->post_id, $this );
-		$gallery_key = apply_filters( 'wp_data_sync_gallery_image_meta_key', $this->gallery_details['key'], $this->post_id, $this );
+        $gallery_ids = apply_filters( 'wp_data_sync_gallery_image_ids', $attach_ids, $this->post_id, $this );
+        $gallery_key = apply_filters( 'wp_data_sync_gallery_image_meta_key', $this->gallery_details['key'], $this->post_id, $this );
 
-		switch ( $this->gallery_details['format'] ) {
+        switch ( $this->gallery_details['format'] ) {
 
-			case 'comma_join' :
-				$gallery_ids = join( ',', $gallery_ids );
-				break;
+            case 'comma_join' :
+                $gallery_ids = join( ',', $gallery_ids );
+                break;
 
-		}
+        }
 
-		// We must update here since WooCommerce _product_image_gallery is a restricted key.
-		update_post_meta( $this->post_id, $gallery_key, $gallery_ids );
+        // We must update here since WooCommerce _product_image_gallery is a restricted key.
+        update_post_meta( $this->post_id, $gallery_key, $gallery_ids );
 
-		$this->process_acf( $gallery_key, $gallery_ids );
+        $this->process_acf( $gallery_key, $gallery_ids );
 
-		Log::write( 'gallery-images', [
-			'gallery_details' => $this->gallery_details,
-			'gallery_images'  => $this->gallery_images,
-			'gallery_key'     => $gallery_key,
-			'gallery_ids'     => $gallery_ids
-		], 'Process Gallery Images' );
+        Log::write( 'gallery-images', [
+            'gallery_details' => $this->gallery_details,
+            'gallery_images'  => $this->gallery_images,
+            'gallery_key'     => $gallery_key,
+            'gallery_ids'     => $gallery_ids
+        ], 'Process Gallery Images' );
 
-		do_action( 'wp_data_sync_gallery_images', $this->post_id, $this->gallery_images, $this );
+        do_action( 'wp_data_sync_gallery_images', $this->post_id, $this->gallery_images, $this );
 
-	}
+    }
 
-	/**
-	 * Attachemnt.
-	 *
-	 * @return bool|int|\WP_Post
-	 */
+    /**
+     * Attachemnt.
+     *
+     * @return bool|int|WP_Post
+     */
 
-	public function attachment() {
+    public function attachment() {
 
-		Log::write( 'attachment', $this->attachment, 'Start Process' );
+        Log::write( 'attachment', $this->attachment, 'Start Process' );
 
-		$image_array = $this->image_array();
+        $image_array = $this->image_array();
 
-		/**
-		 * Extract.
-		 *
-		 * $image_url
-		 * $title
-		 * $description
-		 * $caption
-		 * $alt
-		 */
-		extract( $image_array );
+        /**
+         * Extract.
+         *
+         * $image_url
+         * $title
+         * $description
+         * $caption
+         * $alt
+         */
+        extract( $image_array );
 
-		if ( empty( $image_url ) ) {
-			return false;
-		}
+        if ( empty( $image_url ) ) {
+            return false;
+        }
 
-		require_once( ABSPATH . 'wp-admin/includes/image.php' );
+        require_once( ABSPATH . 'wp-admin/includes/image.php' );
 
-		if ( ! $image_url = $this->is_valid_image_url( $image_url ) ) {
-			return false;
-		}
+        if ( ! $image_url = $this->is_valid_image_url( $image_url ) ) {
+            return false;
+        }
 
-		$basename    = $this->basename( $image_array );
-		$image_title = preg_replace( '/\.[^.]+$/', '', $basename );
+        $basename    = $this->basename( $image_array );
+        $image_title = preg_replace( '/\.[^.]+$/', '', $basename );
 
-		Log::write( 'attachment', [
-			'Basename'    => $basename,
-			'Image Title' => $image_title,
-			'Image URL'   => $image_url
-		], 'Before Create Image' );
+        Log::write( 'attachment', [
+            'Basename'    => $basename,
+            'Image Title' => $image_title,
+            'Image URL'   => $image_url
+        ], 'Before Create Image' );
 
-		$attachment = [
-			'post_title'   => empty( $title ) ? $image_title : $title,
-			'post_content' => $description,
-			'post_excerpt' => $caption
-		];
+        $attachment = [
+            'post_title'   => empty( $title ) ? $image_title : $title,
+            'post_content' => $description,
+            'post_excerpt' => $caption
+        ];
 
-		if ( $attachment['ID'] = $this->attachment_exists( $image_url ) ) {
+        if ( $attachment['ID'] = $this->attachment_exists( $image_url ) ) {
 
-			Log::write( 'attachment', "{$attachment['ID']} - {$attachment['post_title']}", 'Exists' );
+            Log::write( 'attachment', "{$attachment['ID']} - {$attachment['post_title']}", 'Exists' );
 
-			// Update the attachement
-			wp_update_post( $attachment );
+            // Update the attachement
+            wp_update_post( $attachment );
 
-			// Update image alt
-			update_post_meta( $attachment['ID'], '_wp_attachment_image_alt', $alt );
+            // Update image alt
+            update_post_meta( $attachment['ID'], '_wp_attachment_image_alt', $alt );
 
-			// Update the image source URL.
-			update_post_meta( $attachment['ID'], '_source_url', $image_url );
+            // Update the image source URL.
+            update_post_meta( $attachment['ID'], '_source_url', $image_url );
 
-			return $attachment['ID'];
+            return $attachment['ID'];
 
-		}
+        }
 
-		if ( $file_type = $this->file_type( $image_url ) ) {
+        if ( $file_type = $this->file_type( $image_url ) ) {
 
-			if ( $image_data = $this->fetch_image_data( $image_url ) ) {
+            if ( $image_data = $this->fetch_image_data( $image_url ) ) {
 
-				$upload_dir = wp_upload_dir();
-				$file_path  = $this->file_path( $upload_dir, $basename );
+                $upload_dir = wp_upload_dir();
+                $file_path  = $this->file_path( $upload_dir, $basename );
 
-				Log::write( 'attachment', $file_path, 'File Path' );
+                Log::write( 'attachment', $file_path, 'File Path' );
 
-				// Copy the image to image upload dir
-				file_put_contents( $file_path, $image_data );
+                // Copy the image to image upload dir
+                file_put_contents( $file_path, $image_data );
 
-				$attachment = array_merge( [
-					'guid'           => "{$upload_dir['url']}/{$basename}",
-					'post_mime_type' => $file_type,
-					'post_status'    => 'inherit'
-				], $attachment );
+                $attachment = array_merge( [
+                    'guid'           => "{$upload_dir['url']}/{$basename}",
+                    'post_mime_type' => $file_type,
+                    'post_status'    => 'inherit'
+                ], $attachment );
 
-				// Insert image data
-				$attach_id = wp_insert_attachment( $attachment, $file_path, $this->post_id );
+                // Insert image data
+                $attach_id = wp_insert_attachment( $attachment, $file_path, $this->post_id );
 
-				Log::write( 'attachment', $attach_id, 'Attachment ID' );
+                Log::write( 'attachment', $attach_id, 'Attachment ID' );
 
-				if ( is_int( $attach_id ) && 0 < $attach_id ) {
+                if ( is_int( $attach_id ) && 0 < $attach_id ) {
 
-					// Get metadata for featured image
-					$attach_data = wp_generate_attachment_metadata( $attach_id, $file_path );
+                    // Get metadata for featured image
+                    $attach_data = wp_generate_attachment_metadata( $attach_id, $file_path );
 
-					Log::write( 'attachment', $attach_data, 'Attachment Data' );
+                    Log::write( 'attachment', $attach_data, 'Attachment Data' );
 
-					// Update metadata
-					wp_update_attachment_metadata( $attach_id, $attach_data );
+                    // Update metadata
+                    wp_update_attachment_metadata( $attach_id, $attach_data );
 
-					// Update image alt
-					update_post_meta( $attach_id, '_wp_attachment_image_alt', $alt );
+                    // Update image alt
+                    update_post_meta( $attach_id, '_wp_attachment_image_alt', $alt );
 
-					// Update the image source URL.
-					update_post_meta( $attach_id, '_source_url', $image_url );
+                    // Update the image source URL.
+                    update_post_meta( $attach_id, '_source_url', $image_url );
 
-					do_action( 'wp_data_sync_attachment_created', $attach_id, $image_array, $this );
+                    do_action( 'wp_data_sync_attachment_created', $attach_id, $image_array, $this );
 
-					return $attach_id;
+                    return $attach_id;
 
-				}
+                }
 
-			}
+            }
 
-		}
+        }
 
-		return false;
+        return false;
 
-	}
+    }
 
-	/**
-	 * Is Valid Image URL.
-	 *
-	 * @param $image_url
-	 *
-	 * @return mixed|void
-	 */
+    /**
+     * Is Valid Image URL.
+     *
+     * @param $image_url
+     *
+     * @return mixed|void
+     */
 
-	public function is_valid_image_url( $image_url ) {
+    public function is_valid_image_url( $image_url ) {
 
-		// Check for a valid URL.
-		$info = filter_var( $image_url, FILTER_VALIDATE_URL );
+        // Check for a valid URL.
+        $info = filter_var( $image_url, FILTER_VALIDATE_URL );
 
-		if ( ! $info ) {
-			Log::write( 'attachment', $image_url, 'Invalid URL' );
-		}
+        if ( ! $info ) {
+            Log::write( 'attachment', $image_url, 'Invalid URL' );
+        }
 
-		return apply_filters( 'wp_data_sync_is_valid_image_url', $info, $image_url, $this );
+        return apply_filters( 'wp_data_sync_is_valid_image_url', $info, $image_url, $this );
 
-	}
+    }
 
-	/**
-	 * File type.
-	 *
-	 * @param $image_url
-	 *
-	 * @return bool|mixed|string
-	 */
+    /**
+     * File type.
+     *
+     * @param $image_url
+     *
+     * @return bool|mixed|string
+     */
 
-	public function file_type( $image_url ) {
+    public function file_type( $image_url ) {
 
-		$file_type = wp_check_filetype( $image_url );
+        $file_type = wp_check_filetype( $image_url );
 
-		if ( ! empty( $file_type['type'] ) ) {
+        if ( ! empty( $file_type['type'] ) ) {
 
-			Log::write( 'attachment', $file_type['type'], 'File Type' );
+            Log::write( 'attachment', $file_type['type'], 'File Type' );
 
-			return $file_type['type'];
+            return $file_type['type'];
 
-		}
+        }
 
-		$file_type = false;
+        $file_type = false;
 
-		if ( $type = exif_imagetype( $image_url ) ) {
+        if ( $type = exif_imagetype( $image_url ) ) {
 
-			switch ( $type ) {
+            switch ( $type ) {
 
-				case IMAGETYPE_JPEG :
-					$file_type = 'image/jpeg';
-					break;
+                case IMAGETYPE_JPEG :
+                    $file_type = 'image/jpeg';
+                    break;
 
-				case IMAGETYPE_PNG :
-					$file_type = 'image/png';
-					break;
+                case IMAGETYPE_PNG :
+                    $file_type = 'image/png';
+                    break;
 
-				case IMAGETYPE_GIF :
-					$file_type = 'image/gif';
-					break;
+                case IMAGETYPE_GIF :
+                    $file_type = 'image/gif';
+                    break;
 
-			}
+            }
 
-		}
+        }
 
-		Log::write( 'attachment', $file_type, 'File Type' );
+        Log::write( 'attachment', $file_type, 'File Type' );
 
-		return $file_type;
+        return $file_type;
 
-	}
+    }
 
-	/**
-	 * Fetch image data from an image url.
-	 *
-	 * @param $image_url
-	 *
-	 * @return bool|string
-	 */
+    /**
+     * Fetch image data from an image url.
+     *
+     * @param $image_url
+     *
+     * @return bool|string
+     */
 
-	public function fetch_image_data( $image_url ) {
+    public function fetch_image_data( $image_url ) {
 
-		$response      = wp_remote_get( $image_url, [ 'sslverify' => $this->ssl_verify() ] );
-		$response_code = wp_remote_retrieve_response_code( $response );
+        $response      = wp_remote_get( $image_url, [ 'sslverify' => $this->ssl_verify() ] );
+        $response_code = wp_remote_retrieve_response_code( $response );
 
-		Log::write( 'attachment', $response_code, 'Response Code' );
+        Log::write( 'attachment', $response_code, 'Response Code' );
 
-		if ( 200 === $response_code ) {
-			return wp_remote_retrieve_body( $response );
-		}
+        if ( 200 === $response_code ) {
+            return wp_remote_retrieve_body( $response );
+        }
 
-		Log::write( 'attachment', $response, 'Response Failed' );
+        Log::write( 'attachment', $response, 'Response Failed' );
 
-		return false;
+        return false;
 
-	}
+    }
 
-	/**
-	 * Verify if SSL certificate is valid.
-	 *
-	 * @return bool
-	 */
+    /**
+     * Verify if SSL certificate is valid.
+     *
+     * @return bool
+     */
 
-	public function ssl_verify() {
+    public function ssl_verify() {
 
-		if ( Settings::is_checked( 'wp_data_sync_allow_unsecure_images' ) ) {
-			return false;
-		}
+        if ( Settings::is_checked( 'wp_data_sync_allow_unsecure_images' ) ) {
+            return false;
+        }
 
-		return true;
+        return true;
 
-	}
+    }
 
-	/**
-	 * File path.
-	 *
-	 * @param $upload_dir
-	 * @param $basename
-	 *
-	 * @return string
-	 */
+    /**
+     * File path.
+     *
+     * @param $upload_dir
+     * @param $basename
+     *
+     * @return string
+     */
 
-	public function file_path( $upload_dir, $basename ) {
+    public function file_path( $upload_dir, $basename ) {
 
-		if( wp_mkdir_p( $upload_dir['path'] ) ) {
-			return "{$upload_dir['path']}/{$basename}";
-		}
+        if ( wp_mkdir_p( $upload_dir['path'] ) ) {
+            return "{$upload_dir['path']}/{$basename}";
+        }
 
-		return "{$upload_dir['basedir']}/{$basename}";
+        return "{$upload_dir['basedir']}/{$basename}";
 
-	}
+    }
 
-	/**
-	 * Check to see if attachment exists.
-	 *
-	 * @since 1.6.0  Query for _source_url
-	 *
-	 * @param $image_url
-	 *
-	 * @return bool|int
-	 */
+    /**
+     * Check to see if attachment exists.
+     *
+     * @param $image_url
+     *
+     * @return bool|int
+     * @since 1.6.0  Query for _source_url
+     *
+     */
 
-	public function attachment_exists( $image_url ) {
+    public function attachment_exists( $image_url ) {
 
-		global $wpdb;
+        global $wpdb;
 
-		$attach_id = $wpdb->get_var( $wpdb->prepare(
-			"
+        $attach_id = $wpdb->get_var( $wpdb->prepare(
+            "
 			SELECT post_id
 			FROM $wpdb->postmeta
 			WHERE meta_key = '_source_url'
 			AND meta_value = %s
 			",
-			esc_sql( $image_url )
-		) );
+            esc_sql( $image_url )
+        ) );
 
-		if ( null === $attach_id || is_wp_error( $attach_id ) ) {
-			return false;
-		}
+        if ( null === $attach_id || is_wp_error( $attach_id ) ) {
+            return false;
+        }
 
-		return (int) $attach_id;
+        return (int) $attach_id;
 
-	}
+    }
 
-	/**
-	 * Basename.
-	 *
-	 * @param array $image_array
-	 *
-	 * @return mixed|void
-	 */
+    /**
+     * Basename.
+     *
+     * @param array $image_array
+     *
+     * @return mixed|void
+     */
 
-	public function basename( $image_array ) {
+    public function basename( $image_array ) {
 
         if ( Settings::is_checked( 'wp_data_sync_hash_image_basename' ) ) {
             $basename = wp_hash( $image_array['image_url'] );
-        }
-        else {
+        } else {
             $basename = sanitize_file_name( basename( $image_array['image_url'] ) );
         }
 
-		return apply_filters( 'wp_data_sync_basename', $basename, $this->post_id, $image_array );
+        return apply_filters( 'wp_data_sync_basename', $basename, $this->post_id, $image_array );
 
-	}
+    }
 
-	/**
-	 * Image Array.
-	 *
-	 * @return mixed|void
-	 */
+    /**
+     * Image Array.
+     *
+     * @return mixed|void
+     */
 
-	public function image_array() {
+    public function image_array() {
 
-		if ( ! is_array( $this->attachment ) ) {
+        if ( ! is_array( $this->attachment ) ) {
 
-			$this->attachment = [
-				'image_url'   => $this->attachment,
-				'title'       => '',
-				'description' => '',
-				'caption'     => '',
-				'alt'         => ''
-			];
+            $this->attachment = [
+                'image_url'   => $this->attachment,
+                'title'       => '',
+                'description' => '',
+                'caption'     => '',
+                'alt'         => ''
+            ];
 
-		}
+        }
 
-		return apply_filters( 'wp_data_sync_image', $this->attachment, $this->post_id );
+        return apply_filters( 'wp_data_sync_image', $this->attachment, $this->post_id );
 
-	}
+    }
 
-	/**
-	 * Filter Restricted Meta Keys.
-	 *
-	 * An array of restricted meta keys.
-	 * Keys are restricted since their meta value may break other functionality.
-	 *
-	 * @return mixed|void
-	 */
+    /**
+     * Filter Restricted Meta Keys.
+     *
+     * An array of restricted meta keys.
+     * Keys are restricted since their meta value may break other functionality.
+     *
+     * @return mixed|void
+     */
 
-	public function restricted_meta_keys() {
+    public function restricted_meta_keys() {
 
-		$restricted_meta_keys = [
-			'_edit_lock',
-			'_edit_last',
-			'_thumbnail_id',
-			'thumbnail_id',
-			'product_count_product_cat'
-		];
+        $restricted_meta_keys = [
+            '_edit_lock',
+            '_edit_last',
+            '_thumbnail_id',
+            'thumbnail_id',
+            'product_count_product_cat'
+        ];
 
-		return apply_filters( 'wp_data_sync_restricted_meta_keys', $restricted_meta_keys );
+        return apply_filters( 'wp_data_sync_restricted_meta_keys', $restricted_meta_keys );
 
-	}
+    }
 
-	/**
-	 * Integrations.
-	 */
+    /**
+     * Integrations.
+     */
 
-	private function integrations() {
+    private function integrations() {
 
-		foreach ( $this->integrations as $integration => $values ) {
-			do_action( "wp_data_sync_integration_$integration", $this->post_id, $values, $this );
-		}
+        foreach ( $this->integrations as $integration => $values ) {
+            do_action( "wp_data_sync_integration_$integration", $this->post_id, $values, $this );
+        }
 
-	}
+    }
 
-	/**
-	 * Update the last modified date.
-	 *
-	 * Update the dates last to insure core WP does not change them.
-	 *
-	 * @since 2.0.6
-	 */
+    /**
+     * Update the last modified date.
+     *
+     * Update the dates last to insure core WP does not change them.
+     *
+     * @since 2.0.6
+     */
 
-	public function update_date() {
+    public function update_date() {
 
-		$post_data = [ 'ID' => $this->post_id ];
+        $post_data = [ 'ID' => $this->post_id ];
 
-		$date_keys = [
-			'post_date',
-			'post_date_gmt',
-			'post_modified',
-			'post_modified_gmt'
-		];
+        $date_keys = [
+            'post_date',
+            'post_date_gmt',
+            'post_modified',
+            'post_modified_gmt'
+        ];
 
-		foreach ( $date_keys as $date_key ) {
+        foreach ( $date_keys as $date_key ) {
 
-			if ( ! empty( $this->post_data[ $date_key ] ) ) {
-				$post_data[ $date_key ] = $this->post_data[ $date_key ];
-			}
+            if ( ! empty( $this->post_data[ $date_key ] ) ) {
+                $post_data[ $date_key ] = $this->post_data[ $date_key ];
+            }
 
-		}
+        }
 
-		Log::write( 'post-date', $post_data, 'Update Post Dates' );
+        Log::write( 'post-date', $post_data, 'Update Post Dates' );
 
-		wp_update_post( $post_data );
+        wp_update_post( $post_data );
 
-	}
+    }
 
 }

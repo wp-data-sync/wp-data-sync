@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 add_action( 'wpds_delete_log_file', function( $error_file ) {
 
 	if( file_exists( $error_file ) ) {
-		unlink( $error_file );
+		wp_delete_file( $error_file );
 	}
 
 }, 10, 1 );

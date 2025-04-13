@@ -149,7 +149,7 @@ class WC_Product_DataSync {
 
 		foreach ( $category_strings as $category_string ) {
 
-			$parent_id = null;
+			$parent_id = 0;
 			$_terms    = array_map( 'trim', explode( $delimiter, $category_string ) );
 			$total     = count( $_terms );
 

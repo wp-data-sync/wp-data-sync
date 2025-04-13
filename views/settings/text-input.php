@@ -13,16 +13,17 @@ namespace WP_DataSync\App;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	return;
-} ?>
+}
 
-<input
-	type="<?php esc_attr_e( $type ); ?>"
-	name="<?php esc_attr_e( $key ); ?>"
-	id="<?php esc_attr_e( $key ); ?>"
-	value="<?php esc_attr_e( $value ); ?>"
-	class="<?php esc_attr_e( $class ); ?>"
-	placeholder="<?php esc_attr_e( $placeholder ); ?>"
->
+printf(
+    '<input type="%s" name="%s" id="%s" value="%s" class="%s" placeholder="%s">',
+    esc_attr( $type ),
+    esc_attr( $key ),
+    esc_attr( $key ),
+    esc_attr( $value ),
+    esc_attr( $class ),
+    esc_attr( $placeholder )
+);
 
-<?php toottip( $args ); ?>
-<?php message( $args ); ?>
+toottip( $args );
+message( $args );

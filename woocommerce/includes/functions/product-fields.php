@@ -59,16 +59,16 @@ add_action('woocommerce_process_product_meta', function( $product_id ) {
 
 	$product = wc_get_product( $product_id );
 
-	$_upc = isset( $_POST['_upc'] ) ? sanitize_text_field( $_POST['_upc'] ) : '';
+	$_upc = isset( $_POST['_upc'] ) ? sanitize_text_field( wp_unslash( $_POST['_upc'] ) ) : '';
 	$product->update_meta_data( '_upc', $_upc );
 
-	$_mpn = isset( $_POST['_mpn'] ) ? sanitize_text_field( $_POST['_mpn'] ) : '';
+	$_mpn = isset( $_POST['_mpn'] ) ? sanitize_text_field( wp_unslash( $_POST['_mpn'] ) ) : '';
 	$product->update_meta_data( '_mpn', $_mpn );
 
-	$_gtin8 = isset( $_POST['_gtin8'] ) ? sanitize_text_field( $_POST['_gtin8'] ) : '';
+	$_gtin8 = isset( $_POST['_gtin8'] ) ? sanitize_text_field( wp_unslash( $_POST['_gtin8'] ) ) : '';
 	$product->update_meta_data( '_gtin8', $_gtin8 );
 
-	$_isbn = isset( $_POST['_isbn'] ) ? sanitize_text_field( $_POST['_isbn'] ) : '';
+	$_isbn = isset( $_POST['_isbn'] ) ? sanitize_text_field( wp_unslash( $_POST['_isbn'] ) ) : '';
 	$product->update_meta_data( '_isbn', $_isbn );
 
 	$product->save();
@@ -131,7 +131,7 @@ add_action( 'woocommerce_save_product_variation', function( $variation_id, $i ) 
 
 		if ( isset( $_POST[ $key ][ $i ] ) ) {
 
-			$value = sanitize_text_field( $_POST[ $key ][ $i ] );
+			$value = sanitize_text_field( wp_unslash( $_POST[ $key ][ $i ] ) );
 
 			update_post_meta( $variation_id, $key, esc_attr( $value ) );
 

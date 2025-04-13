@@ -22,11 +22,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'WCDSYNC_VERSION', '2.4.0' );
 define( 'WCDSYNC_ORDER_SYNC_STATUS', '_wpds_order_synced' );
 
-// Load WooCommerce scripts
-foreach ( glob( plugin_dir_path( __FILE__ ) . 'includes/**/*.php' ) as $file ) {
-	require_once $file;
-}
-
 /**
  * Register REST API Routes.
  */

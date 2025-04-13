@@ -23,7 +23,7 @@ add_action( 'post_submitbox_misc_actions', function( $post ) {
 	$status = __( 'Active', 'wp-data-sync' );
 	$checked = '';
 
-	if ( get_post_meta( $post->ID, WPDSYNC_SYNC_DISABLED, true ) ) {
+	if ( get_post_meta( $post->ID, wpds_sync_status_disabled, true ) ) {
 		$status = __( 'Disabled', 'wp-data-sync' );
 		$checked = 'checked';
 	}
@@ -32,7 +32,7 @@ add_action( 'post_submitbox_misc_actions', function( $post ) {
 		'<div class="misc-pub-section" id="edit-sync-status">%s: <b>%s</b> <input type="checkbox" name="%s" value="disabled" %s></div>',
 		esc_html( $label ),
 		esc_html( $status ),
-		esc_attr( WPDSYNC_SYNC_DISABLED ),
+		esc_attr( wpds_sync_status_disabled ),
 		esc_attr( $checked ),
 	);
 
@@ -46,15 +46,15 @@ add_action( 'post_submitbox_misc_actions', function( $post ) {
 
 add_action( 'save_post', function( $post_id ) {
 
-	if ( isset( $_POST[ WPDSYNC_SYNC_DISABLED ] ) ) {
+	if ( isset( $_POST[ wpds_sync_status_disabled ] ) ) {
 
-		if ( 'disabled' === $_POST[ WPDSYNC_SYNC_DISABLED ] ) {
-			update_post_meta( $post_id, WPDSYNC_SYNC_DISABLED, 'disabled' );
+		if ( 'disabled' === $_POST[ wpds_sync_status_disabled ] ) {
+			update_post_meta( $post_id, wpds_sync_status_disabled, 'disabled' );
 			return;
 		}
 
 	}
 
-	delete_post_meta( $post_id, WPDSYNC_SYNC_DISABLED );
+	delete_post_meta( $post_id, wpds_sync_status_disabled );
 
 }, 10, 1 );

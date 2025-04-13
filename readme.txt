@@ -1,10 +1,10 @@
 === WP Data Sync ===
 Contributors: kevin-brent
-Tags: sync data, api feed, data feed, json feed, woocommerce, product feed, csv import, data sync, sync products, google sheets, google forms, wp data sync, sync prices, update prices, sync inventory, update inventory, price feed, inventory feed
+Tags: sync data, api feed, data feed, product feed, woocommerece product sync
+Stable tag: 3.0.0
 Requires at least: 5.0
-Tested up to: 6.6.2
+Tested up to: 6.7.2
 Requires PHP: 7.4
-Stable tag: /trunk
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 

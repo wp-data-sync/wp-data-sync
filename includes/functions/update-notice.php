@@ -30,7 +30,7 @@ function update_message( $data, $response ) {
 
 		printf(
 			'<div class="update-message">%s</div>',
-			wpautop( $data['upgrade_notice'] )
+			esc_html( $data['upgrade_notice'] )
 		);
 
 	}

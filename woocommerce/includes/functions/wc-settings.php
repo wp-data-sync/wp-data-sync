@@ -32,11 +32,11 @@ add_filter( 'wp_data_sync_settings', function ( $settings, $_settings ) {
             'name'              => 'wp_data_sync_product_visibility',
             'class'             => 'product-visibility widefat',
             'values'            => [
-                'visible'                                  => __( 'Shop and search results', 'woocommerce' ),
-                'exclude-from-search'                      => __( 'Shop only', 'woocommerce' ),
-                'exclude-from-catalog'                     => __( 'Search results only', 'woocommerce' ),
-                'exclude-from-catalog,exclude-from-search' => __( 'Hidden', 'woocommerce' ),
-                'featured'                                 => __( 'Featured', 'woocommerce' )
+                'visible'                                  => __( 'Shop and search results', 'wp-data-sync' ),
+                'exclude-from-search'                      => __( 'Shop only', 'wp-data-sync' ),
+                'exclude-from-catalog'                     => __( 'Search results only', 'wp-data-sync' ),
+                'exclude-from-catalog,exclude-from-search' => __( 'Hidden', 'wp-data-sync' ),
+                'featured'                                 => __( 'Featured', 'wp-data-sync' )
             ]
         ]
     ];
@@ -124,7 +124,7 @@ add_filter( 'wp_data_sync_settings', function ( $settings, $_settings ) {
             'type'              => '',
             'class'             => 'regular-text',
             'placeholder'       => '',
-            'info'              => __( '', 'wp-data-sync' ),
+            'info'              => __( 'Set qty for the dynamic cross sells.', 'wp-data-sync' ),
             'values' =>[
                 'all' => 'All',
                 '1' => '1',
@@ -164,11 +164,11 @@ add_filter( 'wp_data_sync_settings', function ( $settings, $_settings ) {
             'type'              => '',
             'class'             => 'regular-text',
             'placeholder'       => '',
-            'info'              => __( '', 'wp-data-sync' ),
+            'info'              => __( 'Set sort order for the dynamic cross sells.', 'wp-data-sync' ),
             'values' =>[
-                'random' => __( 'Random', 'wp-daya-sync' ),
-                'oldest' => __( 'Oldest', 'wp-daya-sync' ),
-                'newest' => __( 'Newest', 'wp-daya-sync' )
+                'random' => __( 'Random', 'wp-data-sync' ),
+                'oldest' => __( 'Oldest', 'wp-data-sync' ),
+                'newest' => __( 'Newest', 'wp-data-sync' )
             ]
         ]
     ];
@@ -200,7 +200,7 @@ add_filter( 'wp_data_sync_settings', function ( $settings, $_settings ) {
             'type'              => '',
             'class'             => 'regular-text',
             'placeholder'       => '',
-            'info'              => __( '', 'wp-data-sync' ),
+            'info'              => __( 'Set qty for the dynamic up sells.', 'wp-data-sync' ),
             'values' =>[
                 'all' => 'All',
                 '1' => '1',
@@ -240,11 +240,11 @@ add_filter( 'wp_data_sync_settings', function ( $settings, $_settings ) {
             'type'              => '',
             'class'             => 'regular-text',
             'placeholder'       => '',
-            'info'              => __( '', 'wp-data-sync' ),
+            'info'              => __( 'Set sort order for the dynamic up sells.', 'wp-data-sync' ),
             'values' =>[
-                'random' => __( 'Random', 'wp-daya-sync' ),
-                'oldest' => __( 'Oldest', 'wp-daya-sync' ),
-                'newest' => __( 'Newest', 'wp-daya-sync' )
+                'random' => __( 'Random', 'wp-data-sync' ),
+                'oldest' => __( 'Oldest', 'wp-data-sync' ),
+                'newest' => __( 'Newest', 'wp-data-sync' )
             ]
         ]
     ];
@@ -277,17 +277,17 @@ add_filter( 'wp_data_sync_settings', function ( $settings, $_settings ) {
             'info'              => __( 'When multiple products use the same indetifier, update the selected fields for all products with a duplicate indetifier value.', 'wp-data-sync' ),
             'selected'          => get_option( 'wp_data_sync_update_duplicate_fields', [ 'none' ] ),
             'options'           => apply_filters( 'wp_data_sync_update_duplicate_field_options', [
-                'none'              => __( 'None' ),
-                '_manage_stock'     => __( 'Manage Stock', 'woocommerce' ),
-                '_stock'            => __( 'Stock Quantity', 'woocommerce' ),
-                '_backorders'       => __( 'Allow Backorders', 'woocommerce' ),
-                '_low_stock_amount' => __( 'Low Stock Threshold', 'woocommerce' ),
-                '_regular_price'    => __( 'Regular Price', 'woocommerce' ),
-                '_sale_price'       => __( 'Sale Price', 'woocommerce' ),
-                '_weight'           => __( 'Weight', 'woocommerce' ),
-                '_length'           => __( 'Length', 'woocommerce' ),
-                '_width'            => __( 'Width', 'woocommerce' ),
-                '_height'           => __( 'Height', 'woocommerce' )
+                'none'              => __( 'None', 'wp-data-sync' ),
+                '_manage_stock'     => __( 'Manage Stock', 'wp-data-sync' ),
+                '_stock'            => __( 'Stock Quantity', 'wp-data-sync' ),
+                '_backorders'       => __( 'Allow Backorders', 'wp-data-sync' ),
+                '_low_stock_amount' => __( 'Low Stock Threshold', 'wp-data-sync' ),
+                '_regular_price'    => __( 'Regular Price', 'wp-data-sync' ),
+                '_sale_price'       => __( 'Sale Price', 'wp-data-sync' ),
+                '_weight'           => __( 'Weight', 'wp-data-sync' ),
+                '_length'           => __( 'Length', 'wp-data-sync' ),
+                '_width'            => __( 'Width', 'wp-data-sync' ),
+                '_height'           => __( 'Height', 'wp-data-sync' )
             ], $_settings )
         ]
     ];
@@ -386,11 +386,11 @@ add_filter( 'wp_data_sync_settings', function ( $settings, $_settings ) {
             'placeholder'       => '',
             'selected'          => get_option( 'wp_data_sync_allowed_order_status', [] ),
             'options'           => apply_filters( 'wp_data_sync_allowed_order_status', [
-                'wc-pending'    => __( 'Pending', 'woocommerce' ),
-                'wc-processing' => __( 'Processing', 'woocommerce' ),
-                'wc-on-hold'    => __( 'On Hold', 'woocommerce' ),
-                'wc-completed'  => __( 'Completed', 'woocommerce' ),
-                'wc-refunded'   => __( 'Refunded', 'woocommerce' )
+                'wc-pending'    => __( 'Pending', 'wp-data-sync' ),
+                'wc-processing' => __( 'Processing', 'wp-data-sync' ),
+                'wc-on-hold'    => __( 'On Hold', 'wp-data-sync' ),
+                'wc-completed'  => __( 'Completed', 'wp-data-sync' ),
+                'wc-refunded'   => __( 'Refunded', 'wp-data-sync' )
             ] )
         ]
     ];

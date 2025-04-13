@@ -1,15 +1,15 @@
-# Copyright (C) 2024 WP Data Sync
+# Copyright (C) 2025 WP Data Sync
 # This file is distributed under the GPL2.
 msgid ""
 msgstr ""
-"Project-Id-Version: WP Data Sync 2.11.0\n"
+"Project-Id-Version: WP Data Sync 3.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wp-data-sync\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-10-22T18:20:46+00:00\n"
+"POT-Creation-Date: 2025-04-13T16:19:24+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: wp-data-sync\n"
@@ -17,6 +17,9 @@ msgstr ""
 #. Plugin Name of the plugin
 #. Author of the plugin
 #: wp-data-sync.php
+#: includes/classes/class.Settings.php:144
+#: includes/classes/class.Settings.php:145
+#: views/settings/form.php:31
 msgid "WP Data Sync"
 msgstr ""
 
@@ -40,24 +43,28 @@ msgstr ""
 msgid "A valid array is required!!"
 msgstr ""
 
-#: includes/classes/class.DataSync.php:216
+#: includes/classes/class.DataSync.php:225
 msgid "Post ID failed!!"
 msgstr ""
 
-#: includes/classes/class.DataSync.php:234
+#: includes/classes/class.DataSync.php:244
 msgid "Post Type Required!!"
 msgstr ""
 
-#: includes/classes/class.DataSync.php:249
+#: includes/classes/class.DataSync.php:259
 msgid "Post Sync Status Disabled!!"
 msgstr ""
 
-#: includes/classes/class.DataSync.php:258
+#: includes/classes/class.DataSync.php:269
 msgid "Post Trashed"
 msgstr ""
 
-#: includes/classes/class.DataSync.php:784
+#: includes/classes/class.DataSync.php:803
 msgid "WP Data Sync Placeholder"
+msgstr ""
+
+#: includes/classes/class.ItemInfoRequest.php:204
+msgid "Item does not exist!!"
 msgstr ""
 
 #: includes/classes/class.KeyRequest.php:133
@@ -73,7 +80,7 @@ msgstr ""
 msgid "Meta Keys"
 msgstr ""
 
-#: includes/classes/class.Log.php:116
+#: includes/classes/class.Log.php:118
 msgid "Please choose a file and save changes."
 msgstr ""
 
@@ -95,6 +102,74 @@ msgstr ""
 
 #: includes/classes/class.Settings.php:160
 msgid "You do not have sufficient permissions to access this page."
+msgstr ""
+
+#: includes/classes/class.Settings.php:188
+msgid "Home URL"
+msgstr ""
+
+#: includes/classes/class.Settings.php:192
+msgid "Site URL"
+msgstr ""
+
+#: includes/classes/class.Settings.php:196
+msgid "REST API URL"
+msgstr ""
+
+#: includes/classes/class.Settings.php:200
+msgid "WP Data Sync Version"
+msgstr ""
+
+#: includes/classes/class.Settings.php:204
+msgid "WordPress Version"
+msgstr ""
+
+#: includes/classes/class.Settings.php:208
+msgid "WooCommerce Version"
+msgstr ""
+
+#: includes/classes/class.Settings.php:212
+msgid "PHP Version"
+msgstr ""
+
+#: includes/classes/class.Settings.php:216
+msgid "Database Table Prefix"
+msgstr ""
+
+#: includes/classes/class.Settings.php:220
+msgid "WordPress Multisite"
+msgstr ""
+
+#: includes/classes/class.Settings.php:224
+msgid "WP PHP Memory Limit"
+msgstr ""
+
+#: includes/classes/class.Settings.php:228
+msgid "PHP Memory Limit"
+msgstr ""
+
+#: includes/classes/class.Settings.php:232
+msgid "Post Max Size"
+msgstr ""
+
+#: includes/classes/class.Settings.php:236
+msgid "Max Execution Time"
+msgstr ""
+
+#: includes/classes/class.Settings.php:240
+msgid "Max Upload Size"
+msgstr ""
+
+#: includes/classes/class.Settings.php:244
+msgid "Upload Max Filesize"
+msgstr ""
+
+#: includes/classes/class.Settings.php:248
+msgid "Max Input Time"
+msgstr ""
+
+#: includes/classes/class.Settings.php:279
+msgid "Plugin (active)"
 msgstr ""
 
 #: includes/classes/class.Settings.php:443
@@ -134,30 +209,38 @@ msgid "Default Status"
 msgstr ""
 
 #: includes/classes/class.Settings.php:532
+#: includes/classes/class.Settings.php:743
 msgid "Publish"
 msgstr ""
 
 #: includes/classes/class.Settings.php:533
+#: includes/classes/class.Settings.php:744
+#: woocommerce/includes/functions/wc-settings.php:389
 msgid "Pending"
 msgstr ""
 
 #: includes/classes/class.Settings.php:534
+#: includes/classes/class.Settings.php:745
 msgid "Draft"
 msgstr ""
 
 #: includes/classes/class.Settings.php:535
+#: includes/classes/class.Settings.php:746
 msgid "Future"
 msgstr ""
 
 #: includes/classes/class.Settings.php:536
+#: includes/classes/class.Settings.php:747
 msgid "Private"
 msgstr ""
 
 #: includes/classes/class.Settings.php:537
+#: includes/classes/class.Settings.php:748
 msgid "Trash"
 msgstr ""
 
 #: includes/classes/class.Settings.php:538
+#: includes/classes/class.Settings.php:749
 msgid "Inherit"
 msgstr ""
 
@@ -489,6 +572,26 @@ msgstr ""
 msgid "Default Product Visibility"
 msgstr ""
 
+#: woocommerce/includes/functions/wc-settings.php:35
+msgid "Shop and search results"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:36
+msgid "Shop only"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:37
+msgid "Search results only"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:38
+msgid "Hidden"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:39
+msgid "Featured"
+msgstr ""
+
 #: woocommerce/includes/functions/wc-settings.php:46
 msgid "Use Current Product Visibility"
 msgstr ""
@@ -530,8 +633,31 @@ msgstr ""
 msgid "Dynamic Product Cross-Sells Quantity"
 msgstr ""
 
+#: woocommerce/includes/functions/wc-settings.php:127
+msgid "Set qty for the dynamic cross sells."
+msgstr ""
+
 #: woocommerce/includes/functions/wc-settings.php:156
 msgid "Dynamic Product Cross-Sells Sort Order"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:167
+msgid "Set sort order for the dynamic cross sells."
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:169
+#: woocommerce/includes/functions/wc-settings.php:245
+msgid "Random"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:170
+#: woocommerce/includes/functions/wc-settings.php:246
+msgid "Oldest"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:171
+#: woocommerce/includes/functions/wc-settings.php:247
+msgid "Newest"
 msgstr ""
 
 #: woocommerce/includes/functions/wc-settings.php:178
@@ -546,8 +672,16 @@ msgstr ""
 msgid "Dynamic Product Up-Sells Quantity"
 msgstr ""
 
+#: woocommerce/includes/functions/wc-settings.php:203
+msgid "Set qty for the dynamic up sells."
+msgstr ""
+
 #: woocommerce/includes/functions/wc-settings.php:232
 msgid "Dynamic Product Up-Sells Sort Order"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:243
+msgid "Set sort order for the dynamic up sells."
 msgstr ""
 
 #: woocommerce/includes/functions/wc-settings.php:254
@@ -564,6 +698,50 @@ msgstr ""
 
 #: woocommerce/includes/functions/wc-settings.php:277
 msgid "When multiple products use the same indetifier, update the selected fields for all products with a duplicate indetifier value."
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:280
+msgid "None"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:281
+msgid "Manage Stock"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:282
+msgid "Stock Quantity"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:283
+msgid "Allow Backorders"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:284
+msgid "Low Stock Threshold"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:285
+msgid "Regular Price"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:286
+msgid "Sale Price"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:287
+msgid "Weight"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:288
+msgid "Length"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:289
+msgid "Width"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:290
+msgid "Height"
 msgstr ""
 
 #: woocommerce/includes/functions/wc-settings.php:297
@@ -625,6 +803,22 @@ msgstr ""
 
 #: woocommerce/includes/functions/wc-settings.php:378
 msgid "Allowed Order Status"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:390
+msgid "Processing"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:391
+msgid "On Hold"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:392
+msgid "Completed"
+msgstr ""
+
+#: woocommerce/includes/functions/wc-settings.php:393
+msgid "Refunded"
 msgstr ""
 
 #: woocommerce/includes/functions/wc-settings.php:400

@@ -247,27 +247,6 @@ class ItemRequest extends Request {
 		$table = self::table();
 
 		/**
-		 * SELECT statement.
-		 */
-
-		$select = "
-			SELECT SQL_NO_CACHE SQL_CALC_FOUND_ROWS  p.ID 
-			FROM {$wpdb->prefix}posts p
-		";
-
-		/**
-		 * JOIN statement.
-		 */
-
-		$join = apply_filters( 'wp_data_sync_item_request_sql_join', $wpdb->prepare(
-			"
-			LEFT JOIN $table i
-			ON (p.ID = i.item_id AND i.api_id = %s)
-			",
-			esc_sql( $this->api_id )
-		), $this->post_type );
-
-		/**
 		 * WHERE statement
 		 */
 
@@ -275,44 +254,29 @@ class ItemRequest extends Request {
 		$count        = count( $status );
 		$placeholders = join( ', ', array_fill( 0, $count, '%s' ) );
 		$where_args   = array_merge(
+            [ esc_sql( $this->api_id ) ],
 			[ esc_sql( $this->post_type ) ],
-			array_map( 'esc_sql', $status )
+			array_map( 'esc_sql', $status ),
+            [ intval( $this->limit ) ]
 		);
 
-		$where = apply_filters( 'wp_data_sync_item_request_sql_where', $wpdb->prepare(
-			" 
-			WHERE i.item_id IS NULL 
-			AND p.post_type = %s 
-			AND p.post_status IN ( $placeholders )
-			",
-			$where_args
-		), $this->post_type );
-
-		/**
-		 * ORDER BY statement
-		 */
-
-		$order_by = apply_filters( 'wp_data_sync_item_request_sql_order_by', "ORDER BY p.ID DESC", $this->post_type );
-
-		/**
-		 * LIMIT statement
-		 */
-
-		$limit = apply_filters( 'wp_data_sync_item_request_sql_limit', $wpdb->prepare(
-			"LIMIT %d",
-			$this->limit
-		), $this->limit, $this->post_type );
-
-		/**
-		 * Combine parts to make the SQL statement.
-		 */
-
-		$sql = "$select $join $where $order_by $limit";
-
-		$item_ids = $wpdb->get_col( $sql );
+		$item_ids = $wpdb->get_col( $wpdb->prepare(
+            "
+            SELECT SQL_NO_CACHE SQL_CALC_FOUND_ROWS  p.ID 
+			FROM $wpdb->posts p  
+            LEFT JOIN $table i
+			    ON (p.ID = i.item_id AND i.api_id = %s)
+            WHERE i.item_id IS NULL 
+			    AND p.post_type = %s 
+			    AND p.post_status IN ( $placeholders )
+            ORDER BY p.ID DESC
+            LIMIT %d
+            ",
+            $where_args
+        ) );
 
 		Log::write( 'item-request',[
-			'sql'      => $sql,
+			'sql'      => $wpdb->last_query,
 			'item_ids' => $item_ids
 		], 'SQL Query' );
 

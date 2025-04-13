@@ -186,7 +186,7 @@ class WC_Order_DataRequest extends Request {
 	 */
 
 	public function format_min_date( $min_date ) {
-		return date( 'Y-m-d H:i:s', strtotime( $min_date ) );
+		return gmdate( 'Y-m-d H:i:s', strtotime( $min_date ) );
 	}
 
 	/**

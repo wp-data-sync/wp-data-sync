@@ -138,24 +138,22 @@ class WC_Product_Sells {
 
 		$table = self::table();
 
-		$exists = $wpdb->get_var(
-			$wpdb->prepare(
-				"
-				SELECT id
-				FROM $table
-				WHERE type = %s
+		$exists = $wpdb->get_var( $wpdb->prepare(
+            "
+			SELECT id
+			FROM $table
+			WHERE type = %s
 				AND sell_id = %s
 				AND product_id = %d
 				AND relational_id = %s
 				AND relational_key = %s
-				",
-				esc_sql( $this->type ),
-				esc_sql( $sell_id ),
-				intval( $this->product_id ),
-				esc_sql( $this->relational_id ),
-				esc_sql( $this->relational_key )
-			)
-		);
+			",
+            esc_sql( $this->type ),
+            esc_sql( $sell_id ),
+            intval( $this->product_id ),
+            esc_sql( $this->relational_id ),
+            esc_sql( $this->relational_key )
+	    ) );
 
 		if ( empty( $exists ) || is_wp_error( $exists ) ) {
 			return false;
@@ -250,18 +248,16 @@ class WC_Product_Sells {
 
 		global $wpdb;
 
-		$post_id = $wpdb->get_var(
-			$wpdb->prepare(
-				"
-				SELECT post_id
-				FROM $wpdb->postmeta
-				WHERE meta_key = %s
+		$post_id = $wpdb->get_var( $wpdb->prepare(
+	        "
+			SELECT post_id
+			FROM $wpdb->postmeta
+			WHERE meta_key = %s
 				AND meta_value = %s
-				",
-				esc_sql( $row->relational_key ),
-				esc_sql( $row->sell_id )
-			)
-		);
+			",
+            esc_sql( $row->relational_key ),
+            esc_sql( $row->sell_id )
+	    ) );
 
 		if ( null === $post_id || is_wp_error( $post_id ) ) {
 			return false;

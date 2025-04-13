@@ -244,7 +244,7 @@ abstract class Request {
 		$data = [];
 
 		if ( ! is_array( $raw_data ) ) {
-			die( __( 'A valid array is required!!', 'wp-data-sync' ) );
+			wp_die( esc_html__( 'A valid array is required!!', 'wp-data-sync' ) );
 		}
 
 		foreach ( $raw_data as $key => $value ) {
@@ -289,7 +289,7 @@ abstract class Request {
 			return intval( $key );
 		}
 
-		die( __( 'A valid array is required!!', 'wp-data-sync' ) );
+		wp_die( esc_html__( 'A valid array is required!!', 'wp-data-sync' ) );
 
 	}
 

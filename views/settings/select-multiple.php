@@ -16,9 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 } ?>
 
 <select
-	name="<?php esc_attr_e( $name ); ?>[]"
-	id="<?php esc_attr_e( $name ); ?>"
-	class="<?php esc_attr_e( $class ); ?>"
+	name="<?php echo esc_attr( $name ); ?>[]"
+	id="<?php echo esc_attr( $name ); ?>"
+	class="<?php echo esc_attr( $class ); ?>"
 	multiple="multiple"
 >
 
@@ -27,9 +27,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?php $choice = in_array( $value, $selected ) ? 'selected' : ''; ?>
 
 		<option
-			value="<?php esc_attr_e( $value ); ?>"
-			<?php esc_attr_e( $choice ); ?>
-		><?php esc_html_e( $label ); ?></option>
+			value="<?php echo esc_attr( $value ); ?>"
+			<?php echo esc_attr( $choice ); ?>
+		><?php echo esc_html( $label ); ?></option>
 
 	<?php } ?>
 

@@ -11,6 +11,8 @@
 
 namespace WP_DataSync\App;
 
+use WP_Filesystem_Direct;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -31,26 +33,26 @@ class Log {
 	public static function write( $key, $data, $action = '' ) {
 
 		if ( self::is_active() ) {
+            require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
+            require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
 
-			$msg        = self::message( $data, $action );
-			$date       = date( 'Y-m-d' );
-			$hash       = self::log_hash();
-			$error_file = WPDSYNC_LOG_DIR . "{$key}-{$date}-{$hash}.log";
+            $wp_filesystem = new WP_Filesystem_Direct( false );
+			$msg           = self::message( $data, $action );
+			$date          = gmdate( 'Y-m-d' );
+			$hash          = self::log_hash();
+			$error_file    = WPDSYNC_LOG_DIR . "{$key}-{$date}-{$hash}.log";
 
 			// Create the log file dir if we do not already have one.
-			if ( ! file_exists( WPDSYNC_LOG_DIR ) ) {
-				mkdir( WPDSYNC_LOG_DIR, 0755, true );
+			if ( ! $wp_filesystem->exists( WPDSYNC_LOG_DIR ) ) {
+                $wp_filesystem->mkdir( WPDSYNC_LOG_DIR, 0755, true );
 			}
 
-			if ( ! file_exists( $error_file ) ) {
-
-				fopen( $error_file, 'w' );
-
+			if ( ! $wp_filesystem->exists( $error_file ) ) {
 				// Schedule deletion of log file in 10 days
 				wp_schedule_single_event( time() + ( 10 * DAY_IN_SECONDS ), 'wpds_delete_log_file', [ $error_file ] );
-			}
+            }
 
-			error_log( $msg, 3, $error_file );
+            $wp_filesystem->put_contents( $error_file, $msg, 0644 );
 
 		}
 
@@ -69,14 +71,14 @@ class Log {
 
 		ob_start();
 
-		$date = date( "F j, Y, g:i a" );
+		$date = gmdate( "F j, Y, g:i a" );
 
-		echo "[{$date}] - $action - ";
+        printf( '[%s] - %s - ', esc_html( $date), esc_html( $action ) );
 
 		if ( is_array( $data ) || is_object( $data ) ) {
 			print_r( $data );
 		} else {
-			echo $data;
+			echo wp_kses_post( $data );
 		}
 
 		echo "\n";
@@ -167,7 +169,7 @@ class Log {
 
 		if ( ! $log_hash = get_option( 'wp_data_sync_log_hash' ) ) {
 
-			$log_hash = wp_hash( home_url() . rand() );
+			$log_hash = wp_hash( home_url() . wp_rand() );
 
 			add_option( 'wp_data_sync_log_hash', $log_hash );
 

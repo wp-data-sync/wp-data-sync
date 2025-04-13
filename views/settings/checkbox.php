@@ -18,10 +18,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 <input
 	type="checkbox"
 	value="checked"
-	name="<?php esc_attr_e( $key ); ?>"
-	id="<?php esc_attr_e( $key ); ?>"
-	class="<?php esc_attr_e( $class ); ?>"
-	<?php esc_attr_e( $value ); ?>
+	name="<?php echo esc_attr( $key ); ?>"
+	id="<?php echo esc_attr( $key ); ?>"
+	class="<?php echo esc_attr( $class ); ?>"
+	<?php echo esc_attr( $value ); ?>
 >
 
 <?php toottip( $args ); ?>

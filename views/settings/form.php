@@ -28,13 +28,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div class="wp-data-sync-settings wrap">
 
-	<h1 class="wp-data-sync-admin-h1"><?php esc_html_e( 'WP Data Sync' ); ?></h1>
+	<h1 class="wp-data-sync-admin-h1"><?php esc_html_e( 'WP Data Sync', 'wp-data-sync' ); ?></h1>
 
 	<?php do_action( 'wp_data_sync_help_buttons' ); ?>
 
 	<?php view( 'settings/admin-tabs', $args ); ?>
 
-	<form method="post" action="options.php?active_tab=<?php esc_attr_e( $group ); ?>">
+	<form method="post" action="options.php?active_tab=<?php echo esc_attr( $group ); ?>">
 
 		<table class="form-table">
 

@@ -23,16 +23,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<tr class="widefat">
 
-		<th scope="row"><label for="<?php esc_attr_e( $id ); ?>"><?php esc_html_e( $label ); ?></label></th>
+		<th scope="row"><label for="<?php echo esc_attr( $id ); ?>"><?php echo esc_html( $label ); ?></label></th>
 
 		<td>
 			<input
 				type="checkbox"
-				value="<?php esc_attr_e( $value ); ?>"
-				name="<?php esc_attr_e( $key ); ?>[]"
-				id="<?php esc_attr_e( $id ); ?>"
-				class="<?php esc_attr_e( $class ); ?>"
-				<?php esc_attr_e( $checked ); ?>
+				value="<?php echo esc_attr( $value ); ?>"
+				name="<?php echo esc_attr( $key ); ?>[]"
+				id="<?php echo esc_attr( $id ); ?>"
+				class="<?php echo esc_attr( $class ); ?>"
+				<?php echo esc_attr( $checked ); ?>
 			>
 
 			<?php toottip( $args ); ?>

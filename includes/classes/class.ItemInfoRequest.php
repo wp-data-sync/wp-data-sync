@@ -201,7 +201,7 @@ class ItemInfoRequest extends Request {
 	public function get_item_info() {
 
 		if ( ! $item_id = $this->fetch_item_id() ) {
-			return __( 'Item does not exist!!', 'wp-daya-sync' );
+			return __( 'Item does not exist!!', 'wp-data-sync' );
 		}
 
 		$item = new Item( $item_id );
