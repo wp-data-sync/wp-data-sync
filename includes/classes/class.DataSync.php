@@ -255,7 +255,7 @@ class DataSync {
         /**
          * Check the post sync status.
          */
-        if ( get_post_meta( $this->post_id, wpds_sync_status_disabled, true ) ) {
+        if ( get_post_meta( $this->post_id, 'wpds_sync_status_disabled', true ) ) {
             $wpds_response['items'][ $process_id ]['error']  = __( 'Post Sync Status Disabled!!', 'wp-data-sync' );
             $wpds_response['items'][ $process_id ]['status'] = 'disabled';
 
