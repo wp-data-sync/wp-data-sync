@@ -697,6 +697,19 @@ class Settings {
                         'placeholder'       => '',
                         'info'              => __( 'Create a unique image basename from a hash of the source image URL. Recommeneded for image URLs with common basenames.', 'wp-data-sync' )
                     ]
+                ],
+                [
+                    'key'      => 'wp_data_sync_allow_iframes',
+                    'label'    => __( 'Allow iFrames', 'wp-data-sync' ),
+                    'callback' => 'input',
+                    'args'     => [
+                        'sanitize_callback' => 'sanitize_text_field',
+                        'basename'          => 'checkbox',
+                        'type'              => '',
+                        'class'             => '',
+                        'placeholder'       => '',
+                        'info'              => __( 'Allow iFrames in content.', 'wp-data-sync' )
+                    ]
                 ]
             ],
             'item_request'       => [

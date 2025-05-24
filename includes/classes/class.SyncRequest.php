@@ -84,8 +84,8 @@ class SyncRequest extends Request {
 	public function register_route() {
 
 		register_rest_route(
-			'wp-data-sync/' . WPDSYNC_EP_VERSION,
-			'/sync/(?P<access_token>\S+)/(?P<cache_buster>\S+)/',
+			'wp-data-sync',
+            '/' . WPDSYNC_EP_VERSION . '/sync/(?P<access_token>\S+)/(?P<cache_buster>\S+)/',
 			[
 				'methods' => WP_REST_Server::CREATABLE,
 				'args'    => [
