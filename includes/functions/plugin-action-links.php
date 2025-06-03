@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 add_filter( 'plugin_action_links', function( $links, $file ) {
 
-	if ( is_plugin_active( WPDSYNC_FILE ) ) {
+	if ( $file  === WPDSYNC_FILE && is_plugin_active( WPDSYNC_FILE ) ) {
 
 		$link = sprintf( '<a href="options-general.php?page=wp-data-sync">%s</a>', esc_html__( 'Settings', 'wp-data-sync' ) );
 
