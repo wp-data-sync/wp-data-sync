@@ -2,14 +2,14 @@
 # This file is distributed under the GPL2.
 msgid ""
 msgstr ""
-"Project-Id-Version: WP Data Sync 3.0.0\n"
+"Project-Id-Version: WP Data Sync 3.0.4\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wp-data-sync\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-04-13T16:19:24+00:00\n"
+"POT-Creation-Date: 2025-07-29T21:29:39+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: wp-data-sync\n"
@@ -38,8 +38,8 @@ msgstr ""
 msgid "https://wpdatasync.com"
 msgstr ""
 
-#: includes/abstracts/abstract.Request.php:247
-#: includes/abstracts/abstract.Request.php:292
+#: includes/abstracts/abstract.Request.php:249
+#: includes/abstracts/abstract.Request.php:294
 msgid "A valid array is required!!"
 msgstr ""
 
@@ -63,6 +63,10 @@ msgstr ""
 msgid "WP Data Sync Placeholder"
 msgstr ""
 
+#: includes/classes/class.DataSync.php:1935
+msgid "Value must be a string."
+msgstr ""
+
 #: includes/classes/class.ItemInfoRequest.php:204
 msgid "Item does not exist!!"
 msgstr ""
@@ -72,7 +76,7 @@ msgid "Post Types"
 msgstr ""
 
 #: includes/classes/class.KeyRequest.php:138
-#: includes/classes/class.Settings.php:770
+#: includes/classes/class.Settings.php:783
 msgid "Taxonomies"
 msgstr ""
 
@@ -209,38 +213,38 @@ msgid "Default Status"
 msgstr ""
 
 #: includes/classes/class.Settings.php:532
-#: includes/classes/class.Settings.php:743
+#: includes/classes/class.Settings.php:756
 msgid "Publish"
 msgstr ""
 
 #: includes/classes/class.Settings.php:533
-#: includes/classes/class.Settings.php:744
-#: woocommerce/includes/functions/wc-settings.php:389
+#: includes/classes/class.Settings.php:757
+#: woocommerce/includes/functions/wc-settings.php:375
 msgid "Pending"
 msgstr ""
 
 #: includes/classes/class.Settings.php:534
-#: includes/classes/class.Settings.php:745
+#: includes/classes/class.Settings.php:758
 msgid "Draft"
 msgstr ""
 
 #: includes/classes/class.Settings.php:535
-#: includes/classes/class.Settings.php:746
+#: includes/classes/class.Settings.php:759
 msgid "Future"
 msgstr ""
 
 #: includes/classes/class.Settings.php:536
-#: includes/classes/class.Settings.php:747
+#: includes/classes/class.Settings.php:760
 msgid "Private"
 msgstr ""
 
 #: includes/classes/class.Settings.php:537
-#: includes/classes/class.Settings.php:748
+#: includes/classes/class.Settings.php:761
 msgid "Trash"
 msgstr ""
 
 #: includes/classes/class.Settings.php:538
-#: includes/classes/class.Settings.php:749
+#: includes/classes/class.Settings.php:762
 msgid "Inherit"
 msgstr ""
 
@@ -357,60 +361,72 @@ msgstr ""
 msgid "Create a unique image basename from a hash of the source image URL. Recommeneded for image URLs with common basenames."
 msgstr ""
 
-#: includes/classes/class.Settings.php:705
-msgid "Item Request Access Token"
+#: includes/classes/class.Settings.php:703
+msgid "Allow iFrames"
+msgstr ""
+
+#: includes/classes/class.Settings.php:711
+msgid "Allow iFrames in content."
 msgstr ""
 
 #: includes/classes/class.Settings.php:718
-msgid "Item Request Private Token"
+msgid "Item Request Access Token"
 msgstr ""
 
 #: includes/classes/class.Settings.php:731
+msgid "Item Request Private Token"
+msgstr ""
+
+#: includes/classes/class.Settings.php:744
 msgid "Include items with status"
 msgstr ""
 
-#: includes/classes/class.Settings.php:740
+#: includes/classes/class.Settings.php:753
 msgid "Include the selected post ststuses from the item request. Select all that apply."
 msgstr ""
 
-#: includes/classes/class.Settings.php:755
+#: includes/classes/class.Settings.php:768
 msgid "Exclude Data Types"
 msgstr ""
 
-#: includes/classes/class.Settings.php:764
+#: includes/classes/class.Settings.php:777
 msgid "Exclude the selected data types from the item request. Select all that apply."
 msgstr ""
 
-#: includes/classes/class.Settings.php:767
+#: includes/classes/class.Settings.php:780
 msgid "Exclude None"
 msgstr ""
 
-#: includes/classes/class.Settings.php:768
+#: includes/classes/class.Settings.php:781
 msgid "Post Data"
 msgstr ""
 
-#: includes/classes/class.Settings.php:769
+#: includes/classes/class.Settings.php:782
 msgid "Post Meta"
 msgstr ""
 
-#: includes/classes/class.Settings.php:771
+#: includes/classes/class.Settings.php:784
 msgid "Featured Image"
 msgstr ""
 
-#: includes/classes/class.Settings.php:772
+#: includes/classes/class.Settings.php:785
 msgid "Integrations"
 msgstr ""
 
-#: includes/classes/class.Settings.php:780
+#: includes/classes/class.Settings.php:793
 msgid "Allow Logging"
 msgstr ""
 
-#: includes/classes/class.Settings.php:788
+#: includes/classes/class.Settings.php:801
 msgid "We reccommend keeping this off unless you are having an issue with the data sync. If you do have an issue, please activate this before contacting support. Log files will be automatically deleted after 10 days. Please note when allow logging is deactivated all log files will be deleted."
 msgstr ""
 
-#: includes/classes/class.Settings.php:793
+#: includes/classes/class.Settings.php:806
 msgid "Log File"
+msgstr ""
+
+#: includes/functions/image-replace.php:45
+msgid "Image replace requires content to be a string."
 msgstr ""
 
 #: includes/functions/plugin-action-links.php:22
@@ -464,52 +480,6 @@ msgstr ""
 
 #: woocommerce/includes/functions/order-sync-status-order-action.php:44
 msgid "Manually removed order sync status."
-msgstr ""
-
-#: woocommerce/includes/functions/product-brand-taxonomy.php:29
-msgctxt "Brands"
-msgid "Brands"
-msgstr ""
-
-#: woocommerce/includes/functions/product-brand-taxonomy.php:30
-msgctxt "Brand"
-msgid "Brand"
-msgstr ""
-
-#: woocommerce/includes/functions/product-brand-taxonomy.php:31
-msgid "Search Brands"
-msgstr ""
-
-#: woocommerce/includes/functions/product-brand-taxonomy.php:32
-msgid "All Brands"
-msgstr ""
-
-#: woocommerce/includes/functions/product-brand-taxonomy.php:33
-msgid "Parent Brand"
-msgstr ""
-
-#: woocommerce/includes/functions/product-brand-taxonomy.php:34
-msgid "Parent Brand:"
-msgstr ""
-
-#: woocommerce/includes/functions/product-brand-taxonomy.php:35
-msgid "View Brand"
-msgstr ""
-
-#: woocommerce/includes/functions/product-brand-taxonomy.php:36
-msgid "Update Brand"
-msgstr ""
-
-#: woocommerce/includes/functions/product-brand-taxonomy.php:37
-msgid "Add New Brand"
-msgstr ""
-
-#: woocommerce/includes/functions/product-brand-taxonomy.php:38
-msgid "New Brand Name"
-msgstr ""
-
-#: woocommerce/includes/functions/product-brand-taxonomy.php:39
-msgid "Brands"
 msgstr ""
 
 #: woocommerce/includes/functions/product-category-options-array.php:33
@@ -601,247 +571,239 @@ msgid "Use the current product visibility if the product visibility is already s
 msgstr ""
 
 #: woocommerce/includes/functions/wc-settings.php:60
-msgid "Product Brand Taxonomy"
-msgstr ""
-
-#: woocommerce/includes/functions/wc-settings.php:68
-msgid "Activate brand taxonomy on WooCommerce products."
-msgstr ""
-
-#: woocommerce/includes/functions/wc-settings.php:74
 msgid "Defined Cross-Sells"
 msgstr ""
 
+#: woocommerce/includes/functions/wc-settings.php:68
 #: woocommerce/includes/functions/wc-settings.php:82
-#: woocommerce/includes/functions/wc-settings.php:96
 msgid "This relates the IDs from your data source with the IDs from your website. Please note, if the related product does not exist, this system will relate the product when it is created in the data sync."
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:88
+#: woocommerce/includes/functions/wc-settings.php:74
 msgid "Defined Up-Sells"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:102
+#: woocommerce/includes/functions/wc-settings.php:88
 msgid "Dynamic Product Cross-Sells"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:110
+#: woocommerce/includes/functions/wc-settings.php:96
 msgid "Dynamically display cross-sell products on the product pages. Please note: your theme must support cross-sells for products."
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:116
+#: woocommerce/includes/functions/wc-settings.php:102
 msgid "Dynamic Product Cross-Sells Quantity"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:127
+#: woocommerce/includes/functions/wc-settings.php:113
 msgid "Set qty for the dynamic cross sells."
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:156
+#: woocommerce/includes/functions/wc-settings.php:142
 msgid "Dynamic Product Cross-Sells Sort Order"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:167
+#: woocommerce/includes/functions/wc-settings.php:153
 msgid "Set sort order for the dynamic cross sells."
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:169
-#: woocommerce/includes/functions/wc-settings.php:245
+#: woocommerce/includes/functions/wc-settings.php:155
+#: woocommerce/includes/functions/wc-settings.php:231
 msgid "Random"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:170
-#: woocommerce/includes/functions/wc-settings.php:246
+#: woocommerce/includes/functions/wc-settings.php:156
+#: woocommerce/includes/functions/wc-settings.php:232
 msgid "Oldest"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:171
-#: woocommerce/includes/functions/wc-settings.php:247
+#: woocommerce/includes/functions/wc-settings.php:157
+#: woocommerce/includes/functions/wc-settings.php:233
 msgid "Newest"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:178
+#: woocommerce/includes/functions/wc-settings.php:164
 msgid "Dynamic Product Up-Sells"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:186
+#: woocommerce/includes/functions/wc-settings.php:172
 msgid "Dynamically display up-sell products on the product pages. Please note: your theme must support up-sells for products."
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:192
+#: woocommerce/includes/functions/wc-settings.php:178
 msgid "Dynamic Product Up-Sells Quantity"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:203
+#: woocommerce/includes/functions/wc-settings.php:189
 msgid "Set qty for the dynamic up sells."
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:232
+#: woocommerce/includes/functions/wc-settings.php:218
 msgid "Dynamic Product Up-Sells Sort Order"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:243
+#: woocommerce/includes/functions/wc-settings.php:229
 msgid "Set sort order for the dynamic up sells."
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:254
+#: woocommerce/includes/functions/wc-settings.php:240
 msgid "Allow Duplicate SKU"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:262
+#: woocommerce/includes/functions/wc-settings.php:248
 msgid "Allow WooCommerce to use the same SKU for multiple products or variations. This can cause issues with some functionality. Proceed at your own risk."
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:268
+#: woocommerce/includes/functions/wc-settings.php:254
 msgid "Update Duplicate Fields"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:277
+#: woocommerce/includes/functions/wc-settings.php:263
 msgid "When multiple products use the same indetifier, update the selected fields for all products with a duplicate indetifier value."
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:280
+#: woocommerce/includes/functions/wc-settings.php:266
 msgid "None"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:281
+#: woocommerce/includes/functions/wc-settings.php:267
 msgid "Manage Stock"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:282
+#: woocommerce/includes/functions/wc-settings.php:268
 msgid "Stock Quantity"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:283
+#: woocommerce/includes/functions/wc-settings.php:269
 msgid "Allow Backorders"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:284
+#: woocommerce/includes/functions/wc-settings.php:270
 msgid "Low Stock Threshold"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:285
+#: woocommerce/includes/functions/wc-settings.php:271
 msgid "Regular Price"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:286
+#: woocommerce/includes/functions/wc-settings.php:272
 msgid "Sale Price"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:287
+#: woocommerce/includes/functions/wc-settings.php:273
 msgid "Weight"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:288
+#: woocommerce/includes/functions/wc-settings.php:274
 msgid "Length"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:289
+#: woocommerce/includes/functions/wc-settings.php:275
 msgid "Width"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:290
+#: woocommerce/includes/functions/wc-settings.php:276
 msgid "Height"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:297
+#: woocommerce/includes/functions/wc-settings.php:283
 msgid "Manage Backorder Status"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:305
+#: woocommerce/includes/functions/wc-settings.php:291
 msgid "Set backorder status based on stock quantity. NOTE: Allow backorders must be set for each product."
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:311
+#: woocommerce/includes/functions/wc-settings.php:297
 msgid "Convert Product Weight"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:319
+#: woocommerce/includes/functions/wc-settings.php:305
 msgid "Convert the product weight. If you do not see the conversion you need. Please contact our support team to have it added."
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:321
+#: woocommerce/includes/functions/wc-settings.php:307
 msgid "Do Not Convert Weight"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:322
+#: woocommerce/includes/functions/wc-settings.php:308
 msgid "Grams to Kilograms"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:323
+#: woocommerce/includes/functions/wc-settings.php:309
 msgid "Kilograms to Grams"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:324
+#: woocommerce/includes/functions/wc-settings.php:310
 msgid "Pounds to Ounces"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:325
+#: woocommerce/includes/functions/wc-settings.php:311
 msgid "Ounces to Pounds"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:332
+#: woocommerce/includes/functions/wc-settings.php:318
 msgid "Regular Price Adjustment (%)"
 msgstr ""
 
+#: woocommerce/includes/functions/wc-settings.php:326
 #: woocommerce/includes/functions/wc-settings.php:340
-#: woocommerce/includes/functions/wc-settings.php:354
 msgid "Multiply price to add/subtract price adjustment."
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:346
+#: woocommerce/includes/functions/wc-settings.php:332
 msgid "Sale Price Adjustment (%)"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:364
+#: woocommerce/includes/functions/wc-settings.php:350
 msgid "Allow Order Sync"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:372
+#: woocommerce/includes/functions/wc-settings.php:358
 msgid "Allow order details to sync with the WP Data Sync API."
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:378
+#: woocommerce/includes/functions/wc-settings.php:364
 msgid "Allowed Order Status"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:390
+#: woocommerce/includes/functions/wc-settings.php:376
 msgid "Processing"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:391
+#: woocommerce/includes/functions/wc-settings.php:377
 msgid "On Hold"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:392
+#: woocommerce/includes/functions/wc-settings.php:378
 msgid "Completed"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:393
+#: woocommerce/includes/functions/wc-settings.php:379
 msgid "Refunded"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:400
+#: woocommerce/includes/functions/wc-settings.php:386
 msgid "Allowed Product Categories"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:410
+#: woocommerce/includes/functions/wc-settings.php:396
 msgid "Include products with selected categories in order sync."
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:417
+#: woocommerce/includes/functions/wc-settings.php:403
 msgid "Require Valid Product"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:425
+#: woocommerce/includes/functions/wc-settings.php:411
 msgid "Require a valid poroduct in the order."
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:431
+#: woocommerce/includes/functions/wc-settings.php:417
 msgid "Show Order Sync Status Admin Column"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:439
+#: woocommerce/includes/functions/wc-settings.php:425
 msgid "Show admin column for order export status on Orders list."
 msgstr ""
 

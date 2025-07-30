@@ -56,20 +56,6 @@ add_filter( 'wp_data_sync_settings', function ( $settings, $_settings ) {
     ];
 
     $settings['woocommerce'][] = [
-        'key'      => 'wp_data_sync_product_brand_taxonomy',
-        'label'    => __( 'Product Brand Taxonomy', 'wp-data-sync' ),
-        'callback' => 'input',
-        'args'     => [
-            'sanitize_callback' => 'sanitize_text_field',
-            'basename'          => 'checkbox',
-            'type'              => '',
-            'class'             => '',
-            'placeholder'       => '',
-            'info'              => __( 'Activate brand taxonomy on WooCommerce products.', 'wp-data-sync' )
-        ]
-    ];
-
-    $settings['woocommerce'][] = [
         'key'      => 'wp_data_sync_process__crosssell_ids',
         'label'    => __( 'Defined Cross-Sells', 'wp-data-sync' ),
         'callback' => 'input',

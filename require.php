@@ -84,7 +84,6 @@ if ( class_exists( 'woocommerce' ) ) {
     require 'woocommerce/includes/functions/order-sync-status-order-action.php';
     require 'woocommerce/includes/functions/product-allow-duplicate-sku.php';
     require 'woocommerce/includes/functions/product-attribute-clear-cache.php';
-    require 'woocommerce/includes/functions/product-brand-taxonomy.php';
     require 'woocommerce/includes/functions/product-category-options-array.php';
     require 'woocommerce/includes/functions/product-dynamic-sells.php';
     require 'woocommerce/includes/functions/product-excluded-types.php';

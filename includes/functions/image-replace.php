@@ -14,15 +14,15 @@ namespace WP_DataSync\App;
 use DOMDocument;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+    exit;
 }
 
 if ( Settings::is_checked( 'wp_data_sync_replace_post_content_images' ) ) {
-	add_filter( 'wp_data_sync_post_content', 'WP_DataSync\App\image_replace', 10, 3 );
+    add_filter( 'wp_data_sync_post_content', 'WP_DataSync\App\image_replace', 10, 3 );
 }
 
 if ( Settings::is_checked( 'wp_data_sync_replace_post_excerpt_images' ) ) {
-	add_filter( 'wp_data_sync_post_excerpt', 'WP_DataSync\App\image_replace', 10, 3 );
+    add_filter( 'wp_data_sync_post_excerpt', 'WP_DataSync\App\image_replace', 10, 3 );
 }
 
 /**
@@ -37,33 +37,37 @@ if ( Settings::is_checked( 'wp_data_sync_replace_post_excerpt_images' ) ) {
 
 function image_replace( $content, $post_id, $data_sync ) {
 
-	if ( ! empty( $content ) ) {
+    if ( empty( $content ) ) {
+        return $content;
+    }
 
-		$data_sync->set_post_id( $post_id );
+    if ( ! is_string( $content ) ) {
+        return __( 'Image replace requires content to be a string.', 'wp-data-sync' );
+    }
 
-		$html_dom = new DOMDocument;
-		$html_dom->loadHTML( $content );
+    $data_sync->set_post_id( $post_id );
 
-		$image_tags = $html_dom->getElementsByTagName( 'img' );
+    $html_dom = new DOMDocument;
+    $html_dom->loadHTML( $content );
 
-		foreach ( $image_tags as $image_tag ) {
+    $image_tags = $html_dom->getElementsByTagName( 'img' );
 
-			$image_url = $image_tag->getAttribute( 'src' );
+    foreach ( $image_tags as $image_tag ) {
 
-			$data_sync->set_attachment( $image_url );
+        $image_url = $image_tag->getAttribute( 'src' );
 
-			if ( $attach_id = $data_sync->attachment() ) {
+        $data_sync->set_attachment( $image_url );
 
-				if ( $attach_url = wp_get_attachment_url( $attach_id ) ) {
-					$content = str_replace( $image_url, $attach_url, $content );
-				}
+        if ( $attach_id = $data_sync->attachment() ) {
 
-			}
+            if ( $attach_url = wp_get_attachment_url( $attach_id ) ) {
+                $content = str_replace( $image_url, $attach_url, $content );
+            }
 
-		}
+        }
 
-	}
+    }
 
-	return $content;
+    return $content;
 
 }

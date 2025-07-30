@@ -3,7 +3,7 @@ Contributors: kevin-brent
 Tags: sync data, api feed, data feed, product feed, woocommerece product sync
 Stable tag: 3.0.2
 Requires at least: 5.0
-Tested up to: 6.8.1
+Tested up to: 6.8.2
 Requires PHP: 7.4
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html

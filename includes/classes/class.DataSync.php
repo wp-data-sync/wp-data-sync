@@ -40,6 +40,12 @@ class DataSync {
     private $source_name;
 
     /**
+     * @var string
+     */
+
+    private string $source_format;
+
+    /**
      * @var bool|array
      */
 
@@ -161,10 +167,12 @@ class DataSync {
 
     /**
      * DataSync constructor.
+     *
+     * @return void
      */
 
     public function __construct() {
-        // Empty construct
+        // Empty construct.
     }
 
     /**
@@ -173,7 +181,7 @@ class DataSync {
      * @return DataSync
      */
 
-    public static function instance() {
+    public static function instance(): DataSync {
         return new self();
     }
 
@@ -190,7 +198,11 @@ class DataSync {
         if ( is_array( $data ) ) {
 
             foreach ( $data as $key => $value ) {
-                $this->$key = apply_filters( "wp_data_sync_set_property_$key", $value );
+
+                if ( property_exists( $this, $key ) ) {
+                    $this->$key = apply_filters( "wp_data_sync_set_property_$key", $value );
+                }
+
             }
 
         }
@@ -324,6 +336,7 @@ class DataSync {
         }
 
         do_action( 'wp_data_sync_after_process', $this->post_id, $this );
+        do_action( "wp_data_sync_after_process_$this->source_format", $this->post_id, $this );
 
         $this->update_date();
 
@@ -1929,6 +1942,10 @@ class DataSync {
                 'alt'         => ''
             ];
 
+        }
+
+        foreach ( $this->attachment as $key => $value ) {
+            $this->attachment[ $key ] = is_string( $value ) ? $value : __( 'Value must be a string.', 'wp-data-sync' );
         }
 
         return apply_filters( 'wp_data_sync_image', $this->attachment, $this->post_id );

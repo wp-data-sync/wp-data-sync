@@ -95,6 +95,10 @@ class WC_Product_DataSync {
             }
         }
 
+        if ( ! empty( $this->data_sync->get_wc_prices() ) ) {
+            $this->prices();
+        }
+
 	}
 
     /**
@@ -106,6 +110,10 @@ class WC_Product_DataSync {
     public function prices() {
 
         $prices = $this->data_sync->get_wc_prices();
+
+        if ( empty( $prices ) || ! is_array( $prices ) ) {
+            return;
+        }
 
         extract( $prices );
 

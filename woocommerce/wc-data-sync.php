@@ -38,31 +38,21 @@ add_action( 'rest_api_init', function() {
  * Process WooCommerce.
  */
 
-add_action( 'wp_data_sync_after_process', function( $product_id, $data_sync ) {
+add_action( 'wp_data_sync_after_process_woo_product', function( $product_id, $data_sync ) {
 
-	if ( 'product' === $data_sync->get_post_type() || 'product_variation' === $data_sync->get_post_type() ) {
+    if ( $product = wc_get_product( $product_id ) ) {
 
-        add_filter( 'woocommerce_product_type_query', function() use( $data_sync ) {
-            return $data_sync->get_product_type();
-        }, PHP_INT_MAX );
+        $wcds_product = new WC_Product_DataSync( $product, $data_sync );
 
-        if ( $product = wc_get_product( $product_id ) ) {
-
-            $wc_product_data_sync = new WC_Product_DataSync( $product, $data_sync );
-
-            if ( ! empty( $data_sync->get_wc_prices() ) ) {
-                $wc_product_data_sync->prices();
-            }
-
-            if ( 'product' === $data_sync->get_post_type() ) {
-                $wc_product_data_sync->wc_process();
-            }
-
-            $wc_product_data_sync->save();
-
+        if ( is_a( $product, 'WC_Product_Variation' ) ) {
+            $wcds_product->prices();
+        } else {
+            $wcds_product->wc_process();
         }
 
-	}
+        $wcds_product->save();
+
+    }
 
 }, 10, 2 );
 
