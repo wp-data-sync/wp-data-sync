@@ -324,7 +324,8 @@ class DataSync {
         }
 
         if ( $this->gallery_images ) {
-            $this->gallery_images();
+            add_action( 'wp_data_sync_process_gallery_wp_post_type', [ $this, 'gallery_images' ], 0 );
+            do_action( "wp_data_sync_process_gallery_$this->source_format", $this->post_id, $this );
         }
 
         if ( $this->attachment ) {
@@ -458,6 +459,18 @@ class DataSync {
 
     public function set_attachment( $attachment ) {
         $this->attachment = $attachment;
+    }
+
+    /**
+     * Set Gallery Images
+     *
+     * @param array $gallery_images
+     *
+     * @return void
+     */
+
+    public function set_gallery_images( array $gallery_images ) {
+        $this->gallery_images = $gallery_images;
     }
 
     /**
