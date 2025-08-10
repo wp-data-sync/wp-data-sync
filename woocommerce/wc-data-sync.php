@@ -11,7 +11,6 @@
 
 namespace WP_DataSync\Woo;
 
-use WP_DataSync\Api\v5\Data;
 use WP_DataSync\App\DataSync;
 use WP_DataSync\App\Log;
 use WP_DataSync\App\Settings;
@@ -21,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Used to handle WooCommerce integration versions.
-define( 'WCDSYNC_VERSION', '2.4.0' );
+define( 'WCDSYNC_VERSION', '2.5.0' );
 define( 'WCDSYNC_ORDER_SYNC_STATUS', '_wpds_order_synced' );
 
 /**
@@ -59,34 +58,59 @@ add_action( 'wp_data_sync_after_process_woo_product', function( $product_id, $da
 }, 10, 2 );
 
 /**
- * Process WooCommece Cross-Sells.
+ * Schedlue WooCommece Cross-Sells.
+ *
+ * @param int $product_id
+ * @param array $values
+ *
+ * @return void
  */
 
-add_action( 'wp_data_sync_integration_woo_cross_sells', function( $product_id, $values ) {
+add_action( 'wp_data_sync_integration_woo_cross_sells', function( int $product_id, array $values ): void {
 
-	$values['product_id'] = $product_id;
-	$values['type']       = '_crosssell_ids';
-
-	Log::write( 'product-sells', $values, 'Cross sells' );
-
-	$product_sells = WC_Product_Sells::instance();
-
-	if ( $product_sells->set_properties( $values ) ) {
-		$product_sells->save();
-	}
+    wc_schedule_single_action( time(), 'wp_data_sync_process_related_products', [
+        'product_id' => $product_id,
+        'type'       => '_crosssell_ids',
+        'values'     => $values
+    ] );
 
 }, 10, 2 );
 
 /**
- * Process WooCommece Up-Sells.
+ * Scheule WooCommece Upsells.
+ *
+ * @param int $product_id
+ * @param array $values
+ *
+ * @return void
  */
 
-add_action( 'wp_data_sync_integration_woo_up_sells', function( $product_id, $values ) {
+add_action( 'wp_data_sync_integration_woo_up_sells', function( int $product_id, array $values ): void {
+
+    wc_schedule_single_action( time(), 'wp_data_sync_process_related_products', [
+        'product_id' => $product_id,
+        'type'       => '_upsell_ids',
+        'values'     => $values
+    ] );
+
+}, 10, 2 );
+
+/**
+ * Process WooCommece Related Products
+ *
+ * @param int $product_id
+ * @param string $type
+ * @param array $values
+ *
+ * @return void
+ */
+
+add_action( 'wp_data_sync_process_related_products', function( int $product_id, string $type, array $values ): void {
 
 	$values['product_id'] = $product_id;
-	$values['type']       = '_upsell_ids';
+	$values['type']       = $type;
 
-	Log::write( 'product-sells', $values, 'Up sells' );
+	Log::write( "product_$type", $values );
 
 	$product_sells = WC_Product_Sells::instance();
 
@@ -94,7 +118,9 @@ add_action( 'wp_data_sync_integration_woo_up_sells', function( $product_id, $val
 		$product_sells->save();
 	}
 
-}, 10, 2 );
+    Log::write( "product_$type", 'Done' );
+
+}, 10, 3 );
 
 /**
  * WooCommerce ItemRequest
