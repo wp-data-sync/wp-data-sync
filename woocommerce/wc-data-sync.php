@@ -123,6 +123,18 @@ add_action( 'wp_data_sync_process_related_products', function( int $product_id, 
 }, 10, 3 );
 
 /**
+ * Process the relateIDs event.
+ *
+ * @return void
+ */
+add_action( 'wp_data_sync_process_relate_ids', function(): void {
+
+    $product_sells = WC_Product_Sells::instance();
+    $product_sells->relate_ids();
+
+} );
+
+/**
  * WooCommerce ItemRequest
  */
 

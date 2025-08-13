@@ -211,10 +211,10 @@ class WC_Product_Sells {
 	/**
 	 * Get the unrelated rows.
 	 *
-	 * @return array|bool|object
+	 * @return array
 	 */
 
-	public function get_unrelated() {
+	public function get_unrelated(): array {
 
 		global $wpdb;
 
@@ -229,7 +229,7 @@ class WC_Product_Sells {
 		);
 
 		if ( null === $unrelated || is_wp_error( $unrelated ) ) {
-			return false;
+			return [];
 		}
 
 		return $unrelated;
@@ -347,7 +347,11 @@ class WC_Product_Sells {
 
 		$this->set_relation();
 		$this->stage_sell_ids();
-		$this->relate_ids();
+
+        if ( ! as_has_scheduled_action( 'wp_data_sync_process_relate_ids' ) ) {
+            // Wait 30 minutes to run this action.
+            as_schedule_single_action( time() + 1800, 'wp_data_sync_process_relate_ids' );
+        }
 
 	}
 
@@ -367,6 +371,13 @@ class WC_Product_Sells {
 
 	/**
 	 * Create the sells database table.
+     *
+     * type - type of sell, cross or up.
+     * sell_id - primary ID of the related product.
+     * product_id - the WC ID of the current product.
+     * relation_id - primary ID of the current product.
+     * relation_key - meta_key used to relate sell_id with relation_id.
+     * post_id - the post ID of the related product.
 	 */
 
 	public static function create_table() {

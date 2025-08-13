@@ -1,7 +1,7 @@
 === WP Data Sync ===
 Contributors: kevin-brent
 Tags: sync data, sync products, woocommerce, product feed, data feed
-Stable tag: 3.2.0
+Stable tag: 3.3.1
 Requires at least: 5.0
 Tested up to: 6.8.2
 Requires PHP: 7.4
