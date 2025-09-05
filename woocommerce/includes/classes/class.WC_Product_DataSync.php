@@ -11,7 +11,6 @@
 
 namespace WP_DataSync\Woo;
 
-use WP_DataSync\Api\App\Data;
 use WP_DataSync\App\DataSync;
 use WP_DataSync\App\Log;
 use WP_DataSync\App\Settings;
@@ -87,6 +86,9 @@ class WC_Product_DataSync {
 			$this->attributes();
 		}
 
+        /**
+         * This should not run for product variations, only the parent product.
+         */
         if ( $this->product->is_type( 'variable' ) || $this->product->is_type( 'variable-subscription' ) ) {
             $this->set_variations_inactive();
 
@@ -95,6 +97,10 @@ class WC_Product_DataSync {
             }
         }
 
+        /**
+         * This could run for a product or product variation.
+         * But only if the product variation is processing Accelerated Sync.
+         */
         if ( ! empty( $this->data_sync->get_wc_prices() ) ) {
             $this->prices();
         }
@@ -152,7 +158,6 @@ class WC_Product_DataSync {
 		}
 
         $term_ids  = [];
-		$append    = Settings::is_true( 'wp_data_sync_append_terms' );
         $delimiter = apply_filters( 'wc_data_sync_category_string_delimiter', '>' );
 
 		foreach ( $category_strings as $category_string ) {
@@ -293,7 +298,7 @@ class WC_Product_DataSync {
 	/**
 	 * Variations
 	 *
-	 * @return viod
+	 * @return void
 	 */
 
 	public function variations() {
@@ -302,11 +307,12 @@ class WC_Product_DataSync {
 
 		if ( is_array( $_variations ) ) {
 
-			$data_sync = DataSync::instance();
-
 			foreach ( $_variations as $i => $values ) {
 
+                $data_sync = DataSync::instance();
+
                 $values['post_data']['post_parent'] = $this->product->get_id();
+                $values['source_format']            = 'woo_product_variation';
 
                 $data_sync->set_properties( $values );
                 $data_sync->process();

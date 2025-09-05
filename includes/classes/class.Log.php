@@ -47,12 +47,17 @@ class Log {
                 $wp_filesystem->mkdir( WPDSYNC_LOG_DIR, 0755, true );
 			}
 
+            $current_content = '';
+
 			if ( ! $wp_filesystem->exists( $error_file ) ) {
-				// Schedule deletion of log file in 10 days
+				// Schedule deletion of the log file in 10 days
 				wp_schedule_single_event( time() + ( 10 * DAY_IN_SECONDS ), 'wpds_delete_log_file', [ $error_file ] );
             }
+            else {
+                $current_content .= $wp_filesystem->get_contents( $error_file );
+            }
 
-            $wp_filesystem->put_contents( $error_file, $msg, 0644 );
+            $wp_filesystem->put_contents( $error_file, $current_content . $msg, 0644 );
 
 		}
 

@@ -14,6 +14,7 @@ namespace WP_DataSync\Woo;
 use WP_DataSync\App\DataSync;
 use WP_DataSync\App\Log;
 use WP_DataSync\App\Settings;
+use WC_Product_Factory;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -41,17 +42,17 @@ add_action( 'rest_api_init', function() {
 
 add_action( 'wp_data_sync_after_process_woo_product', function( $product_id, $data_sync ) {
 
-    if ( $product = wc_get_product( $product_id ) ) {
+    $product_classname = WC_Product_Factory::get_product_classname( $product_id, $data_sync->get_product_type() );
 
-        $wcds_product = new WC_Product_DataSync( $product, $data_sync );
+    // Get the new product object from the correct classname.
+    $product = new $product_classname( $product_id );
 
-        if ( is_a( $product, 'WC_Product_Variation' ) ) {
-            $wcds_product->prices();
-        } else {
-            $wcds_product->wc_process();
-        }
+    if ( $product ) {
 
-        $wcds_product->save();
+        $_product = new WC_Product_DataSync( $product, $data_sync );
+
+        $_product->wc_process();
+        $_product->save();
 
     }
 

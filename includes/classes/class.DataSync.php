@@ -43,7 +43,7 @@ class DataSync {
      * @var string
      */
 
-    private string $source_format;
+    private string $source_format = 'default';
 
     /**
      * @var bool|array
@@ -1297,6 +1297,10 @@ class DataSync {
 
         if ( isset( $term_meta ) ) {
             $this->term_meta( $term_meta, $term_id );
+        }
+
+        if ( 'product_type' === $taxonomy ) {
+            $this->product_type = $name;
         }
 
         return $term_id;
