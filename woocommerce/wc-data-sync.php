@@ -14,6 +14,7 @@ namespace WP_DataSync\Woo;
 use WP_DataSync\App\DataSync;
 use WP_DataSync\App\Log;
 use WP_DataSync\App\Settings;
+use WC_Product;
 use WC_Product_Factory;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -42,12 +43,17 @@ add_action( 'rest_api_init', function() {
 
 add_action( 'wp_data_sync_after_process_woo_product', function( $product_id, $data_sync ) {
 
-    $product_classname = WC_Product_Factory::get_product_classname( $product_id, $data_sync->get_product_type() );
+    if ( empty( $data_sync->get_product_type() ) ) {
+        $product = wc_get_product( $product_id );
+    }
+    else {
+        $product_classname = WC_Product_Factory::get_product_classname( $product_id, $data_sync->get_product_type() );
 
-    // Get the new product object from the correct classname.
-    $product = new $product_classname( $product_id );
+        // Get the new product object from the correct classname.
+        $product = new $product_classname( $product_id );
+    }
 
-    if ( $product ) {
+    if ( $product instanceof WC_Product ) {
 
         $_product = new WC_Product_DataSync( $product, $data_sync );
 
@@ -59,7 +65,7 @@ add_action( 'wp_data_sync_after_process_woo_product', function( $product_id, $da
 }, 10, 2 );
 
 /**
- * Schedlue WooCommece Cross-Sells.
+ * Schedule WooCommerce Cross-Sells.
  *
  * @param int $product_id
  * @param array $values
@@ -78,7 +84,7 @@ add_action( 'wp_data_sync_integration_woo_cross_sells', function( int $product_i
 }, 10, 2 );
 
 /**
- * Scheule WooCommece Upsells.
+ * Schedule WooCommence Upsells.
  *
  * @param int $product_id
  * @param array $values
@@ -97,7 +103,7 @@ add_action( 'wp_data_sync_integration_woo_up_sells', function( int $product_id, 
 }, 10, 2 );
 
 /**
- * Process WooCommece Related Products
+ * Process WooCommence Related Products
  *
  * @param int $product_id
  * @param string $type

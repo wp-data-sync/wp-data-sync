@@ -14,6 +14,7 @@ namespace WP_DataSync\Woo;
 use WP_DataSync\App\DataSync;
 use WP_DataSync\App\Log;
 use WP_DataSync\App\Settings;
+use WP_DataSync\App\SyncRequest;
 use WC_Product;
 use WC_Product_Variation;
 use WC_Product_Attribute;
@@ -130,6 +131,11 @@ class WC_Product_DataSync {
         if ( isset( $_sale_price ) ) {
             $this->product->set_sale_price( $_sale_price );
         }
+
+        SyncRequest::$response['items'][ SyncRequest::$process_id ]['prices'] = [
+            'regular' => $this->product->get_regular_price(),
+            'sale'    => $this->product->get_sale_price()
+        ];
 
         Log::write( 'wc-prices', [
             'product_id'    => $this->product->get_id(),
@@ -334,6 +340,11 @@ class WC_Product_DataSync {
                     $variation->set_sale_price( $_sale_price );
                 }
 
+                SyncRequest::$response['items'][ SyncRequest::$process_id ]['prices'] = [
+                    'regular' => $variation->get_regular_price(),
+                    'sale'    => $variation->get_sale_price()
+                ];
+
 				if ( $selected_options =  $data_sync->get_selected_options() ) {
 
                     $attributes = [];
@@ -460,6 +471,7 @@ class WC_Product_DataSync {
 
     public function save() {
         $this->product->save();
+        SyncRequest::$response['product_type'] = $this->product->get_type();
     }
 
 }

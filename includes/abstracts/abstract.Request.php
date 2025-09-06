@@ -26,6 +26,17 @@ abstract class Request {
     private $request;
 
     /**
+     * @var array
+     */
+
+    public static array $response = [];
+
+    /**
+     * @var int
+     */
+    public static int $process_id = 0;
+
+    /**
      * Set Request
      *
      * @param WP_REST_Request $request
@@ -159,8 +170,6 @@ abstract class Request {
 
     public function content_length() {
 
-        global $wpds_response;
-
         if ( 'GET' === $this->request->get_method() ) {
             return true;
         }
@@ -170,7 +179,7 @@ abstract class Request {
 
         if ( empty( $content_length ) ) {
 
-            $wpds_response['content-length'] = 'Content length not provided.';
+            self::$response['content-length'] = 'Content length not provided.';
 
             return false;
 
@@ -179,7 +188,7 @@ abstract class Request {
         $match = strlen( $json ) === intval( $content_length );
 
         if ( ! $match ) {
-            $wpds_response['content-length'] = 'Content length does not match.';
+            self::$response['content-length'] = 'Content length does not match.';
         }
 
         Log::write( 'request', $content_length, 'Content Length Match' );

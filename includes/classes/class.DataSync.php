@@ -115,7 +115,7 @@ class DataSync {
      * @var string
      */
 
-    private $product_type = 'simple';
+    private $product_type = '';
 
     /**
      * @var bool|array
@@ -217,13 +217,13 @@ class DataSync {
 
     public function process() {
 
-        global $wpds_response, $process_id, $wpdb;
+        global $wpdb;
 
-        $process_id = $this->get_process_id();
+        SyncRequest::$process_id++;
 
         // A primary ID is required!!
         if ( empty( $this->primary_id ) ) {
-            $wpds_response['items'][ $process_id ]['error'] = 'Primary ID empty!!';
+            SyncRequest::$response['items'][ SyncRequest::$process_id ]['error'] = 'Primary ID empty!!';
 
             return;
         }
@@ -240,12 +240,12 @@ class DataSync {
                 $error_msg = $wpdb->last_error;
             }
 
-            $wpds_response['items'][ $process_id ]['error'] = $error_msg;
+            SyncRequest::$response['items'][ SyncRequest::$process_id ]['error'] = $error_msg;
 
             return;
         }
 
-        $wpds_response['items'][ $process_id ]['post_id'] = $this->post_id;
+        SyncRequest::$response['items'][ SyncRequest::$process_id ]['post_id'] = $this->post_id;
 
         /**
          * Check the post type.
@@ -253,7 +253,7 @@ class DataSync {
         if ( empty( $this->post_type ) ) {
 
             if ( ! $this->is_accelerated ) {
-                $wpds_response['items'][ $process_id ]['error'] = __( 'Post Type Required!!', 'wp-data-sync' );
+                SyncRequest::$response['items'][ SyncRequest::$process_id ]['error'] = __( 'Post Type Required!!', 'wp-data-sync' );
 
                 return;
             }
@@ -262,14 +262,14 @@ class DataSync {
 
         }
 
-        $wpds_response['items'][ $process_id ]['post_type'] = $this->post_type;
+        SyncRequest::$response['items'][ SyncRequest::$process_id ]['post_type'] = $this->post_type;
 
         /**
          * Check the post sync status.
          */
         if ( get_post_meta( $this->post_id, 'wpds_sync_status_disabled', true ) ) {
-            $wpds_response['items'][ $process_id ]['error']  = __( 'Post Sync Status Disabled!!', 'wp-data-sync' );
-            $wpds_response['items'][ $process_id ]['status'] = 'disabled';
+            SyncRequest::$response['items'][ SyncRequest::$process_id ]['error']  = __( 'Post Sync Status Disabled!!', 'wp-data-sync' );
+            SyncRequest::$response['items'][ SyncRequest::$process_id ]['status'] = 'disabled';
 
             return;
         }
@@ -278,7 +278,7 @@ class DataSync {
          * Maybe trash the post.
          */
         if ( $this->maybe_trash_post() ) {
-            $wpds_response['items'][ $process_id ]['trash'] = __( 'Post Trashed', 'wp-data-sync' );
+            SyncRequest::$response['items'][ SyncRequest::$process_id ]['trash'] = __( 'Post Trashed', 'wp-data-sync' );
 
             return;
         }
@@ -342,26 +342,6 @@ class DataSync {
         $this->update_date();
 
         return true;
-
-    }
-
-    /**
-     * Get Process ID
-     *
-     * @return int
-     */
-
-    public function get_process_id() {
-
-        global $process_id;
-
-        if ( ! isset( $process_id ) ) {
-            return 1;
-        }
-
-        $process_id ++;
-
-        return $process_id;
 
     }
 

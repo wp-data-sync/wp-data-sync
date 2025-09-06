@@ -114,8 +114,6 @@ class SyncRequest extends Request {
 
 	public function process() {
 
-		global $wpds_response;
-
 		/**
 		 * Disable revisions.
 		 */
@@ -123,7 +121,6 @@ class SyncRequest extends Request {
 		add_filter( 'wp_revisions_to_keep', '__return_false' );
 
 		$start_request  = microtime( true );
-		$wpds_response  = [];
 		$data_sync = DataSync::instance();
 		$data      = $this->request_data();
 
@@ -144,10 +141,10 @@ class SyncRequest extends Request {
 
 		}
 
-		$wpds_response['request_time'] = microtime( true ) - $start_request;
-		Log::write( 'sync-request-response', $wpds_response );
+		self::$response['request_time'] = microtime( true ) - $start_request;
+		Log::write( 'sync-request-response', self::$response );
 
-		return rest_ensure_response( $wpds_response );
+		return rest_ensure_response( self::$response );
 
 	}
 
