@@ -87,15 +87,9 @@ class WC_Product_DataSync {
 			$this->attributes();
 		}
 
-        /**
-         * This should not run for product variations, only the parent product.
-         */
-        if ( $this->product->is_type( 'variable' ) || $this->product->is_type( 'variable-subscription' ) ) {
+        if ( $this->data_sync->get_variations() ) {
             $this->set_variations_inactive();
-
-            if ( $this->data_sync->get_variations() ) {
-                $this->variations();
-            }
+            $this->variations();
         }
 
         /**
