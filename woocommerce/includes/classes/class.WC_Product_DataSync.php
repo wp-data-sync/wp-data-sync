@@ -192,7 +192,7 @@ class WC_Product_DataSync {
 
 		}
 
-		Log::write( 'wc-dategories', [
+		Log::write( 'wc-categories', [
 			'product_id' => $this->product->get_id(),
 			'strings'    => $category_strings,
 			'term_ids'   => $term_ids
