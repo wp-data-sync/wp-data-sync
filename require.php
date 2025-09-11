@@ -79,6 +79,7 @@ if ( class_exists( 'woocommerce' ) ) {
     require 'woocommerce/includes/functions/order-exclude-item.php';
     require 'woocommerce/includes/functions/order-hpos-compatibility.php';
     require 'woocommerce/includes/functions/order-product-meta.php';
+    require 'woocommerce/includes/functions/order-sync-status.php';
     require 'woocommerce/includes/functions/order-sync-status-admin-column.php';
     require 'woocommerce/includes/functions/order-sync-status-bulk-action.php';
     require 'woocommerce/includes/functions/order-sync-status-order-action.php';

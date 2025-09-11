@@ -45,15 +45,11 @@ add_action( 'woocommerce_shop_order_list_table_custom_column', function( $column
         $order  = wc_get_order( $order_id );
         $synced = $order->get_meta( WCDSYNC_ORDER_SYNC_STATUS );
 
-		if ( $synced ) {
+		if ( ! empty( $synced ) ) {
+            printf( '<span class="wpds-order-export synced">%s</span>', esc_html( '&#10003;' ) );
 
-			if ( 'no' !== $value ) {
-				printf( '<span class="wpds-order-export synced">%s</span>', esc_html( '&#10003;' ) );
-
-				return;
-			}
-
-		}
+            return;
+        }
 
 		printf( '<span class="wpds-order-export">%s</span>', esc_html( '&#10005;' ) );
 

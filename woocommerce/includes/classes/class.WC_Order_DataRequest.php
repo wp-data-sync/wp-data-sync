@@ -13,127 +13,130 @@ namespace WP_DataSync\Woo;
 
 use WP_DataSync\App\Request;
 use WP_DataSync\App\Log;
+use WP_Error;
+use WP_HTTP_Response;
+use WP_REST_Response;
 use WP_REST_Server;
 use WP_REST_Request;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+    exit;
 }
 
 class WC_Order_DataRequest extends Request {
 
-	/**
-	 * @var string
-	 */
+    /**
+     * @var string
+     */
 
-	protected $access_token_key = 'wp_data_sync_access_token';
+    protected $access_token_key = 'wp_data_sync_access_token';
 
-	/**
-	 * @var string
-	 */
+    /**
+     * @var string
+     */
 
-	protected $private_token_key = 'wp_data_sync_private_token';
+    protected $private_token_key = 'wp_data_sync_private_token';
 
-	/**
-	 * @var string
-	 */
+    /**
+     * @var string
+     */
 
-	protected $permissions_key = 'wp_data_sync_order_sync_allowed';
+    protected $permissions_key = 'wp_data_sync_order_sync_allowed';
 
-	/**
-	 * @var WC_Order_DataRequest
-	 */
+    /**
+     * @var WC_Order_DataRequest
+     */
 
-	public static $instance;
+    public static $instance;
 
-	/**
-	 * WC_Order_DataRequest constructor.
-	 */
+    /**
+     * WC_Order_DataRequest constructor.
+     */
 
-	public function __construct() {
-		self::$instance = $this;
-	}
+    public function __construct() {
+        self::$instance = $this;
+    }
 
-	/**
-	 * @return WC_Order_DataRequest
-	 */
+    /**
+     * @return WC_Order_DataRequest
+     */
 
-	public static function instance() {
+    public static function instance() {
 
-		if ( self::$instance === null ) {
-			self::$instance = new self();
-		}
+        if ( self::$instance === null ) {
+            self::$instance = new self();
+        }
 
-		return self::$instance;
+        return self::$instance;
 
-	}
+    }
 
-	/**
-	 * Register the route.
-	 *
-	 * @link https://developer.wordpress.org/rest-api/extending-the-rest-api/adding-custom-endpoints/
-	 */
+    /**
+     * Register the route.
+     *
+     * @link https://developer.wordpress.org/rest-api/extending-the-rest-api/adding-custom-endpoints/
+     */
 
-	public function register_route() {
+    public function register_route() {
 
-		register_rest_route(
-			'wp-data-sync',
+        register_rest_route(
+            'wp-data-sync',
             '/' . WPDSYNC_EP_VERSION . '/order-request/(?P<access_token>\S+)/(?P<min_date>\S+)/(?P<limit>\d+)/(?P<cache_buster>\S+)',
-			[
-				'methods' => WP_REST_Server::READABLE,
-				'args'    => [
-					'access_token' => [
-						'sanitize_callback' => 'sanitize_text_field',
-						'validate_callback' => [ $this, 'access_token' ]
-					],
-					'min_date' => [
-						'sanitize_callback' => 'sanitize_text_field',
-						'validate_callback' => function ( $param ) {
-							return is_string( $param );
-						}
-					],
-					'limit' => [
-						'sanitize_callback' => 'absint',
-						'validate_callback' => function( $param ) {
-							return is_numeric( $param );
-						}
-					],
-					'cache_buster' => [
-						'sanitize_callback' => 'sanitize_text_field',
-						'validate_callback' => function( $param ) {
-							return is_string( $param );
-						}
-					]
-				],
-				'permission_callback' => [ $this, 'access' ],
-				'callback'            => [ $this, 'request' ],
-			]
-		);
+            [
+                'methods'             => WP_REST_Server::READABLE,
+                'args'                => [
+                    'access_token' => [
+                        'sanitize_callback' => 'sanitize_text_field',
+                        'validate_callback' => [ $this, 'access_token' ]
+                    ],
+                    'min_date'     => [
+                        'sanitize_callback' => 'sanitize_text_field',
+                        'validate_callback' => function ( $param ) {
+                            return is_string( $param );
+                        }
+                    ],
+                    'limit'        => [
+                        'sanitize_callback' => 'absint',
+                        'validate_callback' => function ( $param ) {
+                            return is_numeric( $param );
+                        }
+                    ],
+                    'cache_buster' => [
+                        'sanitize_callback' => 'sanitize_text_field',
+                        'validate_callback' => function ( $param ) {
+                            return is_string( $param );
+                        }
+                    ]
+                ],
+                'permission_callback' => [ $this, 'access' ],
+                'callback'            => [ $this, 'request' ],
+            ]
+        );
 
-	}
+    }
 
-	/**
-	 * Request.
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return \WP_Error|\WP_HTTP_Response|\WP_REST_Response
-	 */
+    /**
+     * Request.
+     *
+     * @param WP_REST_Request $request
+     *
+     * @return WP_Error|WP_HTTP_Response|WP_REST_Response
+     */
 
-	public function request( WP_REST_Request $request ) {
+    public function request( WP_REST_Request $request ) {
 
-		$min_date = $request->get_param( 'min_date' );
-		$limit    = $request->get_param( 'limit' );
-		$response = $this->get_response( $min_date, $limit );
+        $min_date = $request->get_param( 'min_date' );
+        $limit    = $request->get_param( 'limit' );
+        $response = $this->get_response( $min_date, $limit );
 
-		Log::write( 'order-request', [
+        Log::write( 'order-request', [
             'params'   => $request->get_url_params(),
             'response' => $response
         ] );
 
-		return rest_ensure_response( $response );
+        return rest_ensure_response( $response );
 
-	}
+    }
 
     /**
      * Get Response
@@ -177,52 +180,52 @@ class WC_Order_DataRequest extends Request {
 
     }
 
-	/**
-	 * Format min date.
-	 *
-	 * @param $min_date
-	 *
-	 * @return false|string
-	 */
+    /**
+     * Format min date.
+     *
+     * @param $min_date
+     *
+     * @return false|string
+     */
 
-	public function format_min_date( $min_date ) {
-		return gmdate( 'Y-m-d H:i:s', strtotime( $min_date ) );
-	}
+    public function format_min_date( $min_date ) {
+        return gmdate( 'Y-m-d H:i:s', strtotime( $min_date ) );
+    }
 
-	/**
-	 * Fetch orders.
-	 *
-	 * @param string $min_date
-	 * @param int $limit
-	 *
-	 * @return array|bool
-	 */
+    /**
+     * Fetch orders.
+     *
+     * @param string $min_date
+     * @param int $limit
+     *
+     * @return array|bool
+     */
 
-	public function fetch_orders( $min_date, $limit ) {
+    public function fetch_orders( $min_date, $limit ) {
 
-		global $wpdb;
+        global $wpdb;
 
-		$allowed_status = get_option( 'wp_data_sync_allowed_order_status' );
+        $allowed_status = get_option( 'wp_data_sync_allowed_order_status' );
 
-		if ( empty( $allowed_status ) ) {
-			return false;
-		}
+        if ( empty( $allowed_status ) ) {
+            return false;
+        }
 
         $orders = wc_get_orders( [
-            'limit'      => $limit,
-            'status'     => array_map( 'esc_sql', $allowed_status ),
-            'date_after' => $this->format_min_date( $min_date ),
-            'order'      => 'ASC',
-            'meta_key' => WCDSYNC_ORDER_SYNC_STATUS,
-            'meta_compare'  => 'NOT EXISTS'
+            'limit'        => $limit,
+            'status'       => array_map( 'esc_sql', $allowed_status ),
+            'date_after'   => $this->format_min_date( $min_date ),
+            'order'        => 'ASC',
+            'meta_key'     => WCDSYNC_ORDER_SYNC_STATUS,
+            'meta_compare' => 'NOT EXISTS'
         ] );
 
-		if ( empty( $orders ) || is_wp_error( $orders ) ) {
-			return false;
-		}
+        if ( empty( $orders ) || is_wp_error( $orders ) ) {
+            return false;
+        }
 
-		return $orders;
+        return $orders;
 
-	}
+    }
 
 }
