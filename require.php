@@ -86,6 +86,7 @@ if ( class_exists( 'woocommerce' ) ) {
     require 'woocommerce/includes/functions/product-stock-qty-for-backorder.php';
     require 'woocommerce/includes/functions/product-update-duplicate-fields.php';
     require 'woocommerce/includes/functions/product-weight-conversion.php';
+    require 'woocommerce/includes/functions/wc-rest-api.php';
     require 'woocommerce/includes/functions/wc-settings.php';
     require 'woocommerce/includes/functions/wc-tabs.php';
     require 'woocommerce/includes/functions/wc-update.php';

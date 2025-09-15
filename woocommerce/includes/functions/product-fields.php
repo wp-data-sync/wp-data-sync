@@ -21,12 +21,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 add_action( 'woocommerce_product_options_general_product_data', function() {
 
+    $product = wc_get_product();
+
 	woocommerce_wp_text_input([
-		'id'          => '_upc',
-		'label'       => __( 'UPC', 'wp-data-sync' ),
+		'id'          => '_vendor',
+		'label'       => __( 'Vendor', 'wp-data-sync' ),
 		'desc_tip'    => true,
-		'description' => __( 'Universal Product Code', 'wp-data-sync' )
+		'description' => __( 'Vendor Name', 'wp-data-sync' )
 	]);
+
+    if ( $product->is_type( 'variable' ) || $product->is_type( 'variable-subscription') ) {
+        return;
+    }
+
+    woocommerce_wp_text_input([
+        'id'          => '_upc',
+        'label'       => __( 'UPC', 'wp-data-sync' ),
+        'desc_tip'    => true,
+        'description' => __( 'Universal Product Code', 'wp-data-sync' )
+    ]);
 
 	woocommerce_wp_text_input([
 		'id'          => '_mpn',
@@ -59,8 +72,11 @@ add_action('woocommerce_process_product_meta', function( $product_id ) {
 
 	$product = wc_get_product( $product_id );
 
-	$_upc = isset( $_POST['_upc'] ) ? sanitize_text_field( wp_unslash( $_POST['_upc'] ) ) : '';
-	$product->update_meta_data( '_upc', $_upc );
+	$_vendor = isset( $_POST['_vendor'] ) ? sanitize_text_field( wp_unslash( $_POST['_vendor'] ) ) : '';
+	$product->update_meta_data( '_vendor', $_vendor );
+
+    $_upc = isset( $_POST['_upc'] ) ? sanitize_text_field( wp_unslash( $_POST['_upc'] ) ) : '';
+    $product->update_meta_data( '_upc', $_upc );
 
 	$_mpn = isset( $_POST['_mpn'] ) ? sanitize_text_field( wp_unslash( $_POST['_mpn'] ) ) : '';
 	$product->update_meta_data( '_mpn', $_mpn );
