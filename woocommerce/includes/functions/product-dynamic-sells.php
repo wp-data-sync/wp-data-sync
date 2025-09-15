@@ -90,9 +90,11 @@ function woo_dynamic_sells_ids( $key, $sell_ids, $product ) {
 
         case 'random':
             $sort_order = 'RAND()';
+            break;
 
         case 'newest':
             $sort_order = 'DESC';
+            break;
 
         default:
             $sort_order = 'ASC';

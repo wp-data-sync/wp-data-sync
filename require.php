@@ -66,8 +66,6 @@ if ( class_exists( 'woocommerce' ) ) {
     /**
      * WC Classes
      */
-    require 'woocommerce/includes/classes/class.WC_Order_Data.php';
-    require 'woocommerce/includes/classes/class.WC_Order_DataRequest.php';
     require 'woocommerce/includes/classes/class.WC_Product_DataSync.php';
     require 'woocommerce/includes/classes/class.WC_Product_Item.php';
     require 'woocommerce/includes/classes/class.WC_Product_Sells.php';
@@ -75,14 +73,7 @@ if ( class_exists( 'woocommerce' ) ) {
     /**
      * WC Functions
      */
-    require 'woocommerce/includes/functions/order-can-sync.php';
-    require 'woocommerce/includes/functions/order-exclude-item.php';
     require 'woocommerce/includes/functions/order-hpos-compatibility.php';
-    require 'woocommerce/includes/functions/order-product-meta.php';
-    require 'woocommerce/includes/functions/order-sync-status.php';
-    require 'woocommerce/includes/functions/order-sync-status-admin-column.php';
-    require 'woocommerce/includes/functions/order-sync-status-bulk-action.php';
-    require 'woocommerce/includes/functions/order-sync-status-order-action.php';
     require 'woocommerce/includes/functions/product-allow-duplicate-sku.php';
     require 'woocommerce/includes/functions/product-attribute-clear-cache.php';
     require 'woocommerce/includes/functions/product-category-options-array.php';

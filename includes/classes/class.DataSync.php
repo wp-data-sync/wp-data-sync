@@ -142,12 +142,6 @@ class DataSync {
     private $selected_options = false;
 
     /**
-     * @var bool|array
-     */
-
-    private $order_items = false;
-
-    /**
      * @var array
      */
 
@@ -454,16 +448,6 @@ class DataSync {
     }
 
     /**
-     * Set order items.
-     *
-     * @param $order_items
-     */
-
-    public function set_order_items( $order_items ) {
-        $this->order_items = $order_items;
-    }
-
-    /**
      * Is new.
      *
      * @return bool
@@ -659,16 +643,6 @@ class DataSync {
 
     public function get_selected_options() {
         return apply_filters( 'wp_data_sync_procudt_variation_selected_options', $this->selected_options, $this );
-    }
-
-    /**
-     * Get order items.
-     *
-     * @return array|bool
-     */
-
-    public function get_order_items() {
-        return $this->order_items;
     }
 
     /**

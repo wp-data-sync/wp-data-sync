@@ -466,10 +466,6 @@ msgstr ""
 msgid "Select One"
 msgstr ""
 
-#: woocommerce/includes/classes/class.WC_Order_DataRequest.php:163
-msgid "Order synced to WP Data Sync API"
-msgstr ""
-
 #: woocommerce/includes/functions/order-sync-status-bulk-action.php:28
 msgid "Reset Sync Status"
 msgstr ""

@@ -22,20 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Used to handle WooCommerce integration versions.
-define( 'WCDSYNC_VERSION', '2.5.0' );
-define( 'WCDSYNC_ORDER_SYNC_STATUS', '_wpds_order_synced' );
-
-/**
- * Register REST API Routes.
- */
-
-add_action( 'rest_api_init', function() {
-
-	if ( Settings::is_checked( 'wp_data_sync_order_sync_allowed' ) ) {
-		WC_Order_DataRequest::instance()->register_route();
-	}
-
-} );
+define( 'WCDSYNC_VERSION', '2.6.0' );
 
 /**
  * Process WooCommerce.
