@@ -27,6 +27,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 add_filter( 'woocommerce_rest_prepare_shop_order_object', function( WP_REST_Response $response ) {
 
+    /**
+     * Add extended product keys to line items.
+     */
     $extended_keys = [ 'vendor', 'upc', 'mpn', 'gtin8', 'isbn' ];
 
     $response_data = $response->get_data();
@@ -46,6 +49,19 @@ add_filter( 'woocommerce_rest_prepare_shop_order_object', function( WP_REST_Resp
         }
 
     }
+
+    /**
+     * Add full_name to billing and shipping.
+     */
+    $response_data['billing']['full_name'] = trim( sprintf( '%s %s',
+        $response_data['billing']['first_name'],
+        $response_data['billing']['last_name']
+    ) );
+
+    $response_data['shipping']['full_name'] = trim( sprintf( '%s %s',
+        $response_data['shipping']['first_name'],
+        $response_data['shipping']['last_name']
+    ) );
 
     $response->set_data( $response_data );
 
