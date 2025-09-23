@@ -63,6 +63,16 @@ add_filter( 'woocommerce_rest_prepare_shop_order_object', function( WP_REST_Resp
         $response_data['shipping']['last_name']
     ) );
 
+    /**
+     * Populate shipping fields with billing data if they are empty.
+     */
+
+    foreach ( $response_data['shipping'] as $key => $value ) {
+        if ( empty( $value ) ) {
+            $response_data['shipping'][ $key ] = $response_data['billing'][ $key ];
+        }
+    }
+
     $response->set_data( $response_data );
 
     return $response;
