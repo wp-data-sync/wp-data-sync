@@ -44,6 +44,8 @@ add_filter( 'woocommerce_rest_prepare_shop_order_object', function( WP_REST_Resp
                     $response_data['line_items'][ $i ][ $extended_key ] = $product->get_meta( "_$extended_key" );
                 }
 
+                $brands = wc_get_object_terms( $product->get_id(), 'product_brand', 'name' );
+                $response_data['line_items'][ $i ]['brand'] = join( ', ', $brands );
             }
 
         }
@@ -72,6 +74,8 @@ add_filter( 'woocommerce_rest_prepare_shop_order_object', function( WP_REST_Resp
             $response_data['shipping'][ $key ] = $response_data['billing'][ $key ];
         }
     }
+    
+    $response_data = apply_filters( 'wp_data_sync_shop_order_response_data', $response_data );
 
     $response->set_data( $response_data );
 
