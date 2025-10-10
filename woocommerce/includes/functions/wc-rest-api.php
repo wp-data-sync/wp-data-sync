@@ -95,8 +95,8 @@ function shop_order_line_item_custom_fields(): array {
         'mpn',
         'gtin8',
         'isbn',
-        'wpds_order_item_custom_1',
-        'wpds_order_item_custom_2',
-        'wpds_order_item_custom_3'
+        'wpds_product_custom_1',
+        'wpds_product_custom_2',
+        'wpds_product_custom_3'
     ] );
 }
