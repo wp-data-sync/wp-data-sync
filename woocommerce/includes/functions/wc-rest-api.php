@@ -12,6 +12,7 @@
 namespace WP_DataSync\Woo;
 
 use WP_REST_Response;
+use WC_Order;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -25,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return array
  */
 
-add_filter( 'woocommerce_rest_prepare_shop_order_object', function( WP_REST_Response $response ) {
+add_filter( 'woocommerce_rest_prepare_shop_order_object', function( WP_REST_Response $response, WC_Order $order ) {
 
     $response_data = $response->get_data();
 
@@ -69,13 +70,17 @@ add_filter( 'woocommerce_rest_prepare_shop_order_object', function( WP_REST_Resp
             $response_data['shipping'][ $key ] = $response_data['billing'][ $key ];
         }
     }
+
+    $response_data['wpds_order_custom_1'] = $order->get_meta( '_wpds_order_custom_1' );
+    $response_data['wpds_order_custom_2'] = $order->get_meta( '_wpds_order_custom_2' );
+    $response_data['wpds_order_custom_3'] = $order->get_meta( '_wpds_order_custom_3' );
     
     $response_data = apply_filters( 'wp_data_sync_shop_order_response_data', $response_data );
 
     $response->set_data( $response_data );
 
     return $response;
-} );
+}, 10, 2 );
 
 /**
  * Shop order line item custom fields.
@@ -90,8 +95,8 @@ function shop_order_line_item_custom_fields(): array {
         'mpn',
         'gtin8',
         'isbn',
-        'wpds_order_custom_1',
-        'wpds_order_custom_2',
-        'wpds_order_custom_3'
+        'wpds_order_item_custom_1',
+        'wpds_order_item_custom_2',
+        'wpds_order_item_custom_3'
     ] );
 }
