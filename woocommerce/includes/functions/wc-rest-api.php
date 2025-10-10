@@ -27,11 +27,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 add_filter( 'woocommerce_rest_prepare_shop_order_object', function( WP_REST_Response $response ) {
 
-    /**
-     * Add extended product keys to line items.
-     */
-    $extended_keys = [ 'vendor', 'upc', 'mpn', 'gtin8', 'isbn' ];
-
     $response_data = $response->get_data();
 
     if ( isset( $response_data['line_items'] ) ) {
@@ -40,8 +35,8 @@ add_filter( 'woocommerce_rest_prepare_shop_order_object', function( WP_REST_Resp
 
             if ( $product = wc_get_product( $line_item['product_id'] ) ) {
 
-                foreach ( $extended_keys as $extended_key ) {
-                    $response_data['line_items'][ $i ][ $extended_key ] = $product->get_meta( "_$extended_key" );
+                foreach ( shop_order_line_item_custom_fields() as $custom_field ) {
+                    $response_data['line_items'][ $i ][ $custom_field ] = $product->get_meta( "_$custom_field" );
                 }
 
                 $brands = wc_get_object_terms( $product->get_id(), 'product_brand', 'name' );
@@ -81,3 +76,22 @@ add_filter( 'woocommerce_rest_prepare_shop_order_object', function( WP_REST_Resp
 
     return $response;
 } );
+
+/**
+ * Shop order line item custom fields.
+ *
+ * @return array
+ * @since 3.4.5
+ */
+function shop_order_line_item_custom_fields(): array {
+    return apply_filters( 'wp_data_sync_shop_order_response_line_item_custom_fields', [
+        'vendor',
+        'upc',
+        'mpn',
+        'gtin8',
+        'isbn',
+        'wpds_order_custom_1',
+        'wpds_order_custom_2',
+        'wpds_order_custom_3'
+    ] );
+}

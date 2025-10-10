@@ -1,9 +1,9 @@
 === WP Data Sync ===
 Contributors: kevin-brent
 Tags: sync data, sync products, sync custom post types, integrate api
-Stable tag: /tags/3.4.4/
+Stable tag: /tags/3.4.5/
 Requires at least: 5.0
-Tested up to: 6.8.2
+Tested up to: 6.8.3
 Requires PHP: 7.4
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
