@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $uploads = wp_get_upload_dir();
 
-define( 'WPDSYNC_VERSION', '3.4.5' );
+define( 'WPDSYNC_VERSION', '3.4.6' );
 define( 'WPDSYNC_PLUGIN', __FILE__ );
 define( 'WPDSYNC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPDSYNC_URL', plugin_dir_url( __FILE__ ) );
