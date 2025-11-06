@@ -25,39 +25,31 @@ class SyncRequest extends Request {
 	 * @var string
 	 */
 
-	protected $access_token_key = 'wp_data_sync_access_token';
+	protected string $access_token_key = 'wp_data_sync_access_token';
 
 	/**
 	 * @var string
 	 */
 
-	protected $private_token_key = 'wp_data_sync_private_token';
+	protected string $private_token_key = 'wp_data_sync_private_token';
 
 	/**
 	 * @var string
 	 */
 
-	protected $permissions_key = 'wp_data_sync_allowed';
+	protected string $permissions_key = 'wp_data_sync_allowed';
 
 	/**
 	 * @var string
 	 */
 
-	protected $log_key = 'sync-request-data';
-
-	/**
-	 * @var SyncRequest
-	 */
-
-	public static $instance;
+	protected string $log_key = 'sync-request-data';
 
 	/**
 	 * SyncRequest constructor.
 	 */
 
-	public function __construct() {
-		self::$instance = $this;
-	}
+	public function __construct() {}
 
 	/**
 	 * Instance.
@@ -65,14 +57,8 @@ class SyncRequest extends Request {
 	 * @return SyncRequest
 	 */
 
-	public static function instance() {
-
-		if ( self::$instance === null ) {
-			self::$instance = new self();
-		}
-
-		return self::$instance;
-
+	public static function instance(): SyncRequest {
+        return new self();
 	}
 
 	/**
@@ -126,7 +112,7 @@ class SyncRequest extends Request {
 
 		if ( isset( $data['items'] ) && is_array( $data['items'] ) ) {
 
-			foreach ( $data['items'] as $key => $data ) {
+			foreach ( $data['items'] as $data ) {
 
 				$data_sync->set_properties( $data );
 				$data_sync->process();

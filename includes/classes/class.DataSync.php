@@ -46,10 +46,10 @@ class DataSync {
     private string $source_format = 'default';
 
     /**
-     * @var bool|array
+     * @var array
      */
 
-    private $primary_id = false;
+    private array $primary_id = [];
 
     /**
      * @var bool|int
@@ -206,10 +206,10 @@ class DataSync {
     /**
      * Process request data.
      *
-     * @return mixed
+     * @return bool
      */
 
-    public function process() {
+    public function process(): bool {
 
         global $wpdb;
 
@@ -219,7 +219,7 @@ class DataSync {
         if ( empty( $this->primary_id ) ) {
             SyncRequest::$response['items'][ SyncRequest::$process_id ]['error'] = 'Primary ID empty!!';
 
-            return;
+            return false;
         }
 
         /**
@@ -236,7 +236,7 @@ class DataSync {
 
             SyncRequest::$response['items'][ SyncRequest::$process_id ]['error'] = $error_msg;
 
-            return;
+            return false;
         }
 
         SyncRequest::$response['items'][ SyncRequest::$process_id ]['post_id'] = $this->post_id;
@@ -249,7 +249,7 @@ class DataSync {
             if ( ! $this->is_accelerated ) {
                 SyncRequest::$response['items'][ SyncRequest::$process_id ]['error'] = __( 'Post Type Required!!', 'wp-data-sync' );
 
-                return;
+                return false;
             }
 
             $this->set_post_type();
@@ -265,7 +265,7 @@ class DataSync {
             SyncRequest::$response['items'][ SyncRequest::$process_id ]['error']  = __( 'Post Sync Status Disabled!!', 'wp-data-sync' );
             SyncRequest::$response['items'][ SyncRequest::$process_id ]['status'] = 'disabled';
 
-            return;
+            return false;
         }
 
         /**
@@ -274,7 +274,7 @@ class DataSync {
         if ( $this->maybe_trash_post() ) {
             SyncRequest::$response['items'][ SyncRequest::$process_id ]['trash'] = __( 'Post Trashed', 'wp-data-sync' );
 
-            return;
+            return false;
         }
 
         /**
@@ -486,7 +486,7 @@ class DataSync {
     /**
      * Get the primary ID.
      *
-     * @return int|bool
+     * @return array
      */
 
     public function get_primary_id() {
