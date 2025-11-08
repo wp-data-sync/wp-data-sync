@@ -13,9 +13,9 @@ namespace WP_DataSync\Woo;
 
 use WP_DataSync\App\DataSync;
 use WP_DataSync\App\Log;
-use WP_DataSync\App\Settings;
 use WC_Product;
 use WC_Product_Factory;
+use WP_DataSync\App\SyncRequest;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -30,10 +30,20 @@ define( 'WCDSYNC_VERSION', '2.6.0' );
 
 add_action( 'wp_data_sync_after_process_woo_product', function( $product_id, $data_sync ) {
 
+    SyncRequest::$response['process_product'][] = 'start';
+
     if ( empty( $data_sync->get_product_type() ) ) {
+
+        SyncRequest::$response['process_product'][] = 'empty product type';
+
         $product = wc_get_product( $product_id );
+
     }
     else {
+
+        SyncRequest::$response['process_product'][] = 'has product type';
+
+        // This is used if we have a product type to ensure we get the correct product class.
         $product_classname = WC_Product_Factory::get_product_classname( $product_id, $data_sync->get_product_type() );
 
         // Get the new product object from the correct classname.
@@ -45,9 +55,14 @@ add_action( 'wp_data_sync_after_process_woo_product', function( $product_id, $da
         $_product = new WC_Product_DataSync( $product, $data_sync );
 
         $_product->wc_process();
-        $_product->save();
+
+        SyncRequest::$response['process_product'][] = 'completed successfully';
+
+        return;
 
     }
+
+    SyncRequest::$response['process_product'][] = 'failed';
 
 }, 10, 2 );
 

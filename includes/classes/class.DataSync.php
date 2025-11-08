@@ -115,7 +115,7 @@ class DataSync {
      * @var string
      */
 
-    private $product_type = '';
+    private string $product_type = '';
 
     /**
      * @var bool|array
@@ -145,7 +145,7 @@ class DataSync {
      * @var array
      */
 
-    private $wc_prices = [];
+    private array $wc_prices = [];
 
     /**
      * @var bool|array
@@ -661,7 +661,7 @@ class DataSync {
      * @return array
      */
 
-    public function get_wc_prices() {
+    public function get_wc_prices(): array {
         return apply_filters( 'wp_data_sync_get_wc_prices', $this->wc_prices, $this->post_meta, $this );
     }
 
@@ -1004,7 +1004,10 @@ class DataSync {
 
         if ( '_regular_price' === $meta_key || '_sale_price' === $meta_key ) {
             $this->set_wc_prices( $meta_key, $meta_value );
-        } elseif ( ! in_array( $meta_key, $this->restricted_meta_keys() ) ) {
+        }
+
+        // We save meta here to ensure prices make it to DB.
+        if ( ! in_array( $meta_key, $this->restricted_meta_keys() ) ) {
 
             update_post_meta( $post_id, $meta_key, $meta_value );
 
