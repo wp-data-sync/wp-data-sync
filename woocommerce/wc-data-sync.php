@@ -30,18 +30,18 @@ define( 'WCDSYNC_VERSION', '2.6.0' );
 
 add_action( 'wp_data_sync_after_process_woo_product', function( $product_id, $data_sync ) {
 
-    SyncRequest::$response['process_product'][] = 'start';
+    SyncRequest::$response['items'][ SyncRequest::$process_id ]['process_product'][] = 'start';
 
     if ( empty( $data_sync->get_product_type() ) ) {
 
-        SyncRequest::$response['process_product'][] = 'empty product type';
+        SyncRequest::$response['items'][ SyncRequest::$process_id ]['process_product'][] = 'empty product type';
 
         $product = wc_get_product( $product_id );
 
     }
     else {
 
-        SyncRequest::$response['process_product'][] = 'has product type';
+        SyncRequest::$response['items'][ SyncRequest::$process_id ]['process_product'][] = 'has product type';
 
         // This is used if we have a product type to ensure we get the correct product class.
         $product_classname = WC_Product_Factory::get_product_classname( $product_id, $data_sync->get_product_type() );
@@ -56,13 +56,13 @@ add_action( 'wp_data_sync_after_process_woo_product', function( $product_id, $da
 
         $_product->wc_process();
 
-        SyncRequest::$response['process_product'][] = 'completed successfully';
+        SyncRequest::$response['items'][ SyncRequest::$process_id ]['process_product'][] = 'completed successfully';
 
         return;
 
     }
 
-    SyncRequest::$response['process_product'][] = 'failed';
+    SyncRequest::$response['items'][ SyncRequest::$process_id ]['process_product'][] = 'failed';
 
 }, 10, 2 );
 

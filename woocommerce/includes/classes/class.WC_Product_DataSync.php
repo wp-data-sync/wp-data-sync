@@ -77,23 +77,23 @@ class WC_Product_DataSync {
 
         if ( $this->data_sync->get_taxonomies() ) {
             $this->product_visibility();
-            SyncRequest::$response['process_product'][] = 'visibility';
+            SyncRequest::$response['items'][ SyncRequest::$process_id ]['process_product'][] = 'visibility';
         }
 
 		if ( $this->data_sync->get_wc_categories() ) {
 			$this->categories();
-            SyncRequest::$response['process_product'][] = 'categories';
+            SyncRequest::$response['items'][ SyncRequest::$process_id ]['process_product'][] = 'categories';
 		}
 
 		if ( $this->data_sync->get_attributes() ) {
 			$this->attributes();
-            SyncRequest::$response['process_product'][] = 'attributes';
+            SyncRequest::$response['items'][ SyncRequest::$process_id ]['process_product'][] = 'attributes';
 		}
 
         if ( $this->data_sync->get_variations() ) {
             $this->set_variations_inactive();
             $this->variations();
-            SyncRequest::$response['process_product'][] = 'variations';
+            SyncRequest::$response['items'][ SyncRequest::$process_id ]['process_product'][] = 'variations';
         }
 
         /**
@@ -102,7 +102,7 @@ class WC_Product_DataSync {
          */
         if ( ! empty( $this->data_sync->get_wc_prices() ) ) {
             $this->prices();
-            SyncRequest::$response['process_product'][] = 'prices';
+            SyncRequest::$response['items'][ SyncRequest::$process_id ]['process_product'][] = 'prices';
         }
 
         $this->save();
@@ -472,8 +472,8 @@ class WC_Product_DataSync {
 
     public function save() {
         $this->product->save();
-        SyncRequest::$response['product_type'] = $this->product->get_type();
-        SyncRequest::$response['process_product'][] = 'saved';
+        SyncRequest::$response['items'][ SyncRequest::$process_id ]['product_type'] = $this->product->get_type();
+        SyncRequest::$response['items'][ SyncRequest::$process_id ]['process_product'][] = 'saved';
     }
 
 }

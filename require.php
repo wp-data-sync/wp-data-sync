@@ -56,7 +56,7 @@ require WPDSYNC_PATH . 'includes/functions/view.php';
 /**
  * WooCommerce
  */
-if ( class_exists( 'woocommerce' ) ) {
+if ( class_exists( 'WooCommerce' ) ) {
 
     /**
      * WC
