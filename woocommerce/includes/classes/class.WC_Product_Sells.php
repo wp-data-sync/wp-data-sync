@@ -11,8 +11,9 @@
 
 namespace WP_DataSync\Woo;
 
-use WP_DataSync\App\Settings;
 use WP_DataSync\App\Log;
+use WP_DataSync\App\Settings;
+use WC_Product;
 
 class WC_Product_Sells {
 
@@ -20,45 +21,43 @@ class WC_Product_Sells {
 	 * @var string
 	 */
 
-	private $type;
+	private string $type;
 
 	/**
 	 * @var array
 	 */
 
-	private $sell_ids;
+	private array $sell_ids;
 
 	/**
 	 * @var string
 	 */
 
-	private $relational_id;
+	private string $relational_id;
 
 	/**
 	 * @var string
 	 */
 
-	private $relational_key;
+	private string $relational_key;
 
-	/**
-	 * @var int
-	 */
+    /**
+     * @var array
+     */
 
-	private $product_id;
+    private array $product_ids = [];
 
-	/**
-	 * @var WC_Product_Sells
-	 */
+    /**
+     * @var WC_Product
+     */
 
-	public static $instance;
+    private WC_Product $product;
 
 	/**
 	 * WC_Product_Sells constructor.
 	 */
 
-	public function __construct() {
-		self::$instance = $this;
-	}
+	public function __construct() {}
 
 	/**
 	 * Instance.
@@ -66,278 +65,113 @@ class WC_Product_Sells {
 	 * @return WC_Product_Sells
 	 */
 
-	public static function instance() {
-
-		if ( self::$instance === NULL ) {
-			self::$instance = new self();
-		}
-
-		return self::$instance;
-
+	public static function instance(): WC_Product_Sells {
+		return new self();
 	}
 
 	/**
 	 * Set properties.
 	 *
-	 * @param $values array
+	 * @param $args array
+     *
+     * @return bool
 	 */
 
-	public function set_properties( $values ) {
+	public function set_properties( array $args ): bool {
 
-		foreach ( $values as $key => $value ) {
+		foreach ( $args as $key => $value ) {
 			$this->$key = $value;
 		}
 
-		return Settings::is_checked( "wp_data_sync_process_$this->type" );
+        $args['active'] = Settings::is_checked( "wp_data_sync_process__{$this->type}sell_ids" );
 
-	}
+        Log::write( "product-{$this->type}-sells", $args, 'Properties' );
 
-	/**
-	 * Set the sell ID relationship.
-	 */
-
-	public function set_relation() {
-		update_post_meta( $this->product_id, $this->relational_key, $this->relational_id );
-	}
-
-	/**
-	 * Set sell IDs.
-	 */
-
-	public function stage_sell_ids() {
-
-		if ( is_array( $this->sell_ids ) ) {
-
-			foreach ( $this->sell_ids as $sell_id ) {
-
-				if ( ! $this->sell_id_exists( $sell_id ) ) {
-
-					$this->insert_sell_id( $sell_id );
-
-					Log::write( 'product-sells', $sell_id, 'Insert Sell ID' );
-
-				}
-
-			}
-
-		}
-
-	}
-
-	/**
-	 * Sell id exists.
-	 *
-	 * @param $sell_id
-	 *
-	 * @return bool
-	 */
-
-	public function sell_id_exists( $sell_id ) {
-
-		global $wpdb;
-
-		$table = self::table();
-
-		$exists = $wpdb->get_var( $wpdb->prepare(
-            "
-			SELECT id
-			FROM $table
-			WHERE type = %s
-				AND sell_id = %s
-				AND product_id = %d
-				AND relational_id = %s
-				AND relational_key = %s
-			",
-            esc_sql( $this->type ),
-            esc_sql( $sell_id ),
-            intval( $this->product_id ),
-            esc_sql( $this->relational_id ),
-            esc_sql( $this->relational_key )
-	    ) );
-
-		if ( empty( $exists ) || is_wp_error( $exists ) ) {
-			return false;
-		}
-
-		return true;
-
-	}
-
-	/**
-	 * Insert sell id.
-	 *
-	 * @param $sell_id
-	 */
-
-	public function insert_sell_id( $sell_id ) {
-
-		global $wpdb;
-
-		$wpdb->insert( self::table(), [
-			'type'           => $this->type,
-			'sell_id'        => $sell_id,
-			'product_id'     => $this->product_id,
-			'relational_id'  => $this->relational_id,
-			'relational_key' => $this->relational_key
-		] );
-
-	}
-
-	/**
-	 * Relate the unrelated IDs.
-	 */
-
-	public function relate_ids() {
-
-		if ( $unrelated = $this->get_unrelated() ) {
-
-			foreach ( $unrelated as $row ) {
-
-				if ( $post_id = $this->relation_exists( $row ) ) {
-
-					$this->update_relation( $row, $post_id );
-					$this->set_product_ids( $row, $post_id );
-
-					Log::write( 'product-sells', $row, "Ralation Exists: $post_id" );
-
-				}
-
-			}
-
-		}
-
-	}
-
-	/**
-	 * Get the unrelated rows.
-	 *
-	 * @return array
-	 */
-
-	public function get_unrelated(): array {
-
-		global $wpdb;
-
-		$table = self::table();
-
-		$unrelated = $wpdb->get_results(
-			"
-			SELECT *
-			FROM $table
-			WHERE post_id = 0
-			"
-		);
-
-		if ( null === $unrelated || is_wp_error( $unrelated ) ) {
-			return [];
-		}
-
-		return $unrelated;
-
-	}
-
-	/**
-	 * Relation exists.
-	 *
-	 * @param $row
-	 *
-	 * @return bool|int
-	 */
-
-	public function relation_exists( $row ) {
-
-		global $wpdb;
-
-		$post_id = $wpdb->get_var( $wpdb->prepare(
-	        "
-			SELECT post_id
-			FROM $wpdb->postmeta
-			WHERE meta_key = %s
-				AND meta_value = %s
-			",
-            esc_sql( $row->relational_key ),
-            esc_sql( $row->sell_id )
-	    ) );
-
-		if ( null === $post_id || is_wp_error( $post_id ) ) {
-			return false;
-		}
-
-		return (int) $post_id;
-
-	}
-
-	/**
-	 * Update relation.
-	 *
-	 * @param $row
-	 * @param $post_id
-	 */
-
-	public function update_relation( $row, $post_id ) {
-
-		global $wpdb;
-
-		$wpdb->update(
-			self::table(),
-			[ 'post_id' => $post_id ],
-			[ 'id'      => $row->id ]
-		);
-
-	}
-
-	/**
-	 * Set product IDs.
-	 *
-	 * @param $row
-	 * @param $post_id
-	 */
-
-	public function set_product_ids( $row, $post_id ) {
-
-		if( $product_ids = $this->get_product_ids( $row, $post_id ) ) {
-
-			update_post_meta( $post_id, $row->type, $product_ids );
-
-			Log::write( 'product-sells', $product_ids, "Ralated $row->type IDs: $post_id" );
-
-		}
+        return $args['active'];
 
 	}
 
 	/**
 	 * Get product IDs.
 	 *
-	 * @param $row
-	 * @param $post_id
-	 *
-	 * @return array|bool
+	 * @return array
 	 */
 
-	public function get_product_ids( $row, $post_id ) {
+	public function get_product_ids(): array {
 
 		global $wpdb;
 
-		$table = self::table();
+        $placeholders = implode( ',', array_fill( 0, count( $this->sell_ids ), '%s' ) );
 
-		$product_ids = $wpdb->get_col( $wpdb->prepare(
+		$sql = $wpdb->prepare(
 			"
-			SELECT product_id
-			FROM $table
-			WHERE post_id = %d
-			AND type = %s
+			SELECT p.ID
+			FROM $wpdb->posts p
+			INNER JOIN $wpdb->postmeta pm
+			    ON p.ID = pm.post_id 
+		            AND pm.meta_key = %s 
+			        AND pm.meta_value IN ($placeholders)
+			WHERE p.post_type = 'product'
+			    AND p.post_status = 'publish'
 			",
-			intval( $post_id ),
-			esc_sql( $row->type )
-		) );
+            array_merge(
+                [ esc_sql( $this->relational_key ) ],
+			    array_map( 'esc_sql', $this->sell_ids )
+            )
+		);
+
+        $product_ids = $wpdb->get_col( $sql );
+
+        Log::write( "product-{$this->type}-sells", [
+            'sql'         => $sql,
+            'product_ids' => $product_ids
+        ], 'Product IDs SQL' );
 
 		if ( empty( $product_ids ) || is_wp_error( $product_ids ) ) {
-			return false;
+			return [];
 		}
 
-		return $product_ids;
+		return array_map( 'intval', $product_ids );
 
 	}
+
+    /**
+     * Get related rows.
+     *
+     * @param $sell_ids
+     *
+     * @return array|object|\stdClass[]
+     */
+
+    public function get_related_rows( $sell_ids ) {
+
+        global $wpdb;
+
+        $placeholders = implode( ',', array_fill( 0, count( $sell_ids ), '%s' ) );
+
+        $results = $wpdb->get_results( $wpdb->prepare(
+            "
+			SELECT p.ID + 0 AS ID, pm.meta_key
+			FROM $wpdb->posts p
+			INNER JOIN $wpdb->postmeta pm
+			    ON p.ID = pm.post_id 
+		            AND pm.meta_key IN ('_up_sells_args', '_cross_sells_args') 
+			INNER JOIN $wpdb->postmeta pm2
+			    ON p.ID = pm2.post_id 
+			        AND pm2.meta_value IN ($placeholders)
+			WHERE p.post_type = 'product'
+			    AND p.post_status = 'publish'
+			",
+            array_map( 'esc_sql', $sell_ids )
+        ), ARRAY_A );
+
+        if ( empty( $results ) || is_wp_error( $results ) ) {
+            return [];
+        }
+
+        return $results ;
+
+    }
 
 	/**
 	 * Save the sell ids.
@@ -345,68 +179,34 @@ class WC_Product_Sells {
 
 	public function save() {
 
-		$this->set_relation();
-		$this->stage_sell_ids();
+        if( $this->product_ids = $this->get_product_ids() ) {
 
-        if ( ! as_has_scheduled_action( 'wp_data_sync_process_relate_ids' ) ) {
-            // Wait 30 minutes to run this action.
-            as_schedule_single_action( time() + 1800, 'wp_data_sync_process_relate_ids' );
+            if ( 'cross' === $this->type ) {
+                $this->product->set_cross_sell_ids( $this->product_ids );
+            }
+            elseif ( 'up' === $this->type ) {
+                $this->product->set_upsell_ids( $this->product_ids );
+            }
+
         }
 
-	}
+        $this->product->update_meta_data( "_{$this->type}_sells_args", [
+            'type'           => $this->type,
+            'relational_key' => $this->relational_key,
+            'sell_ids'       => $this->sell_ids
+        ] );
 
-	/**
-	 * Database tabke name.
-	 *
-	 * @return string
-	 */
+        $this->product->save();
 
-	public static function table() {
+        if ( ! doing_action( 'wp_data_sync_process_product_sells' ) ) {
 
-		global $wpdb;
+            $event_args = [ 'sell_ids' => $this->sell_ids ];
 
-		return $wpdb->prefix . 'data_sync_product_sells';
+            if ( ! as_has_scheduled_action( 'wp_data_sync_schedule_product_sells_events', $event_args ) ) {
+                as_schedule_single_action( time() + 1800, 'wp_data_sync_schedule_product_sells_events', $event_args );
+            }
 
-	}
-
-	/**
-	 * Create the sells database table.
-     *
-     * type - type of sell, cross or up.
-     * sell_id - primary ID of the related product.
-     * product_id - the WC ID of the current product.
-     * relation_id - primary ID of the current product.
-     * relation_key - meta_key used to relate sell_id with relation_id.
-     * post_id - the post ID of the related product.
-	 */
-
-	public static function create_table() {
-
-		global $wpdb;
-
-		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-
-		$charset_collate = $wpdb->get_charset_collate();
-		$table           = self::table();
-
-		$sql = "
-			CREATE TABLE IF NOT EXISTS $table (
-  			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  			type varchar(40) NOT NULL,
-  			sell_id varchar(300) NOT NULL,
-  			product_id bigint(20) NOT NULL,
-  			relational_id varchar(300) NOT NULL,
-  			relational_key varchar(300) NOT NULL,
-  			post_id bigint(20) NOT NULL DEFAULT 0,
-  			PRIMARY KEY (id),
-  			KEY type (type),
-			KEY sell_id (sell_id),
-			KEY relational_id (relational_id),
-			KEY relational_key (relational_key)
-			) $charset_collate;
-        ";
-
-		dbDelta( $sql );
+        }
 
 	}
 

@@ -12,7 +12,6 @@
 namespace WP_DataSync\Woo;
 
 use WP_DataSync\App\DataSync;
-use WP_DataSync\App\Log;
 use WC_Product;
 use WC_Product_Factory;
 use WP_DataSync\App\SyncRequest;
@@ -22,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Used to handle WooCommerce integration versions.
-define( 'WCDSYNC_VERSION', '2.6.0' );
+define( 'WCDSYNC_VERSION', '2.7.0' );
 
 /**
  * Process WooCommerce.
@@ -77,11 +76,20 @@ add_action( 'wp_data_sync_after_process_woo_product', function( $product_id, $da
 
 add_action( 'wp_data_sync_integration_woo_cross_sells', function( int $product_id, array $values ): void {
 
-    wc_schedule_single_action( time(), 'wp_data_sync_process_related_products', [
-        'product_id' => $product_id,
-        'type'       => '_crosssell_ids',
-        'values'     => $values
-    ] );
+    if ( ! $product = wc_get_product( $product_id ) ) {
+        return;
+    }
+
+    $args = array_merge( [
+        'product' => $product,
+        'type'    => 'cross',
+    ], $values );
+
+    $product_sells = WC_Product_Sells::instance();
+
+    if ( $product_sells->set_properties( $args ) ) {
+        $product_sells->save();
+    }
 
 }, 10, 2 );
 
@@ -96,52 +104,73 @@ add_action( 'wp_data_sync_integration_woo_cross_sells', function( int $product_i
 
 add_action( 'wp_data_sync_integration_woo_up_sells', function( int $product_id, array $values ): void {
 
-    wc_schedule_single_action( time(), 'wp_data_sync_process_related_products', [
-        'product_id' => $product_id,
-        'type'       => '_upsell_ids',
-        'values'     => $values
-    ] );
+    if ( ! $product = wc_get_product( $product_id ) ) {
+        return;
+    }
+
+    $args = array_merge( [
+        'product' => $product,
+        'type'    => 'up',
+    ], $values );
+
+    $product_sells = WC_Product_Sells::instance();
+
+    if ( $product_sells->set_properties( $args ) ) {
+        $product_sells->save();
+    }
 
 }, 10, 2 );
 
 /**
- * Process WooCommence Related Products
+ * Shhedule the product sells events.
  *
- * @param int $product_id
- * @param string $type
- * @param array $values
+ * @param array $sell_ids
  *
  * @return void
  */
-
-add_action( 'wp_data_sync_process_related_products', function( int $product_id, string $type, array $values ): void {
-
-	$values['product_id'] = $product_id;
-	$values['type']       = $type;
-
-	Log::write( "product_$type", $values );
-
-	$product_sells = WC_Product_Sells::instance();
-
-	if ( $product_sells->set_properties( $values ) ) {
-		$product_sells->save();
-	}
-
-    Log::write( "product_$type", 'Done' );
-
-}, 10, 3 );
-
-/**
- * Process the relateIDs event.
- *
- * @return void
- */
-add_action( 'wp_data_sync_process_relate_ids', function(): void {
+add_action( 'wp_data_sync_schedule_product_sells_events', function( array $sell_ids ): void {
 
     $product_sells = WC_Product_Sells::instance();
-    $product_sells->relate_ids();
+
+    $rows = $product_sells->get_related_rows( $sell_ids );
+    $i    = 1;
+
+    foreach ( $rows as $row ) {
+        if ( ! as_has_scheduled_action( 'wp_data_sync_process_product_sells', $row ) ) {
+            as_schedule_single_action( time() + $i, 'wp_data_sync_process_product_sells', $row );
+            $i = $i + 3;
+        }
+    }
 
 } );
+
+/**
+ * Process the product sells event.
+ *
+ * @param int $product_id
+ * @param string $meta_key
+ *
+ * @return void
+ */
+add_action( 'wp_data_sync_process_product_sells', function( int $product_id, string $meta_key ): void {
+
+    if ( ! $product = wc_get_product( $product_id ) ) {
+        return;
+    }
+
+    $product_sells = WC_Product_Sells::instance();
+
+    if ( $args = $product->get_meta( $meta_key ) ) {
+
+        $args['product'] = $product;;
+
+        if ( $product_sells->set_properties( $args ) ) {
+            $product_sells->save();
+        }
+
+    }
+
+}, 10, 2 );
 
 /**
  * WooCommerce ItemRequest

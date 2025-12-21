@@ -23,8 +23,6 @@ add_action( 'init', function() {
 
 	if ( WCDSYNC_VERSION !== get_option( 'WCDSYNC_VERSION' ) ) {
 
-		WC_Product_Sells::create_table();
-
 		update_option( 'WCDSYNC_VERSION', WCDSYNC_VERSION );
 
 	}
