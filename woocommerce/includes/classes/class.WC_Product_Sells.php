@@ -17,6 +17,12 @@ use WC_Product;
 
 class WC_Product_Sells {
 
+    /**
+     * @var string
+     */
+
+    private string  $table;
+
 	/**
 	 * @var string
 	 */
@@ -57,7 +63,11 @@ class WC_Product_Sells {
 	 * WC_Product_Sells constructor.
 	 */
 
-	public function __construct() {}
+	public function __construct() {
+        global $wpdb;
+
+       $this->table =  $wpdb->prefix . 'data_sync_sell_actions';
+    }
 
 	/**
 	 * Instance.
@@ -151,7 +161,7 @@ class WC_Product_Sells {
 
         $results = $wpdb->get_results( $wpdb->prepare(
             "
-			SELECT p.ID + 0 AS ID, pm.meta_key
+			SELECT p.ID + 0 AS product_id, pm.meta_key
 			FROM $wpdb->posts p
 			INNER JOIN $wpdb->postmeta pm
 			    ON p.ID = pm.post_id 
@@ -198,16 +208,97 @@ class WC_Product_Sells {
 
         $this->product->save();
 
-        if ( ! doing_action( 'wp_data_sync_process_product_sells' ) ) {
+	}
 
-            $event_args = [ 'sell_ids' => $this->sell_ids ];
+    /**
+     * Save event.
+     *
+     * @return void
+     */
 
-            if ( ! as_has_scheduled_action( 'wp_data_sync_schedule_product_sells_events', $event_args ) ) {
-                as_schedule_single_action( time() + 1800, 'wp_data_sync_schedule_product_sells_events', $event_args );
-            }
+    public function save_event(): void {
+        global $wpdb;
 
+        $wpdb->query( $wpdb->prepare(
+            "
+            INSERT IGNORE INTO $this->table (hash, sell_ids) 
+            VALUES (%s, %s)
+            ",
+            wp_hash( json_encode( $this->sell_ids ) ),
+            serialize( array_map( 'esc_sql', $this->sell_ids ) )
+        ) );
+    }
+
+    /**
+     * Get event.
+     *
+     * @return array
+     */
+
+    public function get_event(): array {
+        global $wpdb;
+
+        $result = $wpdb->get_row( $wpdb->prepare(
+            "
+            SELECT *
+            FROM $this->table 
+            WHERE timestamp < DATE_SUB(NOW(), INTERVAL 1 HOUR)
+            LIMIT 1
+            "
+        ), ARRAY_A );
+
+        if ( empty( $result ) || is_wp_error( $result) ) {
+            return [];
         }
 
-	}
+        $result['sell_ids'] = maybe_unserialize( $result['sell_ids'] );
+
+        return $result;
+
+    }
+
+    /**
+     * Delete event.
+     *
+     * @param int $id
+     *
+     * @return void
+     */
+
+    public function delete_event( int $id ): void {
+        global $wpdb;
+
+        $wpdb->delete(
+            $this->table,
+            [ 'id' => $id ]
+        );
+    }
+
+    /**
+     * Create table.
+     *
+     * @return void
+     */
+
+    public function create_table(): void {
+
+        global $wpdb;
+
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql = "
+			CREATE TABLE IF NOT EXISTS $this->table (
+  			id bigint(20) NOT NULL AUTO_INCREMENT,
+  			hash varchar(25) NOT NULL,
+  			sell_ids longtext NOT NULL,
+  			timestamp datetime DEFAULT CURRENT_TIMESTAMP,
+  			PRIMARY KEY (id),
+  			UNIQUE KEY hash (hash)
+			) $charset_collate;
+        ";
+
+        dbDelta( $sql );
+
+    }
 
 }

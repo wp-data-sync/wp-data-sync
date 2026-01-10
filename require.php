@@ -83,6 +83,7 @@ if ( class_exists( 'WooCommerce' ) ) {
     require 'woocommerce/includes/functions/product-format-price.php';
     require 'woocommerce/includes/functions/product-price-adjustment.php';
     require 'woocommerce/includes/functions/product-restricted-meta-keys.php';
+    require 'woocommerce/includes/functions/product-sells.php';
     require 'woocommerce/includes/functions/product-stock-qty-for-backorder.php';
     require 'woocommerce/includes/functions/product-update-duplicate-fields.php';
     require 'woocommerce/includes/functions/product-weight-conversion.php';

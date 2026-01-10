@@ -20,8 +20,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Used to handle WooCommerce integration versions.
-define( 'WCDSYNC_VERSION', '2.7.0' );
+// Used to handle WooCommerce integration version.
+define( 'WCDSYNC_VERSION', '3.0.0' );
 
 /**
  * Process WooCommerce.
@@ -62,113 +62,6 @@ add_action( 'wp_data_sync_after_process_woo_product', function( $product_id, $da
     }
 
     SyncRequest::$response['items'][ SyncRequest::$process_id ]['process_product'][] = 'failed';
-
-}, 10, 2 );
-
-/**
- * Schedule WooCommerce Cross-Sells.
- *
- * @param int $product_id
- * @param array $values
- *
- * @return void
- */
-
-add_action( 'wp_data_sync_integration_woo_cross_sells', function( int $product_id, array $values ): void {
-
-    if ( ! $product = wc_get_product( $product_id ) ) {
-        return;
-    }
-
-    $args = array_merge( [
-        'product' => $product,
-        'type'    => 'cross',
-    ], $values );
-
-    $product_sells = WC_Product_Sells::instance();
-
-    if ( $product_sells->set_properties( $args ) ) {
-        $product_sells->save();
-    }
-
-}, 10, 2 );
-
-/**
- * Schedule WooCommence Upsells.
- *
- * @param int $product_id
- * @param array $values
- *
- * @return void
- */
-
-add_action( 'wp_data_sync_integration_woo_up_sells', function( int $product_id, array $values ): void {
-
-    if ( ! $product = wc_get_product( $product_id ) ) {
-        return;
-    }
-
-    $args = array_merge( [
-        'product' => $product,
-        'type'    => 'up',
-    ], $values );
-
-    $product_sells = WC_Product_Sells::instance();
-
-    if ( $product_sells->set_properties( $args ) ) {
-        $product_sells->save();
-    }
-
-}, 10, 2 );
-
-/**
- * Shhedule the product sells events.
- *
- * @param array $sell_ids
- *
- * @return void
- */
-add_action( 'wp_data_sync_schedule_product_sells_events', function( array $sell_ids ): void {
-
-    $product_sells = WC_Product_Sells::instance();
-
-    $rows = $product_sells->get_related_rows( $sell_ids );
-    $i    = 1;
-
-    foreach ( $rows as $row ) {
-        if ( ! as_has_scheduled_action( 'wp_data_sync_process_product_sells', $row ) ) {
-            as_schedule_single_action( time() + $i, 'wp_data_sync_process_product_sells', $row );
-            $i = $i + 3;
-        }
-    }
-
-} );
-
-/**
- * Process the product sells event.
- *
- * @param int $product_id
- * @param string $meta_key
- *
- * @return void
- */
-add_action( 'wp_data_sync_process_product_sells', function( int $product_id, string $meta_key ): void {
-
-    if ( ! $product = wc_get_product( $product_id ) ) {
-        return;
-    }
-
-    $product_sells = WC_Product_Sells::instance();
-
-    if ( $args = $product->get_meta( $meta_key ) ) {
-
-        $args['product'] = $product;;
-
-        if ( $product_sells->set_properties( $args ) ) {
-            $product_sells->save();
-        }
-
-    }
 
 }, 10, 2 );
 
