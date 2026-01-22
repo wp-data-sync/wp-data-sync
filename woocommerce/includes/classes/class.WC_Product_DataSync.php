@@ -472,6 +472,7 @@ class WC_Product_DataSync {
 
     public function save() {
         $this->product->save();
+        wc_delete_product_transients( $this->product->get_id() );
         SyncRequest::$response['items'][ SyncRequest::$process_id ]['product_type'] = $this->product->get_type();
         SyncRequest::$response['items'][ SyncRequest::$process_id ]['process_product'][] = 'saved';
     }
