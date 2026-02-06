@@ -133,6 +133,12 @@ class WC_Product_DataSync {
             $this->product->set_sale_price( $_sale_price );
         }
 
+        if ( $this->product->is_on_sale() ) {
+            $this->product->set_price( $this->product->get_sale_price() );
+        } else {
+            $this->product->set_price( $this->product->get_regular_price() );
+        }
+
         SyncRequest::$response['items'][ SyncRequest::$process_id ]['prices'] = [
             'regular' => $this->product->get_regular_price(),
             'sale'    => $this->product->get_sale_price()
@@ -144,6 +150,8 @@ class WC_Product_DataSync {
             'price'         => $this->product->get_price(),
             'regular_price' => $this->product->get_regular_price(),
             'sale_price'    => $this->product->get_sale_price(),
+            'on_sale_from'  => $this->product->get_date_on_sale_from(),
+            'on_sale_to'    => $this->product->get_date_on_sale_to(),
             'api_prices'    => $prices
         ], 'Set WC Prices' );
 
