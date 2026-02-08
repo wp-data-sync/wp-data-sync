@@ -710,7 +710,35 @@ class Settings {
                         'placeholder'       => '',
                         'info'              => __( 'Allow iFrames in content.', 'wp-data-sync' )
                     ]
-                ]
+                ],
+                [
+                    'key'       => 'wp_data_sync_block_update_list',
+                    'label'     => __( 'Block Update List', 'wp-data-sync' ),
+                    'callback'  => 'input',
+                    'no_report' => true,
+                    'args'      => [
+                        'sanitize_callback' => 'sanitize_textarea_field',
+                        'basename'          => 'textarea',
+                        'type'              => 'textarea',
+                        'class'             => 'large-text',
+                        'placeholder'       => sprintf(
+                            '%s (%s)%s%s (%s)%s%s (%s)%s%s (%s)',
+                            'property.key.key',
+                            __( 'example', 'wp-data-sync' ),
+                            PHP_EOL,
+                            'post_data.post_content',
+                            __( 'unset post content', 'wp-data-sync' ),
+                            PHP_EOL,
+                            'post_meta._some_meta_field',
+                            __( 'unset 1 meta field', 'wp-data-sync' ),
+                            PHP_EOL,
+                            'taxonomies',
+                            __( 'unset all taxonomy fields', 'wp-data-sync' )
+                        ),
+                        'rows'              => 8,
+                        'info'              => __( 'Add 1 key per row. Block updates to data for an item synced from your portal. You can find the keys in the item processed data section in your portal.', 'wp-data-sync' )
+                    ]
+                ],
             ],
             'item_request'       => [
                 [

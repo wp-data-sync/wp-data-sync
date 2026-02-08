@@ -11,6 +11,7 @@
 
 namespace WP_DataSync\App;
 
+use Ashley\App\Setting;
 use Monolog\Formatter\LogglyFormatter;
 use WP_Error;
 use WP_Post;
@@ -275,6 +276,10 @@ class DataSync {
             SyncRequest::$response['items'][ SyncRequest::$process_id ]['trash'] = __( 'Post Trashed', 'wp-data-sync' );
 
             return false;
+        }
+
+        if ( ! $this->is_new ) {
+            $this->process_block_list();
         }
 
         /**
@@ -1991,6 +1996,69 @@ class DataSync {
         Log::write( 'post-date', $post_data, 'Update Post Dates' );
 
         wp_update_post( $post_data );
+
+    }
+
+    /**
+     * Process the Blocklist
+     *
+     * Unset fields that should never get updated by sync on existing items.
+     * This does not run for new items.
+     *
+     * @snoing 3.5.4
+     *
+     * @return void
+     */
+
+    private function process_block_list(): void {
+
+        $block_update_list = Settings::is_set( 'block_update_list' );
+
+        if ( empty( $block_update_list ) ) {
+            return;
+        }
+
+        $rows = array_map( 'trim', explode( PHP_EOL, $block_update_list ) );
+
+        if ( empty( $rows ) || ! is_array( $rows ) ) {
+            return;
+        }
+
+        foreach ( $rows as $row ) {
+
+            if ( empty( $row ) ) {
+                continue;
+            }
+
+            $keys     = explode( '.', $row );
+            $property = $keys[0];
+
+            if ( ! property_exists( $this, $property ) ) {
+                continue;
+            }
+
+            if ( 1 === count( $keys ) ) {
+                $this->$property = false;
+                continue;
+            }
+
+            unset( $keys[0] );;
+
+            $ref =& $this->$property;
+
+            foreach ( $keys as $key  ) {
+                if ( ! isset( $ref[ $key ] ) ) {
+                    break;
+                }
+
+                if ( $key === end( $keys ) ) {
+                    unset( $ref[ $key ] );
+                } else {
+                    $ref =& $ref[ $key ];
+                }
+            }
+
+        }
 
     }
 
