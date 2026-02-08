@@ -1,17 +1,17 @@
-# Copyright (C) 2025 WP Data Sync
+# Copyright (C) 2026 WP Data Sync
 # This file is distributed under the GPL2.
 msgid ""
 msgstr ""
-"Project-Id-Version: WP Data Sync 3.0.4\n"
+"Project-Id-Version: WP Data Sync 3.5.4\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wp-data-sync\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-07-29T21:29:39+00:00\n"
+"POT-Creation-Date: 2026-02-08T21:15:43+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.10.0\n"
+"X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: wp-data-sync\n"
 
 #. Plugin Name of the plugin
@@ -38,32 +38,32 @@ msgstr ""
 msgid "https://wpdatasync.com"
 msgstr ""
 
-#: includes/abstracts/abstract.Request.php:249
-#: includes/abstracts/abstract.Request.php:294
+#: includes/abstracts/abstract.Request.php:258
+#: includes/abstracts/abstract.Request.php:303
 msgid "A valid array is required!!"
 msgstr ""
 
-#: includes/classes/class.DataSync.php:225
+#: includes/classes/class.DataSync.php:232
 msgid "Post ID failed!!"
 msgstr ""
 
-#: includes/classes/class.DataSync.php:244
+#: includes/classes/class.DataSync.php:251
 msgid "Post Type Required!!"
 msgstr ""
 
-#: includes/classes/class.DataSync.php:259
+#: includes/classes/class.DataSync.php:266
 msgid "Post Sync Status Disabled!!"
 msgstr ""
 
-#: includes/classes/class.DataSync.php:269
+#: includes/classes/class.DataSync.php:276
 msgid "Post Trashed"
 msgstr ""
 
-#: includes/classes/class.DataSync.php:803
+#: includes/classes/class.DataSync.php:788
 msgid "WP Data Sync Placeholder"
 msgstr ""
 
-#: includes/classes/class.DataSync.php:1935
+#: includes/classes/class.DataSync.php:1927
 msgid "Value must be a string."
 msgstr ""
 
@@ -76,7 +76,7 @@ msgid "Post Types"
 msgstr ""
 
 #: includes/classes/class.KeyRequest.php:138
-#: includes/classes/class.Settings.php:783
+#: includes/classes/class.Settings.php:811
 msgid "Taxonomies"
 msgstr ""
 
@@ -84,7 +84,7 @@ msgstr ""
 msgid "Meta Keys"
 msgstr ""
 
-#: includes/classes/class.Log.php:118
+#: includes/classes/class.Log.php:123
 msgid "Please choose a file and save changes."
 msgstr ""
 
@@ -213,38 +213,37 @@ msgid "Default Status"
 msgstr ""
 
 #: includes/classes/class.Settings.php:532
-#: includes/classes/class.Settings.php:756
+#: includes/classes/class.Settings.php:784
 msgid "Publish"
 msgstr ""
 
 #: includes/classes/class.Settings.php:533
-#: includes/classes/class.Settings.php:757
-#: woocommerce/includes/functions/wc-settings.php:375
+#: includes/classes/class.Settings.php:785
 msgid "Pending"
 msgstr ""
 
 #: includes/classes/class.Settings.php:534
-#: includes/classes/class.Settings.php:758
+#: includes/classes/class.Settings.php:786
 msgid "Draft"
 msgstr ""
 
 #: includes/classes/class.Settings.php:535
-#: includes/classes/class.Settings.php:759
+#: includes/classes/class.Settings.php:787
 msgid "Future"
 msgstr ""
 
 #: includes/classes/class.Settings.php:536
-#: includes/classes/class.Settings.php:760
+#: includes/classes/class.Settings.php:788
 msgid "Private"
 msgstr ""
 
 #: includes/classes/class.Settings.php:537
-#: includes/classes/class.Settings.php:761
+#: includes/classes/class.Settings.php:789
 msgid "Trash"
 msgstr ""
 
 #: includes/classes/class.Settings.php:538
-#: includes/classes/class.Settings.php:762
+#: includes/classes/class.Settings.php:790
 msgid "Inherit"
 msgstr ""
 
@@ -369,59 +368,83 @@ msgstr ""
 msgid "Allow iFrames in content."
 msgstr ""
 
-#: includes/classes/class.Settings.php:718
+#: includes/classes/class.Settings.php:716
+msgid "Block Update List"
+msgstr ""
+
+#: includes/classes/class.Settings.php:727
+msgid "example"
+msgstr ""
+
+#: includes/classes/class.Settings.php:730
+msgid "unset post content"
+msgstr ""
+
+#: includes/classes/class.Settings.php:733
+msgid "unset 1 meta field"
+msgstr ""
+
+#: includes/classes/class.Settings.php:736
+msgid "unset all taxonomy fields"
+msgstr ""
+
+#: includes/classes/class.Settings.php:739
+msgid "Add 1 key per row. Block updates to data for an item synced from your portal. You can find the keys in the item processed data section in your portal."
+msgstr ""
+
+#: includes/classes/class.Settings.php:746
 msgid "Item Request Access Token"
 msgstr ""
 
-#: includes/classes/class.Settings.php:731
+#: includes/classes/class.Settings.php:759
 msgid "Item Request Private Token"
 msgstr ""
 
-#: includes/classes/class.Settings.php:744
+#: includes/classes/class.Settings.php:772
 msgid "Include items with status"
 msgstr ""
 
-#: includes/classes/class.Settings.php:753
+#: includes/classes/class.Settings.php:781
 msgid "Include the selected post ststuses from the item request. Select all that apply."
 msgstr ""
 
-#: includes/classes/class.Settings.php:768
+#: includes/classes/class.Settings.php:796
 msgid "Exclude Data Types"
 msgstr ""
 
-#: includes/classes/class.Settings.php:777
+#: includes/classes/class.Settings.php:805
 msgid "Exclude the selected data types from the item request. Select all that apply."
 msgstr ""
 
-#: includes/classes/class.Settings.php:780
+#: includes/classes/class.Settings.php:808
 msgid "Exclude None"
 msgstr ""
 
-#: includes/classes/class.Settings.php:781
+#: includes/classes/class.Settings.php:809
 msgid "Post Data"
 msgstr ""
 
-#: includes/classes/class.Settings.php:782
+#: includes/classes/class.Settings.php:810
 msgid "Post Meta"
 msgstr ""
 
-#: includes/classes/class.Settings.php:784
+#: includes/classes/class.Settings.php:812
 msgid "Featured Image"
 msgstr ""
 
-#: includes/classes/class.Settings.php:785
+#: includes/classes/class.Settings.php:813
 msgid "Integrations"
 msgstr ""
 
-#: includes/classes/class.Settings.php:793
+#: includes/classes/class.Settings.php:821
 msgid "Allow Logging"
 msgstr ""
 
-#: includes/classes/class.Settings.php:801
+#: includes/classes/class.Settings.php:829
 msgid "We reccommend keeping this off unless you are having an issue with the data sync. If you do have an issue, please activate this before contacting support. Log files will be automatically deleted after 10 days. Please note when allow logging is deactivated all log files will be deleted."
 msgstr ""
 
-#: includes/classes/class.Settings.php:806
+#: includes/classes/class.Settings.php:834
 msgid "Log File"
 msgstr ""
 
@@ -434,7 +457,6 @@ msgid "Settings"
 msgstr ""
 
 #: includes/functions/post-sync-status.php:22
-#: woocommerce/includes/functions/order-sync-status-admin-column.php:27
 msgid "Sync Status"
 msgstr ""
 
@@ -466,18 +488,6 @@ msgstr ""
 msgid "Select One"
 msgstr ""
 
-#: woocommerce/includes/functions/order-sync-status-bulk-action.php:28
-msgid "Reset Sync Status"
-msgstr ""
-
-#: woocommerce/includes/functions/order-sync-status-order-action.php:29
-msgid "Reset order sync status"
-msgstr ""
-
-#: woocommerce/includes/functions/order-sync-status-order-action.php:44
-msgid "Manually removed order sync status."
-msgstr ""
-
 #: woocommerce/includes/functions/product-category-options-array.php:33
 msgid "Allow All Categories"
 msgstr ""
@@ -494,43 +504,51 @@ msgstr ""
 msgid "Variations"
 msgstr ""
 
-#: woocommerce/includes/functions/product-fields.php:26
-#: woocommerce/includes/functions/product-fields.php:86
+#: woocommerce/includes/functions/product-fields.php:28
+msgid "Vendor"
+msgstr ""
+
+#: woocommerce/includes/functions/product-fields.php:30
+msgid "Vendor Name"
+msgstr ""
+
+#: woocommerce/includes/functions/product-fields.php:39
+#: woocommerce/includes/functions/product-fields.php:102
 msgid "UPC"
 msgstr ""
 
-#: woocommerce/includes/functions/product-fields.php:28
-#: woocommerce/includes/functions/product-fields.php:89
+#: woocommerce/includes/functions/product-fields.php:41
+#: woocommerce/includes/functions/product-fields.php:105
 msgid "Universal Product Code"
 msgstr ""
 
-#: woocommerce/includes/functions/product-fields.php:33
-#: woocommerce/includes/functions/product-fields.php:95
+#: woocommerce/includes/functions/product-fields.php:46
+#: woocommerce/includes/functions/product-fields.php:111
 msgid "MPN"
 msgstr ""
 
-#: woocommerce/includes/functions/product-fields.php:35
-#: woocommerce/includes/functions/product-fields.php:98
+#: woocommerce/includes/functions/product-fields.php:48
+#: woocommerce/includes/functions/product-fields.php:114
 msgid "Manufacturer Part Number"
 msgstr ""
 
-#: woocommerce/includes/functions/product-fields.php:40
-#: woocommerce/includes/functions/product-fields.php:104
+#: woocommerce/includes/functions/product-fields.php:53
+#: woocommerce/includes/functions/product-fields.php:120
 msgid "GTIN"
 msgstr ""
 
-#: woocommerce/includes/functions/product-fields.php:42
-#: woocommerce/includes/functions/product-fields.php:107
+#: woocommerce/includes/functions/product-fields.php:55
+#: woocommerce/includes/functions/product-fields.php:123
 msgid "Global Trade Item Number"
 msgstr ""
 
-#: woocommerce/includes/functions/product-fields.php:47
-#: woocommerce/includes/functions/product-fields.php:113
+#: woocommerce/includes/functions/product-fields.php:60
+#: woocommerce/includes/functions/product-fields.php:129
 msgid "ISBN"
 msgstr ""
 
-#: woocommerce/includes/functions/product-fields.php:49
-#: woocommerce/includes/functions/product-fields.php:116
+#: woocommerce/includes/functions/product-fields.php:62
+#: woocommerce/includes/functions/product-fields.php:132
 msgid "International Standard Book Number"
 msgstr ""
 
@@ -751,62 +769,6 @@ msgstr ""
 msgid "Sale Price Adjustment (%)"
 msgstr ""
 
-#: woocommerce/includes/functions/wc-settings.php:350
-msgid "Allow Order Sync"
-msgstr ""
-
-#: woocommerce/includes/functions/wc-settings.php:358
-msgid "Allow order details to sync with the WP Data Sync API."
-msgstr ""
-
-#: woocommerce/includes/functions/wc-settings.php:364
-msgid "Allowed Order Status"
-msgstr ""
-
-#: woocommerce/includes/functions/wc-settings.php:376
-msgid "Processing"
-msgstr ""
-
-#: woocommerce/includes/functions/wc-settings.php:377
-msgid "On Hold"
-msgstr ""
-
-#: woocommerce/includes/functions/wc-settings.php:378
-msgid "Completed"
-msgstr ""
-
-#: woocommerce/includes/functions/wc-settings.php:379
-msgid "Refunded"
-msgstr ""
-
-#: woocommerce/includes/functions/wc-settings.php:386
-msgid "Allowed Product Categories"
-msgstr ""
-
-#: woocommerce/includes/functions/wc-settings.php:396
-msgid "Include products with selected categories in order sync."
-msgstr ""
-
-#: woocommerce/includes/functions/wc-settings.php:403
-msgid "Require Valid Product"
-msgstr ""
-
-#: woocommerce/includes/functions/wc-settings.php:411
-msgid "Require a valid poroduct in the order."
-msgstr ""
-
-#: woocommerce/includes/functions/wc-settings.php:417
-msgid "Show Order Sync Status Admin Column"
-msgstr ""
-
-#: woocommerce/includes/functions/wc-settings.php:425
-msgid "Show admin column for order export status on Orders list."
-msgstr ""
-
 #: woocommerce/includes/functions/wc-tabs.php:22
 msgid "WC Products"
-msgstr ""
-
-#: woocommerce/includes/functions/wc-tabs.php:25
-msgid "WC Orders"
 msgstr ""
