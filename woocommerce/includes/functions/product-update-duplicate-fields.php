@@ -58,7 +58,7 @@ add_action( 'init', function() {
                 $data_sync->save_post_meta( $post_id, $meta_key, $meta_value );
             }
 
-            Log::write( 'update-duplicate-field', [
+            Log::set( 'update-duplicate-field', [
                 'meta_key'   => $meta_key,
                 'meta_value' => $meta_value,
                 'primary_id' => $data_sync->get_primary_id(),

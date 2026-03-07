@@ -137,10 +137,12 @@ class ItemRequest extends Request {
 
 		$response = $this->get_items();
 
-		Log::write( 'item-request', [
+		Log::set( 'item-request', [
 			'api_id'   => $this->api_id,
 			'response' => $response
 		], 'Response' );
+
+        Log::write();
 
 		return rest_ensure_response( $response );
 
@@ -214,7 +216,7 @@ class ItemRequest extends Request {
 
 				$items[] = $item_data = $item->get();
 
-				Log::write( 'item-request', [
+				Log::set( 'item-request', [
 					'item_id'   => $item_id,
 					'item_data' => $item_data
 				], 'Item Data' );
@@ -275,7 +277,7 @@ class ItemRequest extends Request {
             $where_args
         ) );
 
-		Log::write( 'item-request',[
+		Log::set( 'item-request',[
 			'sql'      => $wpdb->last_query,
 			'item_ids' => $item_ids
 		], 'SQL Query' );

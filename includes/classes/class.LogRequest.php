@@ -155,7 +155,7 @@ class LogRequest extends Request {
 
 		}
 
-		Log::write( 'log-request-response', $response );
+		Log::set( 'log-request-response', $response );
 
 		return rest_ensure_response( $response );
 

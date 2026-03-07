@@ -35,7 +35,7 @@ add_filter( 'wp_data_sync__weight_value', function( $weight, $product_id, $data_
 
 		$weight = floatval( $weight );
 
-		Log::write( 'weight-conversion', $weight, 'Weight Before Conversion' );
+		Log::set( 'weight-conversion', $weight, 'Weight Before Conversion' );
 
 		switch ( $conversion ) {
 
@@ -57,7 +57,7 @@ add_filter( 'wp_data_sync__weight_value', function( $weight, $product_id, $data_
 
 		}
 
-		Log::write( 'weight-conversion', $weight, 'Weight After Conversion' );
+		Log::set( 'weight-conversion', $weight, 'Weight After Conversion' );
 
 	}
 

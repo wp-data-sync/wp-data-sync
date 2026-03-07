@@ -22,46 +22,75 @@ class Log {
 	const FILE_KEY = 'wp_data_sync_log_file';
 	const ALLOWED_KEY = 'wp_data_sync_allow_logging';
 
+    /**
+     * @var array
+     */
+
+    private static array $Logs = [];
+
 	/**
-	 * Write the log to the file.
+	 * Set the log to the file.
 	 *
 	 * @param string              $key
 	 * @param string|array|object $data
 	 * @param string              $action
 	 */
 
-	public static function write( $key, $data, $action = '' ) {
+	public static function set( string $key, $data, string $action = '' ): void {
 
 		if ( self::is_active() ) {
+            self::$Logs[ $key ][] = self::message( $data, $action );
+		}
+
+	}
+
+    /**
+     * Write
+     *
+     * @return void
+     */
+
+    public static function write() {
+
+        if ( self::is_active() ) {
+
             require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
             require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
 
             $wp_filesystem = new WP_Filesystem_Direct( false );
-			$msg           = self::message( $data, $action );
-			$date          = gmdate( 'Y-m-d' );
-			$hash          = self::log_hash();
-			$error_file    = WPDSYNC_LOG_DIR . "{$key}-{$date}-{$hash}.log";
+            $date          = gmdate( 'Y-m-d' );
+            $hash          = self::log_hash();
 
-			// Create the log file dir if we do not already have one.
-			if ( ! $wp_filesystem->exists( WPDSYNC_LOG_DIR ) ) {
-                $wp_filesystem->mkdir( WPDSYNC_LOG_DIR, 0755, true );
-			}
+            foreach ( self::$Logs as $key => $messages ) {
 
-            $current_content = '';
+                if ( empty( $messages ) ) {
+                    continue;
+                }
 
-			if ( ! $wp_filesystem->exists( $error_file ) ) {
-				// Schedule deletion of the log file in 10 days
-				wp_schedule_single_event( time() + ( 10 * DAY_IN_SECONDS ), 'wpds_delete_log_file', [ $error_file ] );
+                // Create the log file dir if we do not already have one.
+                if ( ! $wp_filesystem->exists( WPDSYNC_LOG_DIR ) ) {
+                    $wp_filesystem->mkdir( WPDSYNC_LOG_DIR, 0755, true );
+                }
+
+                $current_content = '';
+                $error_file      = WPDSYNC_LOG_DIR . "{$key}-{$date}-{$hash}.log";
+
+                if ( ! $wp_filesystem->exists( $error_file ) ) {
+                    // Schedule deletion of the log file in 10 days
+                    wp_schedule_single_event( time() + ( 10 * DAY_IN_SECONDS ), 'wpds_delete_log_file', [ $error_file ] );
+                } else {
+                    $current_content .= $wp_filesystem->get_contents( $error_file );
+                }
+
+                $message = implode( PHP_EOL, $messages );
+
+                $wp_filesystem->put_contents( $error_file, $current_content . $message, 0644 );
+
             }
-            else {
-                $current_content .= $wp_filesystem->get_contents( $error_file );
-            }
 
-            $wp_filesystem->put_contents( $error_file, $current_content . $msg, 0644 );
+        }
 
-		}
-
-	}
+    }
 
 	/**
 	 * Log message..

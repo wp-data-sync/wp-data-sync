@@ -131,12 +131,14 @@ class ItemInfoRequest extends Request {
 
 		$response = $this->get_item_info();
 
-		Log::write( 'item-info-request', [
+		Log::set( 'item-info-request', [
 			'api_id'   => $this->api_id,
 			'key'      => $this->key,
 			'value'    => $this->value,
 			'response' => $response
 		], 'Response' );
+
+        Log::write();
 
 		return rest_ensure_response( $response );
 

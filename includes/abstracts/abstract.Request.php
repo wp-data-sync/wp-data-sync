@@ -58,7 +58,7 @@ abstract class Request {
 
         $this->set_request( $request );
 
-        Log::write( 'request', $this->request->get_method(), 'Resquest Method' );
+        Log::set( 'request', $this->request->get_method(), 'Resquest Method' );
 
         if ( $this->allowed() && $this->referer() && $this->content_length() && $this->user_agent() ) {
             return $this->private_key();
@@ -96,11 +96,11 @@ abstract class Request {
             return false;
         }
 
-        Log::write( 'request', "Access Token Provided" );
+        Log::set( 'request', "Access Token Provided" );
 
         if ( $access_token === $local_token ) {
 
-            Log::write( 'request', "Access token Approved" );
+            Log::set( 'request', "Access token Approved" );
 
             return true;
 
@@ -128,11 +128,11 @@ abstract class Request {
             return false;
         }
 
-        Log::write( 'request', "Private Token Provided" );
+        Log::set( 'request', "Private Token Provided" );
 
         if ( $private_key === $local_token ) {
 
-            Log::write( 'request', "Private Token Approved" );
+            Log::set( 'request', "Private Token Approved" );
 
             return true;
 
@@ -156,7 +156,7 @@ abstract class Request {
             return false;
         }
 
-        Log::write( 'request', "Referer: $referer" );
+        Log::set( 'request', "Referer: $referer" );
 
         return true;
 
@@ -191,7 +191,7 @@ abstract class Request {
             self::$response['content-length'] = 'Content length does not match.';
         }
 
-        Log::write( 'request', $content_length, 'Content Length Match' );
+        Log::set( 'request', $content_length, 'Content Length Match' );
 
         return $match;
 
@@ -207,7 +207,7 @@ abstract class Request {
 
         $user_agent = $this->request->get_header( 'user-agent' );
 
-        Log::write( 'request', $user_agent, 'User Agent' );
+        Log::set( 'request', $user_agent, 'User Agent' );
 
         return 'WP Data Sync API' === $user_agent;
 
@@ -225,18 +225,18 @@ abstract class Request {
 
         $json = $this->request->get_body();
 
-        Log::write( $this->log_key, 'Sync Request JSON' );
-        Log::write( $this->log_key, $json );
+        Log::set( $this->log_key, 'Sync Request JSON' );
+        Log::set( $this->log_key, $json );
 
         $raw_data = json_decode( $json, true );
 
-        Log::write( $this->log_key, 'Sync Request Raw Data' );
-        Log::write( $this->log_key, $raw_data );
+        Log::set( $this->log_key, 'Sync Request Raw Data' );
+        Log::set( $this->log_key, $raw_data );
 
         $data = $this->sanitize_request( $raw_data );
 
-        Log::write( $this->log_key, 'Sync Request Sanitized Data' );
-        Log::write( $this->log_key, $data );
+        Log::set( $this->log_key, 'Sync Request Sanitized Data' );
+        Log::set( $this->log_key, $data );
 
         return apply_filters( 'wp_data_sync_data', $data );
 
@@ -330,7 +330,7 @@ abstract class Request {
 
         }
 
-        Log::write( 'sanitize-callback', "$key - $sanitize_callback" );
+        Log::set( 'sanitize-callback', "$key - $sanitize_callback" );
 
         return apply_filters( 'wp_data_sync_sanitize_callback', $sanitize_callback, $key );
 
@@ -406,7 +406,7 @@ abstract class Request {
 
         if ( 'ASCII' !== $encoding ) {
 
-            Log::write( 'encoding', [
+            Log::set( 'encoding', [
                 'encoding'    => $encoding,
                 'clean_value' => $clean_value
             ] );

@@ -705,7 +705,7 @@ class DataSync {
             esc_sql( $value )
         ) );
 
-        Log::write( 'fetch-post-id', [
+        Log::set( 'fetch-post-id', [
             'is_accelerated' => $this->is_accelerated,
             'query'          => $wpdb->last_query,
             'result'         => $post_id,
@@ -832,7 +832,7 @@ class DataSync {
 
         if ( empty( $success ) || is_wp_error( $success ) ) {
 
-            Log::write( 'wpdb-error-insert-post-row', $success );
+            Log::set( 'wpdb-error-insert-post-row', $success );
 
             return false;
 
@@ -966,7 +966,7 @@ class DataSync {
         $result = wp_update_post( $this->post_data );
 
         if ( is_wp_error( $result ) ) {
-            Log::write( 'wp-error-update-post-data', $result );
+            Log::set( 'wp-error-update-post-data', $result );
         }
 
     }
@@ -1085,7 +1085,7 @@ class DataSync {
 
         if ( apply_filters( 'wp_data_sync_is_acf_field_post_meta', false, $meta_key, $this->post_id, $this ) ) {
 
-            Log::write( 'acf-field', [
+            Log::set( 'acf-field', [
                 'post_id' => $this->post_id,
                 'key'     => $meta_key,
                 'value'   => $meta_value,
@@ -1126,7 +1126,7 @@ class DataSync {
 
             if ( empty( $taxonomy ) || ! taxonomy_exists( $taxonomy ) ) {
 
-                Log::write( 'invalid-taxonomy', $taxonomy );
+                Log::set( 'invalid-taxonomy', $taxonomy );
 
                 continue;
 
@@ -1154,7 +1154,7 @@ class DataSync {
 
             }
 
-            Log::write( 'term-id', $term_ids );
+            Log::set( 'term-id', $term_ids );
 
             wp_set_object_terms( $this->post_id, $term_ids, $taxonomy, $append );
 
@@ -1218,7 +1218,7 @@ class DataSync {
 
         $name = trim( wp_unslash( $name ) );
 
-        Log::write( 'term-id', "$name - $taxonomy - $parent_id" );
+        Log::set( 'term-id', "$name - $taxonomy - $parent_id" );
 
         /**
          * Filter: wp_data_sync_term_name
@@ -1284,7 +1284,7 @@ class DataSync {
         $slug    = sanitize_title( $name );
         $term_id = $this->_term_exists( $name, $slug, $taxonomy, $parent_id );
 
-        Log::write( 'term-exists', [
+        Log::set( 'term-exists', [
             'name'     => $name,
             'slug'     => $slug,
             'taxonomy' => $taxonomy,
@@ -1335,7 +1335,7 @@ class DataSync {
             intval( $parent_id )
         ) );
 
-        Log::write( 'term-exists', [
+        Log::set( 'term-exists', [
             'sql'    => $wpdb->last_query,
             'result' => $result
         ] );
@@ -1366,7 +1366,7 @@ class DataSync {
             $term = wp_insert_term( $name, $taxonomy, [ 'parent' => $parent_id ] );
 
             if ( is_wp_error( $term ) ) {
-                Log::write( 'wp-error-term', $term );
+                Log::set( 'wp-error-term', $term );
 
                 return false;
             }
@@ -1374,7 +1374,7 @@ class DataSync {
             $term_id = $term['term_id'];
         }
 
-        Log::write( 'term-id', $term_id );
+        Log::set( 'term-id', $term_id );
 
         return (int) $term_id;
 
@@ -1593,7 +1593,7 @@ class DataSync {
 
         $this->process_acf( $gallery_key, $gallery_ids );
 
-        Log::write( 'gallery-images', [
+        Log::set( 'gallery-images', [
             'gallery_details' => $this->gallery_details,
             'gallery_images'  => $this->gallery_images,
             'gallery_key'     => $gallery_key,
@@ -1612,7 +1612,7 @@ class DataSync {
 
     public function attachment() {
 
-        Log::write( 'attachment', $this->attachment, 'Start Process' );
+        Log::set( 'attachment', $this->attachment, 'Start Process' );
 
         $image_array = $this->image_array();
 
@@ -1640,7 +1640,7 @@ class DataSync {
         $basename    = $this->basename( $image_array );
         $image_title = preg_replace( '/\.[^.]+$/', '', $basename );
 
-        Log::write( 'attachment', [
+        Log::set( 'attachment', [
             'Basename'    => $basename,
             'Image Title' => $image_title,
             'Image URL'   => $image_url
@@ -1654,7 +1654,7 @@ class DataSync {
 
         if ( $attachment['ID'] = $this->attachment_exists( $image_url ) ) {
 
-            Log::write( 'attachment', "{$attachment['ID']} - {$attachment['post_title']}", 'Exists' );
+            Log::set( 'attachment', "{$attachment['ID']} - {$attachment['post_title']}", 'Exists' );
 
             // Update the attachement
             wp_update_post( $attachment );
@@ -1676,7 +1676,7 @@ class DataSync {
                 $upload_dir = wp_upload_dir();
                 $file_path  = $this->file_path( $upload_dir, $basename );
 
-                Log::write( 'attachment', $file_path, 'File Path' );
+                Log::set( 'attachment', $file_path, 'File Path' );
 
                 // Copy the image to image upload dir
                 file_put_contents( $file_path, $image_data );
@@ -1690,14 +1690,14 @@ class DataSync {
                 // Insert image data
                 $attach_id = wp_insert_attachment( $attachment, $file_path, $this->post_id );
 
-                Log::write( 'attachment', $attach_id, 'Attachment ID' );
+                Log::set( 'attachment', $attach_id, 'Attachment ID' );
 
                 if ( is_int( $attach_id ) && 0 < $attach_id ) {
 
                     // Get metadata for featured image
                     $attach_data = wp_generate_attachment_metadata( $attach_id, $file_path );
 
-                    Log::write( 'attachment', $attach_data, 'Attachment Data' );
+                    Log::set( 'attachment', $attach_data, 'Attachment Data' );
 
                     // Update metadata
                     wp_update_attachment_metadata( $attach_id, $attach_data );
@@ -1736,7 +1736,7 @@ class DataSync {
         $info = filter_var( $image_url, FILTER_VALIDATE_URL );
 
         if ( ! $info ) {
-            Log::write( 'attachment', $image_url, 'Invalid URL' );
+            Log::set( 'attachment', $image_url, 'Invalid URL' );
         }
 
         return apply_filters( 'wp_data_sync_is_valid_image_url', $info, $image_url, $this );
@@ -1757,7 +1757,7 @@ class DataSync {
 
         if ( ! empty( $file_type['type'] ) ) {
 
-            Log::write( 'attachment', $file_type['type'], 'File Type' );
+            Log::set( 'attachment', $file_type['type'], 'File Type' );
 
             return $file_type['type'];
 
@@ -1785,7 +1785,7 @@ class DataSync {
 
         }
 
-        Log::write( 'attachment', $file_type, 'File Type' );
+        Log::set( 'attachment', $file_type, 'File Type' );
 
         return $file_type;
 
@@ -1804,13 +1804,13 @@ class DataSync {
         $response      = wp_remote_get( $image_url, [ 'sslverify' => $this->ssl_verify() ] );
         $response_code = wp_remote_retrieve_response_code( $response );
 
-        Log::write( 'attachment', $response_code, 'Response Code' );
+        Log::set( 'attachment', $response_code, 'Response Code' );
 
         if ( 200 === $response_code ) {
             return wp_remote_retrieve_body( $response );
         }
 
-        Log::write( 'attachment', $response, 'Response Failed' );
+        Log::set( 'attachment', $response, 'Response Failed' );
 
         return false;
 
@@ -1993,7 +1993,7 @@ class DataSync {
 
         }
 
-        Log::write( 'post-date', $post_data, 'Update Post Dates' );
+        Log::set( 'post-date', $post_data, 'Update Post Dates' );
 
         wp_update_post( $post_data );
 

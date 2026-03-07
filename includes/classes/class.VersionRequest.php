@@ -114,6 +114,8 @@ class VersionRequest extends Request {
 
 	public function request() {
 
+        Log::write();
+
 		return rest_ensure_response( [
 			'version' => WPDSYNC_VERSION
 		] );

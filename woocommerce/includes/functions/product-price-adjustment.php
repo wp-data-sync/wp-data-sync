@@ -40,12 +40,12 @@ add_filter( 'wp_data_sync__regular_price_value', function( $price, $product_id, 
 		$price      = floatval( $price );
 		$adjustment = floatval( $adjustment );
 
-		Log::write( 'price-adjustment', $price, 'Regular Price - Before' );
+		Log::set( 'price-adjustment', $price, 'Regular Price - Before' );
 
 		$price = $price * ( ( 100 + $adjustment ) / 100 );
 		$price = round( $price, 2 );
 
-		Log::write( 'price-adjustment', $price, 'Regular Price - After' );
+		Log::set( 'price-adjustment', $price, 'Regular Price - After' );
 
 	}
 
@@ -78,12 +78,12 @@ add_filter( 'wp_data_sync__sale_price_value', function( $price, $product_id, $da
 		$price      = floatval( $price );
 		$adjustment = floatval( $adjustment );
 
-		Log::write( 'price-adjustment', $price, 'Sale Price - Before' );
+		Log::set( 'price-adjustment', $price, 'Sale Price - Before' );
 
 		$price = $price * ( ( 100 + $adjustment ) / 100 );
 		$price = round( $price, 2 );
 
-		Log::write( 'price-adjustment', $price, 'Sale Price - After' );
+		Log::set( 'price-adjustment', $price, 'Sale Price - After' );
 
 	}
 

@@ -34,7 +34,7 @@ function plugin_update() {
 
 		if ( version_compare( $current_version, '2.1.5', '<' ) ) {
 			$settings->delete_all_log_files();
-			Log::write( 'deleted-error-logs', 'Old Log Files Deleted' );
+			Log::set( 'deleted-error-logs', 'Old Log Files Deleted' );
 		}
 
 		update_option( 'WPDSYNC_VERSION', WPDSYNC_VERSION );

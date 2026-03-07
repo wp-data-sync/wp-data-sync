@@ -58,7 +58,7 @@ function reset_item_request_status( $item_id ) {
 
 		ItemRequest::delete_id( $item_id );
 
-		Log::write( 'reset-item-request-status', "Iten ID: $item_id" );
+		Log::set( 'reset-item-request-status', "Iten ID: $item_id" );
 
 	}
 

@@ -144,7 +144,7 @@ class WC_Product_DataSync {
             'sale'    => $this->product->get_sale_price()
         ];
 
-        Log::write( 'wc-prices', [
+        Log::set( 'wc-prices', [
             'product_id'    => $this->product->get_id(),
             'is_on_sale'    => $this->product->is_on_sale(),
             'price'         => $this->product->get_price(),
@@ -201,7 +201,7 @@ class WC_Product_DataSync {
 
 		}
 
-		Log::write( 'wc-categories', [
+		Log::set( 'wc-categories', [
 			'product_id' => $this->product->get_id(),
 			'strings'    => $category_strings,
 			'term_ids'   => $term_ids

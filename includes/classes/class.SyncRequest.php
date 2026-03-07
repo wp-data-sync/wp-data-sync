@@ -128,7 +128,8 @@ class SyncRequest extends Request {
 		}
 
 		self::$response['request_time'] = microtime( true ) - $start_request;
-		Log::write( 'sync-request-response', self::$response );
+		Log::set( 'sync-request-response', self::$response );
+        Log::write();
 
 		return rest_ensure_response( self::$response );
 

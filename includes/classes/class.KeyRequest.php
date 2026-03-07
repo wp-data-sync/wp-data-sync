@@ -112,7 +112,8 @@ class KeyRequest extends Request {
 
 		$response = $this->get_keys();
 
-		Log::write( 'data-key-request-response', $response );
+		Log::set( 'data-key-request-response', $response );
+        Log::write();
 
 		return rest_ensure_response( $response );
 

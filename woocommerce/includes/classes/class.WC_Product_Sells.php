@@ -95,7 +95,7 @@ class WC_Product_Sells {
 
         $args['active'] = Settings::is_checked( "wp_data_sync_process__{$this->type}sell_ids" );
 
-        Log::write( "product-{$this->type}-sells", $args, 'Properties' );
+        Log::set( "product-{$this->type}-sells", $args, 'Properties' );
 
         return $args['active'];
 
@@ -132,7 +132,7 @@ class WC_Product_Sells {
 
         $product_ids = $wpdb->get_col( $sql );
 
-        Log::write( "product-{$this->type}-sells", [
+        Log::set( "product-{$this->type}-sells", [
             'sql'         => $sql,
             'product_ids' => $product_ids
         ], 'Product IDs SQL' );

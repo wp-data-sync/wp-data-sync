@@ -114,7 +114,8 @@ class ReportRequest extends Request {
 
 		$response = Settings::instance()->report_values();
 
-		Log::write( 'system-report-request-response', $response );
+		Log::set( 'system-report-request-response', $response );
+        Log::write();
 
 		return rest_ensure_response( $response );
 
