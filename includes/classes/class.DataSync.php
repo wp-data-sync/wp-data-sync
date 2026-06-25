@@ -11,8 +11,6 @@
 
 namespace WP_DataSync\App;
 
-use Ashley\App\Setting;
-use Monolog\Formatter\LogglyFormatter;
 use WP_Error;
 use WP_Post;
 
