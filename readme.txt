@@ -3,7 +3,7 @@ Contributors: kevin-brent
 Tags: erp, middleware, sync, data, api, feed, JSON, woocommerce, product, price, inventory, csv, import, google, sheets, forms
 Stable tag: /tags/3.5.6/
 Requires at least: 5.0
-Tested up to: 7.0
+Tested up to: 7.0.2
 Requires PHP: 7.4
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html

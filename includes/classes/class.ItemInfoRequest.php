@@ -90,8 +90,8 @@ class ItemInfoRequest extends Request {
 	public function register_route() {
 
 		register_rest_route(
-			'wp-data-sync',
-			'/' . WPDSYNC_EP_VERSION . '/get-item-info/(?P<access_token>\S+)/(?P<key>\S+)/(?P<value>\s+)/(?P<api_id>\S+)/',
+            $this->namespace,
+			"/$this->ep_version/get-item-info/(?P<access_token>\S+)/(?P<key>\S+)/(?P<value>\s+)/(?P<api_id>\S+)/",
 			[
 				'methods' => WP_REST_Server::READABLE,
 				'args'    => [

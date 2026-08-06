@@ -37,6 +37,18 @@ abstract class Request {
     public static int $process_id = 0;
 
     /**
+     * @var string
+     */
+
+    protected string $namespace = 'wp-data-sync';
+
+    /**
+     * @var string
+     */
+
+    protected string $ep_version = 'v2';
+
+    /**
      * Set Request
      *
      * @param WP_REST_Request $request
@@ -60,7 +72,7 @@ abstract class Request {
 
         Log::set( 'request', $this->request->get_method(), 'Resquest Method' );
 
-        if ( $this->allowed() && $this->referer() && $this->content_length() && $this->user_agent() ) {
+        if ( $this->allowed() && $this->is_referer() && $this->is_content_length() && $this->is_user_agent() ) {
             return $this->private_key();
         }
 
@@ -74,7 +86,7 @@ abstract class Request {
      * @return bool
      */
 
-    public function allowed() {
+    public function allowed(): bool {
         return Settings::is_checked( $this->permissions_key );
     }
 
@@ -148,7 +160,7 @@ abstract class Request {
      * @return bool
      */
 
-    public function referer() {
+    public function is_referer(): bool {
 
         $referer = sanitize_text_field( $this->request->get_header( 'referer' ) );
 
@@ -163,12 +175,12 @@ abstract class Request {
     }
 
     /**
-     * Content length.
+     * Is Content length.
      *
      * @return bool
      */
 
-    public function content_length() {
+    public function is_content_length(): bool {
 
         if ( 'GET' === $this->request->get_method() ) {
             return true;
@@ -203,9 +215,9 @@ abstract class Request {
      * @return bool
      */
 
-    public function user_agent() {
+    public function is_user_agent(): bool {
 
-        $user_agent = $this->request->get_header( 'user-agent' );
+        $user_agent = $this->request->get_header( 'user-Agent' );
 
         Log::set( 'request', $user_agent, 'User Agent' );
 

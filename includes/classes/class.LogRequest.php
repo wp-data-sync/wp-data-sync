@@ -84,8 +84,8 @@ class LogRequest extends Request {
 	public function register_route() {
 
 		register_rest_route(
-			'wp-data-sync',
-			'/' . WPDSYNC_EP_VERSION . '/log/(?P<callback>\S+)/(?P<access_token>\S+)/(?P<cache_buster>\S+)/',
+            $this->namespace,
+			"/$this->ep_version/log/(?P<callback>\S+)/(?P<access_token>\S+)/(?P<cache_buster>\S+)/",
 			[
 				'methods' => WP_REST_Server::READABLE,
 				'args'    => [

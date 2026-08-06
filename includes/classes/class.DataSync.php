@@ -354,6 +354,8 @@ class DataSync {
             $post_id = $this->fetch_post_id();
         }
 
+        clean_post_cache( $post_id );
+
         $this->post_id = $post_id;
 
     }

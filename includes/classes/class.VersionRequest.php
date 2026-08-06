@@ -11,7 +11,10 @@
 
 namespace WP_DataSync\App;
 
+use WP_Error;
 use WP_REST_Server;
+use WP_HTTP_Response;
+use WP_REST_Response;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -23,33 +26,19 @@ class VersionRequest extends Request {
 	 * @var string
 	 */
 
-	protected $access_token_key = 'wp_data_sync_access_token';
+	protected string $access_token_key = 'wp_data_sync_access_token';
 
 	/**
 	 * @var string
 	 */
 
-	protected $private_token_key = 'wp_data_sync_private_token';
+	protected string $private_token_key = 'wp_data_sync_private_token';
 
 	/**
 	 * @var string
 	 */
 
-	protected $permissions_key = 'wp_data_sync_allowed';
-
-	/**
-	 * @var VersionRequest
-	 */
-
-	public static $instance;
-
-	/**
-	 * VersionRequest constructor.
-	 */
-
-	public function __construct() {
-		self::$instance = $this;
-	}
+	protected string $permissions_key = 'wp_data_sync_allowed';
 
 	/**
 	 * Instance.
@@ -57,36 +46,27 @@ class VersionRequest extends Request {
 	 * @return VersionRequest
 	 */
 
-	public static function instance() {
-
-		if ( self::$instance === null ) {
-			self::$instance = new self();
-		}
-
-		return self::$instance;
-
+	public static function instance(): VersionRequest {
+		return new self();
 	}
 
 	/**
 	 * Register the route.
 	 *
 	 * @since 1.0.0
-	 *        2.0.0 Require version as any 2 character string
+	 *        2.0.0 Require version as any 2-character string
+     *
+     * @return void
 	 */
 
-	public function register_route() {
+	public function register_route(): void {
 
 		register_rest_route(
-			'wp-data-sync',
-			'/(?P<ep_version>\S+)/get-version/(?P<access_token>\S+)/(?P<cache_buster>\S+)/',
+			$this->namespace,
+			"/$this->ep_version/get-version/(?P<access_token>\S+)/(?P<cache_buster>\S+)/",
 			[
 				'methods' => WP_REST_Server::READABLE,
 				'args'    => [
-					'ep_version' => [
-						'validate_callback' => function( $param ) {
-						    return is_string( $param ) && 2 === strlen( $param );
-					    }
-					],
 					'access_token' => [
 						'sanitize_callback' => 'sanitize_text_field',
 						'validate_callback' => [ $this, 'access_token' ]
@@ -107,10 +87,8 @@ class VersionRequest extends Request {
 	/**
 	 * Process the request.
 	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return mixed|\WP_REST_Response
-	 */
+     * @return WP_Error|WP_HTTP_Response|WP_REST_Response
+     */
 
 	public function request() {
 
