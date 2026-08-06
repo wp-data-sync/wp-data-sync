@@ -1,7 +1,7 @@
 === WP Data Sync ===
 Contributors: kevin-brent
 Tags: erp, middleware, sync, data, api, feed, JSON, woocommerce, product, price, inventory, csv, import, google, sheets, forms
-Stable tag: /tags/3.5.6/
+Stable tag: /tags/3.6.0/
 Requires at least: 5.0
 Tested up to: 7.0.2
 Requires PHP: 7.4
