@@ -73,7 +73,7 @@ class WC_Product_DataSync {
 	 * WooCommerce process data.
 	 */
 
-	public function wc_process() {
+	public function wc_process(): void {
 
         if ( $this->data_sync->get_taxonomies() ) {
             $this->product_visibility();
@@ -91,7 +91,6 @@ class WC_Product_DataSync {
 		}
 
         if ( $this->data_sync->get_variations() ) {
-            $this->set_variations_inactive();
             $this->variations();
             SyncRequest::$response['items'][ SyncRequest::$process_id ]['process_product'][] = 'variations';
         }
@@ -316,9 +315,13 @@ class WC_Product_DataSync {
 	 * @return void
 	 */
 
-	public function variations() {
+	public function variations(): void {
 
 		$_variations = $this->data_sync->get_variations();
+		$active_variation_ids   = [];
+		$existing_variation_ids = is_callable( [ $this->product, 'get_children' ] )
+			? $this->product->get_children()
+			: [];
 
 		if ( is_array( $_variations ) ) {
 
@@ -378,10 +381,14 @@ class WC_Product_DataSync {
 				}
 
                 $variation->save();
+				$active_variation_ids[] = $variation->get_id();
 
 			}
 
 		}
+
+		$inactive_variation_ids = array_diff( $existing_variation_ids, $active_variation_ids );
+		$this->set_variations_inactive( $inactive_variation_ids );
 
 	}
 
@@ -455,20 +462,33 @@ class WC_Product_DataSync {
     /**
      * Set variations inactive.
      *
-     * We want to set all variations inactive.
-     * Later when variations are updated,
-     * we will set only current variations active.
+     * Set variations that were omitted from the current payload inactive.
+     *
+     * @param array|null $variation_ids Variation IDs to deactivate. Null deactivates all children.
+     *
+     * @return void
+     *
+     * @author Kevin Brent
      */
 
-    public function set_variations_inactive() {
+    public function set_variations_inactive( ?array $variation_ids = null ): void {
 
-        global $wpdb;
+        if ( null === $variation_ids ) {
+            $variation_ids = is_callable( [ $this->product, 'get_children' ] )
+                ? $this->product->get_children()
+                : [];
+        }
 
-        $wpdb->update(
-            $wpdb->posts,
-            [ 'post_status' => 'private' ],
-            [ 'post_parent' => $this->product->get_id() ]
-        );
+        foreach ( $variation_ids as $variation_id ) {
+            $variation = wc_get_product( $variation_id );
+
+            if ( ! $variation instanceof WC_Product_Variation || 'private' === $variation->get_status( 'edit' ) ) {
+                continue;
+            }
+
+            $variation->set_status( 'private' );
+            $variation->save();
+        }
 
     }
 
@@ -478,9 +498,8 @@ class WC_Product_DataSync {
      * @return void
      */
 
-    public function save() {
+    public function save(): void {
         $this->product->save();
-        wc_delete_product_transients( $this->product->get_id() );
         SyncRequest::$response['items'][ SyncRequest::$process_id ]['product_type'] = $this->product->get_type();
         SyncRequest::$response['items'][ SyncRequest::$process_id ]['process_product'][] = 'saved';
     }

@@ -307,8 +307,6 @@ class DataSync {
 
             do_action( 'wp_data_sync_taxonomies', $this->post_id, $this->taxonomies, $this );
 
-            $this->reset_term_taxonomy_count();
-
         }
 
         if ( $this->featured_image ) {
@@ -345,16 +343,18 @@ class DataSync {
     /**
      * Set post id.
      *
-     * @param bool $post_id
+     * @param bool|int $post_id Post ID, or false to resolve it from the primary ID.
+     *
+     * @return void
+     *
+     * @author Kevin Brent
      */
 
-    public function set_post_id( $post_id = false ) {
+    public function set_post_id( $post_id = false ): void {
 
         if ( ! $post_id ) {
             $post_id = $this->fetch_post_id();
         }
-
-        clean_post_cache( $post_id );
 
         $this->post_id = $post_id;
 
@@ -1505,32 +1505,19 @@ class DataSync {
     }
 
     /**
-     * Reset the term taxonomy count.
+     * Legacy term count reset entry point.
      *
-     * @since 1.4.22
+     * Core taxonomy APIs update affected counts and caches, so a global recount is
+     * intentionally no longer performed.
      *
-     * @link https://stackoverflow.com/questions/18669256/how-to-update-wordpress-taxonomiescategories-tags-count-field-after-bulk-impo
+     * @deprecated 3.5.8 Term counts are maintained by WordPress core.
+     *
+     * @return void
+     *
+     * @author Kevin Brent
      */
-
-    public function reset_term_taxonomy_count() {
-
-        global $wpdb;
-
-        $wpdb->query(
-            "
-			UPDATE $wpdb->term_taxonomy tt SET count = (
-				SELECT COUNT(*) FROM $wpdb->term_relationships tr 
-    			LEFT JOIN $wpdb->posts p ON (p.ID = tr.object_id) 
-    			WHERE 
-        		tr.term_taxonomy_id = tt.term_taxonomy_id 
-        		AND 
-        		tt.taxonomy NOT IN ('link_category')
-        		AND 
-        		p.post_status IN ('publish', 'future')
-			)
-			"
-        );
-
+    public function reset_term_taxonomy_count(): void {
+        _deprecated_function( __METHOD__, '3.5.8', 'wp_set_object_terms()' );
     }
 
     /**
@@ -1974,7 +1961,11 @@ class DataSync {
      * @since 2.0.6
      */
 
-    public function update_date() {
+    public function update_date(): void {
+
+        if ( ! is_array( $this->post_data ) ) {
+            return;
+        }
 
         $post_data = [ 'ID' => $this->post_id ];
 
@@ -1993,9 +1984,17 @@ class DataSync {
 
         }
 
+        if ( 1 === count( $post_data ) ) {
+            return;
+        }
+
         Log::set( 'post-date', $post_data, 'Update Post Dates' );
 
-        wp_update_post( $post_data );
+        $result = wp_update_post( $post_data, true );
+
+        if ( is_wp_error( $result ) ) {
+            Log::set( 'wp-error-update-post-date', $result );
+        }
 
     }
 

@@ -23,31 +23,62 @@ add_action( 'set_object_terms', 'WP_DataSync\App\item_updated', 20, 1 );
 /**
  * Delete item ID from DB.
  *
- * @param $item_id
+ * @param int $item_id Item ID.
+ *
+ * @return void
+ *
+ * @author Kevin Brent
  */
 
-function item_updated( $item_id ) {
+function item_updated( int $item_id ): void {
 	reset_item_request_status( $item_id );
 }
 
 /**
- * Fire when post meta is updated.
+ * Fire when post meta is added or updated.
  *
  * @param int $meta_id
  * @param int $item_id
+ *
+ * @return void
+ *
+ * @author Kevin Brent
  */
 
-add_action( 'updated_postmeta', function( $meta_id, $item_id ) {
+function item_post_meta_changed( int $meta_id, int $item_id ): void {
 	reset_item_request_status( $item_id );
-}, 10, 2 );
+}
+
+add_action( 'added_post_meta', __NAMESPACE__ . '\\item_post_meta_changed', 10, 2 );
+add_action( 'updated_post_meta', __NAMESPACE__ . '\\item_post_meta_changed', 10, 2 );
+
+/**
+ * Fire when post meta is deleted.
+ *
+ * @param array $meta_ids Deleted meta IDs.
+ * @param int   $item_id Post ID.
+ *
+ * @return void
+ *
+ * @author Kevin Brent
+ */
+function item_post_meta_deleted( array $meta_ids, int $item_id ): void {
+	reset_item_request_status( $item_id );
+}
+
+add_action( 'deleted_post_meta', __NAMESPACE__ . '\\item_post_meta_deleted', 10, 2 );
 
 /**
  * Reset item request status.
  *
- * @param $item_id
+ * @param int $item_id Item ID.
+ *
+ * @return void
+ *
+ * @author Kevin Brent
  */
 
-function reset_item_request_status( $item_id ) {
+function reset_item_request_status( int $item_id ): void {
 
 	global $current_item_id;
 
